@@ -1,0 +1,205 @@
+@article{borboudakis2019,
+  title = {Forward-backward selection with early dropping},
+  author = {Borboudakis, Giorgos and Tsamardinos, Ioannis},
+  year = {2019},
+  month = jan,
+  journal = {J. Mach. Learn. Res.},
+  volume = {20},
+  number = {1},
+  pages = {276--314},
+  issn = {1532-4435},
+  abstract = {Forward-backward selection is one of the most basic and commonly-used feature selection algorithms available. It is also general and conceptually applicable to many different types of data. In this paper, we propose a heuristic that significantly improves its running time, while preserving predictive performance. The idea is to temporarily discard the variables that are conditionally independent with the outcome given the selected variable set. Depending on how those variables are reconsidered and reintroduced, this heuristic gives rise to a family of algorithms with increasingly stronger theoretical guarantees. In distributions that can be faithfully represented by Bayesian networks or maximal ancestral graphs, members of this algorithmic family are able to correctly identify the Markov blanket in the sample limit. In experiments we show that the proposed heuristic increases computational efficiency by about 1-2 orders of magnitude, while selecting fewer or the same number of variables and retaining predictive performance. Furthermore, we show that the proposed algorithm and feature selection with LASSO perform similarly when restricted to select the same number of variables, making the proposed algorithm an attractive alternative for problems where no (efficient) algorithm for LASSO exists.}
+}
+
+@article{dong2025a,
+  title = {{{DCILP}}: {{A Distributed Approach}} for {{Large-Scale Causal Structure Learning}}},
+  shorttitle = {{{DCILP}}},
+  author = {Dong, Shuyu and Sebag, Michele and Uemura, Kento and Fujii, Akito and Chang, Shuang and Koyanagi, Yusuke and Maruhashi, Koji},
+  year = {2025},
+  month = apr,
+  journal = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume = {39},
+  number = {15},
+  pages = {16345--16353},
+  issn = {2374-3468},
+  doi = {10.1609/aaai.v39i15.33795},
+  urldate = {2025-08-26},
+  abstract = {Causal learning tackles the computationally demanding task of estimating causal graphs. This paper introduces a new divide-and-conquer approach for causal graph learning, called DCILP. In the divide phase, the Markov blanket MB(Xi) of each variable Xi is identified, and causal learning subproblems associated with each MB(Xi) are independently addressed in parallel. This approach benefits from a more favorable ratio between the number of data samples and the number of variables considered. In counterpart, it can be adversely affected by the presence of hidden confounders, as variables external to MB(Xi) might influence those within it. The reconciliation of the local causal graphs generated during the divide phase is a challenging combinatorial optimization problem, especially in large-scale applications. The main novelty of DCILP is an original formulation of this reconciliation as an integer linear programming (ILP) problem, which can be delegated and efficiently handled by an ILP solver. Through experiments on medium to large scale graphs, and comparisons with state-of-the-art methods, DCILP demonstrates significant improvements in terms of computational complexity, while preserving the learning accuracy on real-world problem and suffering at most a slight loss of accuracy on synthetic problems.},
+  copyright = {Copyright (c) 2025 Association for the Advancement of Artificial Intelligence},
+  langid = {english}
+}
+
+@inproceedings{fu2008a,
+  title = {Fast {{Markov Blanket Discovery Algorithm Via Local Learning}} within {{Single Pass}}},
+  booktitle = {Advances in {{Artificial Intelligence}}},
+  author = {Fu, Shunkai and Desmarais, Michel C.},
+  editor = {Bergler, Sabine},
+  year = {2008},
+  pages = {96--107},
+  publisher = {Springer},
+  address = {Berlin, Heidelberg},
+  doi = {10.1007/978-3-540-68825-9_10},
+  abstract = {Learning of Markov blanket (MB) can be regarded as an optimal solution to the feature selection problem. In this paper, an efficient and effective framework is suggested for learning MB. Firstly, we propose a novel algorithm, called Iterative Parent-Child based search of MB (IPC-MB), to induce MB without having to learn a whole Bayesian network first. It is proved correct, and is demonstrated to be more efficient than the current state of the art, PCMB, by requiring much fewer conditional independence (CI) tests. We show how to construct an AD-tree into the implementation so that computational efficiency is further increased through collecting full statistics within a single data pass. We conclude that IPC-MB plus AD-tree appears a very attractive solution in very large applications.},
+  isbn = {978-3-540-68825-9},
+  langid = {english}
+}
+
+@article{gao2017,
+  title = {Efficient score-based {{Markov Blanket}} discovery},
+  author = {Gao, Tian and Ji, Qiang},
+  year = {2017},
+  month = jan,
+  journal = {International Journal of Approximate Reasoning},
+  volume = {80},
+  pages = {277--293},
+  issn = {0888-613X},
+  doi = {10.1016/j.ijar.2016.09.009},
+  urldate = {2025-08-26},
+  abstract = {In a Bayesian Network (BN), the Markov Blanket (MB) of a target node consists of its parents, children, and spouses, and the target node is independent of all other nodes given its MB. Finding the MB has many applications, including feature selection and BN structure learning. We propose two new Markov Blanket discovery algorithms, score-based Simultaneous Markov Blanket discovery (S2TMB) and its more efficient variant, S2TMB+, to improve the efficiency of existing score-based MB learning algorithms. The proposed methods remove the necessity of enforcing the commonly used symmetry constraint by exploiting the coexistence property between spouses and descendants of the target node. S2TMB and S2TMB+ achieve comparable accuracy and better efficiency than state-of-the-art score-based methods. S2TMB and S2TMB+ are proven sound and complete under one conjecture. Empirical results on standard MB discovery datasets demonstrate the superior performances of S2TMB and S2TMB+.}
+}
+
+@article{hu2024,
+  title = {Causal {{Feature Selection Algorithm Based}} on {{Maximizing Neighbourhood Mutual Information}}},
+  author = {Hu, Lijuan and Zheng, Zhuoyuan},
+  year = {2024},
+  month = dec,
+  journal = {Proceedings of the 2024 8th International Conference on Computer Science and Artificial Intelligence},
+  pages = {482--490},
+  publisher = {ACM},
+  address = {Beijing China},
+  doi = {10.1145/3709026.3709031},
+  urldate = {2025-09-11},
+  abstract = {The method of causal feature selection for constructing predictive models, which utilizes the causal relationships between predictor variables and class variables, has garnered significant attention in recent years. However, almost all existing causal feature selection algorithms use conditional independence (CI) tests to learn the Markov Blanket (MB), leading to algorithmic complexity that grows exponentially with the feature space and encountering errors in CI tests that affect model performance. In this paper, we analyze the unique role of neighborhood mutual information in causal relationships and propose a causal feature selection algorithm based on maximizing neighborhood mutual information (MNMI-CFS). Specifically, the MNMI-CFS method analyzes the relationships between features in three stages, selecting the features with the greatest causal impact on the target variable, thereby improving the performance of the predictive model. We validate the effectiveness of this method by comparing it with six advanced causal feature selection algorithms and demonstrate its performance advantages on five benchmark Bayesian networks and five real datasets.},
+  isbn = {9798400718182},
+  langid = {english}
+}
+
+@article{li2021,
+  title = {Markov {{Blanket Discovery}} using {{Minimum Message Length}}},
+  author = {Li, Yang and Korb, K. and Allison, L.},
+  year = {2021},
+  month = jul,
+  journal = {ArXiv},
+  urldate = {2025-08-26},
+  abstract = {Causal discovery automates the learning of causal Bayesian networks from data and has been of active interest from their beginning. With the sourcing of large data sets off the internet, interest in scaling up to very large data sets has grown. One approach to this is to parallelize search using Markov Blanket (MB) discovery as a first step, followed by a process of combining MBs in a global causal model. We develop and explore three new methods of MB discovery using Minimum Message Length (MML) and compare them empirically to the best existing methods, whether developed specifically as MB discovery or as feature selection. Our best MML method is consistently competitive and has some advantageous features.}
+}
+
+@article{ling2021,
+  title = {Using {{Feature Selection}} for {{Local Causal Structure Learning}}},
+  author = {Ling, Zhaolong and Yu, Kui and Wang, Hao and Li, Lei and Wu, Xindong},
+  year = {2021},
+  month = aug,
+  journal = {IEEE Transactions on Emerging Topics in Computational Intelligence},
+  volume = {5},
+  number = {4},
+  pages = {530--540},
+  issn = {2471-285X},
+  doi = {10.1109/TETCI.2020.2978238},
+  urldate = {2025-09-11},
+  abstract = {Local causal structure learning aims to discover and distinguish the direct causes and direct effects of a target variable. However, the state-of-the-art local causal structure learning algorithms need to perform an exhaustive subset search within the currently selected variables for PC (i.e., parents and children) discovery. In this article, we propose an efficient local causal structure learning algorithm around a target variable, called LCS-FS (Local Causal Structure learning by Feature Selection). First, to construct the local causal skeleton of the target, we employ feature selection for finding PC without searching for conditioning sets to speed up PC discovery, leading to improve the skeleton construction efficiency. Second, to orient edges in this local causal skeleton, we propose an efficient method to find separating sets from the subsets of PC for identifying V-structures. With the integration of feature selection and the new way of finding separating sets, LCS-FS recursively finds the spouses of Markov blankets in local causal skeleton for edge orientations, until the direct causes and direct effects of the target are distinguished. The experiments on five benchmark Bayesian networks with the number of variables from 35 to 801 validate that our algorithm achieves higher efficiency and better accuracy than the state-of-the-art local causal structure learning algorithms.}
+}
+
+@inproceedings{margaritis1999,
+  title = {Bayesian {{Network Induction}} via {{Local Neighborhoods}}},
+  booktitle = {Advances in {{Neural Information Processing Systems}}},
+  author = {Margaritis, Dimitris and Thrun, Sebastian},
+  year = {1999},
+  volume = {12},
+  publisher = {MIT Press},
+  urldate = {2025-08-26},
+  abstract = {In  recent  years,  Bayesian  networks  have  become  highly  successful  tool  for  di(cid:173) agnosis,  analysis,  and  decision  making  in  real-world domains.  We  present  an  efficient algorithm for  learning Bayes  networks from  data.  Our approach  con(cid:173) structs Bayesian networks by first identifying each node's Markov blankets, then  connecting nodes  in  a maximally consistent way.  In  contrast to the majority of  work, which typically uses hill-climbing approaches that may produce dense and  causally incorrect nets, our approach yields much more compact causal networks  by heeding independencies in the data.  Compact causal networks facilitate fast in(cid:173) ference and are also easier to understand. We prove that under mild assumptions,  our approach requires time polynomial in the size of the data and the number of  nodes.  A randomized variant,  also presented here,  yields comparable results at  much higher speeds.}
+}
+
+@inproceedings{niinimaki2012,
+  title = {Local {{Structure Discovery}} in {{Bayesian Networks}}},
+  booktitle = {Conference on {{Uncertainty}} in {{Artificial Intelligence}}},
+  author = {Niinimaki, Teppo and Parviainen, P.},
+  year = {2012},
+  month = aug,
+  urldate = {2025-08-26},
+  abstract = {Learning a Bayesian network structure from data is an NP-hard problem and thus exact algorithms are feasible only for small data sets. Therefore, network structures for larger networks are usually learned with various heuristics. Another approach to scaling up the structure learning is local learning. In local learning, the modeler has one or more target variables that are of special interest; he wants to learn the structure near the target variables and is not interested in the rest of the variables. In this paper, we present a score-based local learning algorithm called SLL. We conjecture that our algorithm is theoretically sound in the sense that it is optimal in the limit of large sample size. Empirical results suggest that SLL is competitive when compared to the constraint-based HITON algorithm. We also study the prospects of constructing the network structure for the whole node set based on local results by presenting two algorithms and comparing them to several heuristics.}
+}
+
+@article{schluter2014,
+  title = {A survey on independence-based {{Markov}} networks learning},
+  author = {Schl{\"u}ter, Federico},
+  year = {2014},
+  month = dec,
+  journal = {Artificial Intelligence Review},
+  volume = {42},
+  number = {4},
+  pages = {1069--1093},
+  issn = {1573-7462},
+  doi = {10.1007/s10462-012-9346-y},
+  urldate = {2025-08-27},
+  abstract = {The problem of learning the Markov network structure from data has become increasingly important in machine learning, and in many other application fields. Markov networks are probabilistic graphical models, a widely used formalism for handling probability distributions in intelligent systems. This document focuses on a technology called independence-based learning, which allows for the learning of the independence structure of Markov networks from data in an efficient and sound manner, whenever the dataset is sufficiently large, and data is a representative sample of the target distribution. In the analysis of such technology, this work surveys the current state-of-the-art algorithms, discussing its limitations, and posing a series of open problems where future work may produce some advances in the area, in terms of quality and efficiency.},
+  langid = {english}
+}
+
+@inproceedings{tsamardinos2003,
+  title = {Algorithms for {{Large Scale Markov Blanket Discovery}}},
+  booktitle = {The {{Florida AI Research Society}}},
+  author = {Tsamardinos, I. and Aliferis, C. and Statnikov, A.},
+  year = {2003},
+  urldate = {2025-08-26},
+  abstract = {This paper presents a number of new algorithms for discovering the Markov Blanket of a target variable T from training data. The Markov Blanket can be used for variable selection for classification, for causal discovery, and for Bayesian Network learning. We introduce a low-order polynomial algorithm and several variants that soundly induce the Markov Blanket under certain broad conditions in datasets with thousands of variables and compare them to other state-of-the-art local and global methods with excellent results.}
+}
+
+@article{wang2020,
+  title = {Towards efficient and effective discovery of {{Markov}} blankets for feature selection},
+  author = {Wang, Hao and Ling, Zhaolong and Yu, Kui and Wu, Xindong},
+  year = {2020},
+  month = jan,
+  journal = {Information Sciences},
+  volume = {509},
+  pages = {227--242},
+  issn = {0020-0255},
+  doi = {10.1016/j.ins.2019.09.010},
+  urldate = {2025-09-07},
+  abstract = {The Markov blanket (MB), a key concept in a Bayesian network (BN), is essential for large-scale BN structure learning and optimal feature selection. Many MB discovery algorithms that are either efficient or effective have been proposed for addressing high-dimensional data. In this paper, we propose a new algorithm for Efficient and Effective MB discovery, called EEMB. Specifically, given a target feature, the EEMB algorithm discovers the PC (i.e., parents and children) and spouses of the target simultaneously and can distinguish PC from spouses during MB discovery. We compare EEMB with the state-of-the-art MB discovery algorithms using a series of benchmark BNs and real-world datasets. The experiments demonstrate that EEMB is competitive with the fastest MB discovery algorithm in terms of computational efficiency and achieves almost the same MB discovery accuracy as the most accurate of the compared algorithms.}
+}
+
+@article{yu2020a,
+  title = {Causality-based {{Feature Selection}}: {{Methods}} and {{Evaluations}}},
+  shorttitle = {Causality-based {{Feature Selection}}},
+  author = {Yu, Kui and Guo, Xianjie and Liu, Lin and Li, Jiuyong and Wang, Hao and Ling, Zhaolong and Wu, Xindong},
+  year = {2020},
+  month = sep,
+  journal = {ACM Comput. Surv.},
+  volume = {53},
+  number = {5},
+  pages = {111:1--111:36},
+  issn = {0360-0300},
+  doi = {10.1145/3409382},
+  urldate = {2025-09-11},
+  abstract = {Feature selection is a crucial preprocessing step in data analytics and machine learning. Classical feature selection algorithms select features based on the correlations between predictive features and the class variable and do not attempt to capture causal relationships between them. It has been shown that the knowledge about the causal relationships between features and the class variable has potential benefits for building interpretable and robust prediction models, since causal relationships imply the underlying mechanism of a system. Consequently, causality-based feature selection has gradually attracted greater attentions and many algorithms have been proposed. In this article, we present a comprehensive review of recent advances in causality-based feature selection. To facilitate the development of new algorithms in the research area and make it easy for the comparisons between new methods and existing ones, we develop the first open-source package, called CausalFS, which consists of most of the representative causality-based feature selection algorithms (available at https://github.com/kuiy/CausalFS). Using CausalFS, we conduct extensive experiments to compare the representative algorithms with both synthetic and real-world datasets. Finally, we discuss some challenging problems to be tackled in future research.}
+}
+
+@article{yu2024,
+  title = {Feature {{Selection}} for {{Efficient Local-to-global Bayesian Network Structure Learning}}},
+  author = {Yu, Kui and Ling, Zhaolong and Liu, Lin and Li, Peipei and Wang, Hao and Li, Jiuyong},
+  year = {2024},
+  month = feb,
+  journal = {ACM Transactions on Knowledge Discovery from Data},
+  volume = {18},
+  number = {2},
+  pages = {1--27},
+  issn = {1556-4681, 1556-472X},
+  doi = {10.1145/3624479},
+  urldate = {2025-09-11},
+  abstract = {Local-to-global learning approach plays an essential role in Bayesian network (BN) structure learning. Existing local-to-global learning algorithms first construct the skeleton of a DAG (directed acyclic graph) by learning the MB (Markov blanket) or PC (parents and children) of each variable in a dataset, then orient edges in the skeleton. However, existing MB or PC learning methods are often computationally expensive especially with a large-sized BN, resulting in inefficient local-to-global learning algorithms. To tackle the problem, in this article, we link feature selection with local BN structure learning and develop an efficient local-to-global learning approach using filtering feature selection. Specifically, we first analyze the rationale of the well-known Minimum-Redundancy and Maximum-Relevance (MRMR) feature selection approach for learning a PC set of a variable. Based on the analysis, we propose an efficient F2SL (feature selection-based structure learning) approach to local-to-global BN structure learning. The F2SL approach first employs the MRMR approach to learn the skeleton of a DAG, then orients edges in the skeleton. Employing independence tests or score functions for orienting edges, we instantiate the F2SL approach into two new algorithms, F2SL-c (using independence tests) and F2SL-s (using score functions). Compared to the state-of-the-art local-to-global BN learning algorithms, the experiments validated that the proposed algorithms in this article are more efficient and provide competitive structure learning quality than the compared algorithms.},
+  langid = {english}
+}
+
+@inproceedings{zhu2014a,
+  title = {A {{Fast Markov}} blanket discovery algorithm},
+  booktitle = {2014 {{IEEE}} 5th {{International Conference}} on {{Software Engineering}} and {{Service Science}}},
+  author = {Zhu, Xiaofeng and Yang, Youlong},
+  year = {2014},
+  month = jun,
+  pages = {318--322},
+  issn = {2327-0594},
+  doi = {10.1109/ICSESS.2014.6933572},
+  urldate = {2025-08-26},
+  abstract = {Learning Markov blanket MB plays an important role in feature selection for classification, causal discovery, and Bayesian Networks learning. In this paper, an efficient and effective algorithm, called Fast Iterative Parent-Child based search of MB (FIPC-MB) is proposed to learn the MB of the target variable T. Foremost, we combined the IPC-MB algorithm with mutual information knowledge to initialize candidate parents and children (Cand\_PC) of the the target node. Furthermore, we changed the sequence of variables belonging to Cand\_PC(T). Finally, we employed the property of mutual information between two variables to select condition set instead of randomly choosing it from Cand\_PC(T) for every conditionnal independence test(CI test). These operations drastically improve the efficiency of searching for condition set and decrease the number of CI tests. In addition, simulation experiments demonstrate that the FIPC-MB algorithm outperforms the state-of-the-art algorithm, IPC-MB, in terms of running efficiency and accuracy of performance.}
+}
