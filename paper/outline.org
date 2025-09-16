@@ -1,0 +1,4 @@
+* Related Work
+- Recent Review: [cite:@yu2020a]
+- Best method for xor so far: [cite:@gao2017]
+- G2 test: [cite:@tsamardinos2006]
