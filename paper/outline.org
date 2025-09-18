@@ -1,4 +1,53 @@
+* Abstract
+- what markov disccovery is
+- why markov blanket discovery is useful
+- however hard problem, large search space
+- previous approaches avoid this large search space
+- but with the trade off of not being able to capture
+- certain higher order relationship between variables.
+- most notably, as far as we are aware, existing methods
+- are not capable of consistently discovering a simple xor relationship
+  between just 3 variables
+- Therefore in this paper, we revisit the possibility of exact markov
+  blanket discovery 
+- By modifying the existing IAMB method for markov blanket
+  discovery resulting in our approach called LIAM-MB.
+- Specifically we will additional step after the forward selection phase
+  of IAMB
+- where we will use techniques common in frequent itemset mining to
+  search the subset lattice of all possible expansions of the current
+  candidate markov blanket from phase 1.
+- Experiments on synthetic Bayesian networks containing simple xor and
+  parity relationships shows that LIAM-MB is able to capture those
+  relationships while other approaches are unable to.
+- Of course, the exact nature of LIAM-MB comes at a cost; further
+  experiments on common benchmark datasets will show how LIAM-MB
+  compares to existing Markov blanket discovery approaches
+  
+- Further experiments on common benchmark datasets will show the cost of
+  the exact nature of LIAM-MB, paticularly when compared to IAMB
+* Intro
+- What is it
+  + find markov blanket
+  + origins
+- Motivation: usecase
+- Why is it hard
+- Generally how methods avoid hardness
+- trade off: some high order relationships no captured
+- xor mini-experiment
 * Related Work
 - Recent Review: [cite:@yu2020a]
 - Best method for xor so far: [cite:@gao2017]
 - G2 test: [cite:@tsamardinos2006]
+** MB discovery
+- the first method specifically for
+** IAMB
+** Frequent Itemset Mining
+* Notations and definitions
+* Method: LIAM-MB
+** Bound on G-Statistic
+- 
+*
+* Future work
+- other methods for lattice mining step
+- better bounds on G-stat or use of another test with better bounds
