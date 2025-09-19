@@ -23,7 +23,6 @@
 - Of course, the exact nature of LIAM-MB comes at a cost; further
   experiments on common benchmark datasets will show how LIAM-MB
   compares to existing Markov blanket discovery approaches
-  
 - Further experiments on common benchmark datasets will show the cost of
   the exact nature of LIAM-MB, paticularly when compared to IAMB
 * Intro
@@ -51,3 +50,4 @@
 * Future work
 - other methods for lattice mining step
 - better bounds on G-stat or use of another test with better bounds
+- add-on for other methods

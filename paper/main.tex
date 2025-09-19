@@ -5,7 +5,7 @@
 % Optional math commands from https://github.com/goodfeli/dlbook_notation.
 \input{math_commands.tex}
 
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 \usepackage{url}
 
 
@@ -51,24 +51,25 @@ Sankt Augustin, Germany\\
 
 \maketitle
 
+%%% Abstract
 \begin{abstract}
   The problem of learning the Markov blanket (MB) of a variable from
   data has applications in many areas such as learning Bayesian
   networks, causal discovery, and feature selection. However, for a
-  dataset with $n$ variables, enumerating every possible MB for a target
-  variable $t$ has a complexity that's exponential to $n - 1$. Previous
-  approaches have employed advanced techniques to avoid fully exploring
-  this exponential search space. However, these methods are not
-  exhaustive, and therefore incapable of consistently capturing certain
-  higher order relationships between variables; most notably, a simple
-  xor relationship between $t$ and $2$ other binary
+  dataset with $n+1$ variables, enumerating every possible MB for a
+  target variable $t$ has a complexity that's exponential to
+  $n$. Previous approaches have employed advanced techniques to avoid
+  fully exploring this exponential search space. However, these methods
+  are not exhaustive, and therefore incapable of consistently capturing
+  certain higher order relationships between variables; most notably,
+  xor relationships between $t$ and $2$ other binary
   variables. Therefore, we will revisit the problem of exhaustive MB
   discovery by using techniques from the field of frequent itemset
   mining to help prune the exponential search space. Specifically, we
   propose a method called Lattice Incremental Association Mining for
   Markov Blanket discovery (LIAM-MB) which just adds an additional phase
   between the two phases of Incremental Association Markov Blanket
-  (IAMB), one of the first approches to MB discovery. Experiments on
+  (IAMB)---one of the first approches to MB discovery. Experiments on
   synthetic Bayesian networks containing xor and parity relationships
   shows that LIAM-MB is able to capture those relationships while other
   approaches are unable to. Further experiments on common benchmark
@@ -77,8 +78,41 @@ Sankt Augustin, Germany\\
   against its parent method IAMB.
 \end{abstract}
 
+%%% Intro
 \section{Introduction}
+%%%% What is MB Discovery
+The Markov blanket (MB) discovery problem is...
+dataset $\db$, target variable $t$
 
+originally discussed in the context of learning Bayesian
+networks~\citep{margaritis1999,tsamardinos2003}
+
+However has been later discussed and used in feature selection and
+causal discovery.
+%%%% Why is MB Discovery hard
+A naive approach to MB discovery would just involve enumerating over all
+the possible MBs of the target variable $t$. However the number of
+possible MBs is exponential with respect to $n$,
+\begin{equation}
+  \label{eq:1}
+  \sum_{i=1}^{n}\binom{n}{i}=2^{n},
+\end{equation}
+where $n$ is the number of variables in $\db$ other than $t$. Therefore
+this 
+
+An exhaustive enumeration of all possible 
+
+%%% Related Work
+\section{Related Work}
+
+
+
+
+%%% Method
+\section{Method}
+
+
+%%% Post matter
 \subsubsection*{Author Contributions}
 If you'd like to, you may include  a section for author contributions as is done
 in many journals. This is optional and at the discretion of the authors.
@@ -88,7 +122,8 @@ Use unnumbered third level headings for the acknowledgments. All
 acknowledgments, including those to funding agencies, go at the end of the paper.
 
 
-\bibliography{iclr2026_conference}
+
+\bibliography{ref}
 \bibliographystyle{iclr2026_conference}
 
 \appendix
