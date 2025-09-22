@@ -38,20 +38,15 @@
 - Recent Review: [cite:@yu2020a]
 - Best method for xor so far: [cite:@gao2017]
 - G2 test: [cite:@tsamardinos2006]
-** MB discovery
+* Notations and definitions and Background
+** G Test
+** MB discovery and IAMB
 - the first method specifically for
-** IAMB
-** Frequent Itemset Mining
-* Notations and definitions
-- 
-- G test
-- 
-* Method: LIAM-MB
-- set enumeration tree
 ** Set enumeration tree
 - A = vars in descendents
 - if traversed via a depth-first search
 - gurantees on the subsets relationship with one another
+* Method: LIAM-MB
 ** Bound on G-Statistic
 -
 ** Pruning

@@ -167,7 +167,7 @@ An exhaustive enumeration of all possible
 \subsection{Interative Association Markov Blanket (IAMB)}
 \begin{minipage}[t]{0.48\linewidth}
 \begin{algorithm}[H]
-\caption{Forward Selection}
+\caption{Forward Selection (\texttt{forward})}
 \DontPrintSemicolon
 \KwIn{$\db$, $\rmX$, $t$, $\alpha$}
 \KwOut{Candidate Markov Blanket $\mb$}
@@ -188,9 +188,9 @@ $\mb \gets \{\}$\;
 \hfill
 \begin{minipage}[t]{0.48\linewidth}
 \begin{algorithm}[H]
-\caption{Prune Candidate MB}
+\caption{Prune Candidate MB (\texttt{prune})}
 \DontPrintSemicolon
-\KwIn{$\mb$}
+\KwIn{$\db$, $\mb$, $t$, $\alpha$}
 \KwOut{Output result}
 \For{each $\rvx\in\mb$}{
   $\mb' \gets \mb \setminus \{\rvx\}$\;
@@ -239,7 +239,63 @@ $\mb \gets \{\}$\;
 
 
 %%% Method
-\section{Method}
+\section{Lattice Incremental Association Mining for Markov Blankets
+  (LIAM-MB)}
+
+\begin{minipage}[t]{0.48\linewidth}
+\begin{algorithm}[H]
+\caption{Lattice Mining (\texttt{lattice})}
+\DontPrintSemicolon
+\KwIn{$\db$, $\rmX$, $t$, $\mb$, $\alpha$}
+\KwOut{Output result}
+$\rmS \gets [\emptyset]$\;
+$\rmA \gets [\rmX]$\;
+$\df_{\max} \gets \infty$\; 
+\For{each $\rvx\in\mb$}{
+  $S \gets \pop(\rmS)$\;
+  $A \gets \pop(\rmA)$\;
+  $\df_{\cur} \gets \df(\rvs)$\;
+  \If{$|S| > 0$}{
+    \If{$S \not\indep t \mid \mb$}{
+      \Return{$S$}\;
+    }
+    \If{$1 - \cdf(G_{S\cup A}; \df(S)) > \alpha$}{
+      $\df_{\max} \gets \df_{\cur}$\;
+      continue\;
+    }
+  }
+  $A' \gets \{a \mid a\in A, \df(S \cup \{s\}) < \df_{\max}\}$\;
+  \For{$i \in [1, |A'|]$}{
+    $a \gets A'_{i}$\;
+    push $S \cup \{a\}$ on to $\rmS$\;
+    push $A'[1,\ldots,i-1]$ on to $\rmA$\;
+  }
+  \Return{$\emptyset$};
+}
+\end{algorithm}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{algorithm}[H]
+\caption{LIAM-MB}
+\DontPrintSemicolon
+\KwIn{$\db$, $\rmX$, $t$, $\alpha$}
+\KwOut{Output result}
+$\mb \gets \texttt{forward}(\db, \rmX, t, \alpha)$\;
+\While{$|\rmX| > 0$}{
+  $S \gets \texttt{lattice}(\db, \rmX, t, \mb, \alpha)$\;
+  \If{$S==\emptyset$}{
+    break\;
+  }
+  \For{$a \in S$}{
+    Remove $a$ from $\rmX$\;
+    Insert $a$ into $\mb$\;
+  }
+}
+$\mb \gets \texttt{prune}(\db, \mb, t, \alpha)$\;
+\Return{$\mb$}\;
+\end{algorithm}
+\end{minipage}
 
 
 \begin{proposition}[CDF of $\chi^{2}$ is monotonic with degrees of freedom]
