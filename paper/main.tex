@@ -14,18 +14,21 @@
 \usetikzlibrary{trees} % needed for tidy tree layouts
 
 % Preamble (add to your document preamble)
+\usepackage{cleveref} % optional but recommended for nicer
+% cross-references
 \usepackage{amsmath,amssymb}
 \usepackage{amsthm}
-\usepackage{cleveref} % optional but recommended for nicer cross-references
 % \usepackage{algorithm}
 % \usepackage{algpseudocode}
 \usepackage[ruled,vlined]{algorithm2e}
-\SetKwComment{Comment}{/* }{ */}
+\SetKwComment{Comment}{// }{}
 \usepackage{float} %figure inside minipage
 
 % Theorem style and numbering
 \theoremstyle{plain}                % default (italic body)
 \newtheorem{theorem}{Theorem} % numbered per section
+\crefname{theorem}{thm.}{thms.}
+\Crefname{theorem}{Theorem}{Theorems}
 \newtheorem{lemma}{Lemma}      % share theorem counter
 \newtheorem{proposition}[lemma]{Proposition}
 \newtheorem{corollary}[lemma]{Corollary}
@@ -242,10 +245,10 @@ $\mb \gets \{\}$\;
 \section{Lattice Incremental Association Mining for Markov Blankets
   (LIAM-MB)}
 
-\begin{minipage}[t]{0.48\linewidth}
+\begin{minipage}[t]{0.5\linewidth}
 \begin{algorithm}[H]
 \caption{Lattice Mining (\texttt{lattice})}
-\DontPrintSemicolon
+% \DontPrintSemicolon
 \KwIn{$\db$, $\rmX$, $t$, $\mb$, $\alpha$}
 \KwOut{Output result}
 $\rmS \gets [\emptyset]$\;
@@ -261,10 +264,12 @@ $\df_{\max} \gets \infty$\;
     }
     \If{$1 - \cdf(G_{S\cup A}; \df(S)) > \alpha$}{
       $\df_{\max} \gets \df_{\cur}$\;
-      continue\;
+      \Comment{\Cref{thm:prune-stat} Pruning}
+      continue\; 
     }
   }
-  $A' \gets \{a \mid a\in A, \df(S \cup \{s\}) < \df_{\max}\}$\;
+  \Comment{\Cref{thm:prune-df} Pruning}
+  $A' \gets \{a \mid a\in A, \df(S \cup \{a\}) < \df_{\max}\}$\;
   \For{$i \in [1, |A'|]$}{
     $a \gets A'_{i}$\;
     push $S \cup \{a\}$ on to $\rmS$\;
@@ -275,7 +280,7 @@ $\df_{\max} \gets \infty$\;
 \end{algorithm}
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.48\linewidth}
+\begin{minipage}[t]{0.45\linewidth}
 \begin{algorithm}[H]
 \caption{LIAM-MB}
 \DontPrintSemicolon
