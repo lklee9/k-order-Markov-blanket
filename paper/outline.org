@@ -43,9 +43,24 @@
 ** IAMB
 ** Frequent Itemset Mining
 * Notations and definitions
-* Method: LIAM-MB
-** Bound on G-Statistic
 - 
+- G test
+- 
+* Method: LIAM-MB
+- set enumeration tree
+** Set enumeration tree
+- A = vars in descendents
+- if traversed via a depth-first search
+- gurantees on the subsets relationship with one another
+** Bound on G-Statistic
+-
+** Pruning
+*** Why limit df when upper bound test fails
+- higher df => harder test to pass
+- => any subset will fail any test at or above this df
+- => we should only visit nodes with df less
+- => only visit easier tests
+*** early return from failed upper bound g-test
 *
 * Future work
 - other methods for lattice mining step

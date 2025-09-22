@@ -6,9 +6,36 @@
 \input{math_commands.tex}
 
 \usepackage[hidelinks]{hyperref}
+\usepackage{subcaption}
 \usepackage{url}
 
+\usepackage{tikz}
+\usetikzlibrary{positioning,graphs}
+\usetikzlibrary{trees} % needed for tidy tree layouts
 
+% Preamble (add to your document preamble)
+\usepackage{amsmath,amssymb}
+\usepackage{amsthm}
+\usepackage{cleveref} % optional but recommended for nicer cross-references
+% \usepackage{algorithm}
+% \usepackage{algpseudocode}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{float} %figure inside minipage
+
+% Theorem style and numbering
+\theoremstyle{plain}                % default (italic body)
+\newtheorem{theorem}{Theorem} % numbered per section
+\newtheorem{lemma}{Lemma}      % share theorem counter
+\newtheorem{proposition}[lemma]{Proposition}
+\newtheorem{corollary}[lemma]{Corollary}
+
+% \theoremstyle{definition}           % upright body
+\newtheorem{definition}{Definition}
+\newtheorem{conjecture}{Conjecture}
+
+
+% \title{Exhaustive Markov Blanket Discovery\\
+%   on the Subset Lattice}
 \title{Exhaustive Markov Blanket Discovery}
 
 % Authors must not appear in the submitted version. They should be hidden
@@ -64,23 +91,25 @@ Sankt Augustin, Germany\\
   certain higher order relationships between variables; most notably,
   xor relationships between $t$ and $2$ other binary
   variables. Therefore, we will revisit the problem of exhaustive MB
-  discovery by using techniques from the field of frequent itemset
-  mining to help prune the exponential search space. Specifically, we
-  propose a method called Lattice Incremental Association Mining for
-  Markov Blanket discovery (LIAM-MB) which just adds an additional phase
-  between the two phases of Incremental Association Markov Blanket
-  (IAMB)---one of the first approches to MB discovery. Experiments on
-  synthetic Bayesian networks containing xor and parity relationships
-  shows that LIAM-MB is able to capture those relationships while other
-  approaches are unable to. Further experiments on common benchmark
-  datasets will show the cost LIAM-MB incurs for being an exhaustive
-  search compared to existing MB discovery approaches, in particular
-  against its parent method IAMB.
+  discovery by using bounds on the G-statistic to help prune the
+  exponential search space. Specifically, we propose a method called
+  Lattice Incremental Association Mining for Markov Blanket discovery
+  (LIAM-MB) which just adds an additional phase between the two phases
+  of Incremental Association Markov Blanket (IAMB)---one of the first
+  approches to MB discovery. Experiments on synthetic Bayesian networks
+  containing xor and parity relationships shows that LIAM-MB is able to
+  capture those relationships while other approaches are unable
+  to. Further experiments on common benchmark datasets will show the
+  cost LIAM-MB incurs for being an exhaustive search compared to
+  existing MB discovery approaches, in particular against its parent
+  method IAMB.
 \end{abstract}
 
 %%% Intro
 \section{Introduction}
 %%%% What is MB Discovery
+Exhaustive vs. Exact
+
 The Markov blanket (MB) discovery problem is...
 dataset $\db$, target variable $t$
 
@@ -103,19 +132,204 @@ this
 An exhaustive enumeration of all possible 
 
 %%% Related Work
-\section{Related Work}
+\section{Background}
 
-
-
+\subsection{Interative Association Markov Blanket (IAMB)}
+\begin{minipage}[t]{0.45\linewidth}
+\begin{algorithm}[H]
+\DontPrintSemicolon
+\KwIn{Input data}
+\KwOut{Output result}
+Initialize parameters\;
+\For{each iteration}{
+    Update weights\;
+}
+\caption{Example Algorithm}
+\end{algorithm}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\linewidth}
+\begin{algorithm}[H]
+\DontPrintSemicolon
+\KwIn{Input data}
+\KwOut{Output result}
+Initialize parameters\;
+\For{each iteration}{
+    Update weights\;
+}
+\caption{Example Algorithm}
+\end{algorithm}
+\end{minipage}
 
 %%% Method
 \section{Method}
+\begin{figure}[t]
+  \centering
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \input{./fig/lattice.tex}
+    \caption{Subset lattice}
+    \label{fig:lattice}
+  \end{subfigure}\hfill
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \input{./fig/enum-tree.tex}
+    \caption{Enumeration tree}
+    \label{fig:tree}
+  \end{subfigure}
+  \caption{Comparison between lattice and tree}
+  \label{fig:comparison}
+\end{figure}
+
+\begin{definition}[Enumeration Tree]
+  An enumeration tree $\tree$ has nodes for each subset in the powerset
+  $V(\tree)=\mathcal{P}(\rmX)$. Let $A(S)$ for some $S\in V(\tree)$ be
+  the variables in its descendants not in $S$.
+
+  When traversing the enumeration tree in a depth-wise manner, let
+  $S_{i}$ be the $i$-th node visited during traversal. Then by
+  definition:
+  \begin{equation}
+    \label{eq:4}
+    S_{i}\cup A(S_{i}) \supseteq S_{j}\cup A(S_{j})
+  \end{equation}
+  where $j > i$.
+\end{definition}
+
+\begin{definition}[G-Statistic]
+  \begin{equation}
+    \label{eq:g-stat}
+    G = 2 \sum_{i} O_{i}\cdot \ln\Biggl(\frac{O_{i}}{E_{i}}\Biggr)
+  \end{equation}
+\end{definition}
+
+\begin{lemma}[G-Statistic and Kullback-Leibler divergence]
+  G-Statistic is propotional to the Kullback-Leibler divergence
+  \begin{equation}
+    \label{eq:g-stat-kl}
+    G
+    = 2 \sum_{i} O_{i}\cdot \ln\Biggl(\frac{O_{i}}{E_{i}}\Biggr)    
+    =2nD_{\kl}(\rvp \| \rvq)
+  \end{equation}
+\end{lemma}
+\begin{proof}
+  \begin{align*}
+    G
+    &= 2 \sum_{i} O_{i}\cdot \ln\Biggl(\frac{O_{i}}{E_{i}}\Biggr)
+    = 2 \sum_{i} \rvp_{i}n\cdot
+      \ln\Biggl(\frac{\rvp_{i}n}{\rvq_{i}n}\Biggr)
+    =2n\sum_{i} \rvp_{i}\cdot
+      \ln\Biggl(\frac{\rvp_{i}}{\rvq_{i}}\Biggr)
+    =2nD_{\kl}(\rvp \| \rvq)
+  \end{align*}
+\end{proof}
+
+\begin{proposition}[CDF of $\chi^{2}$ is monotonic with degrees of freedom]
+  \label{thm:chi2-ineq}
+  \begin{equation}
+    \label{eq:chi2-ineq}
+    F(\rvx; k) \geq F(\rvx; k+1)
+  \end{equation}
+\end{proposition}
+\begin{proof}
+  todo
+\end{proof}
+
+\begin{lemma}[Data Processing Inequality]
+  \label{thm:dpi}
+  For $\rmX\supseteq\rmY$ 
+  \begin{equation}
+    \label{eq:dpi}
+    D_{\kl}(\pr_{\rmX}\|\qr_{\rmX}) \geq
+    D_{\kl}(\pr_{\rmY}\|\qr_{\rmY}) 
+  \end{equation}
+\end{lemma}
+
+\begin{corollary}[Bound on p-value]
+  $\forall \rmY : \rmY\subseteq\rmX$ and $l \geq 0$
+  \begin{equation}
+    \label{eq:p-val-bound}
+    F(G_{\rmX}; k) \geq F(G_{\rmY}; k+l)
+  \end{equation}
+\end{corollary}
+\begin{proof}
+  \begin{align*}
+    F(G_{\rmX}; k)
+    &\geq F(G_{\rmY}; k) \quad \text{from \Cref{thm:dpi}}\\
+    &\geq F(G_{\rmY}; k + l) \quad  \text{from \Cref{thm:chi2-ineq}}
+  \end{align*}
+\end{proof}
+
+\begin{theorem}[Pruning based on maximum G-Statistic]
+  \label{thm:prune-stat}
+  At some node in the enumeration tree $(S, A)$, if
+  \begin{equation}
+    \label{eq:max-reject}
+    1 - F(G_{S\cup A}; \df(S)) > \alpha
+  \end{equation}
+  where $\alpha$ is some prescribed significance level, then
+  \begin{equation}
+    \label{eq:max-pruned}
+    \forall S' \supseteq S : 1 - \cdf(G_{S'}; \df(S')) > \alpha
+  \end{equation}
+  therefore, when \Cref{eq:max-reject} is true, no superset of $S$ can
+  have their conditional independence hypothesis be
+  rejected. Consequently, we cannont definitively accept the hypothesis
+  that any superset of $S$ is in the MB of $t$.
+\end{theorem}
+\begin{proof}
+  Firstly, we know by definition that the degrees of freedom over a
+  superset of $S$ must always be greater than or equal to the degrees of
+  freedom of $S$ itself: $\forall S' \supseteq S : \df(S') \geq \df(S)$.
+  We also know from \Cref{thm:dpi}, that $G_{S\cup A(S)} \geq
+  G_{S'}$. Therefore the following inequality holds:
+  \begin{gather*}
+    F(G_{S\cup A}; \df(S))
+    \underset{\text{\Cref{thm:chi2-ineq}}}{\geq}
+    F(G_{S\cup A}; \df(S'))
+    \underset{\text{\Cref{thm:dpi}}}{\geq}
+    F(G_{S'}; \df(S'))\\
+    \implies 1 - F(G_{S\cup A}; \df(S)) \leq 1 - F(G_{S'}; \df(S'))\\
+  \end{gather*}
+  Consequently
+  \begin{gather*}
+    1 - F(G_{S\cup A}; \df(S)) \geq \alpha
+    \implies
+    1 - F(G_{S'}; \df(S')) \geq \alpha
+  \end{gather*}
+  and as a result we will be unable to reject the hypothesis that $S'$
+  is conditionally independent to $t$ given the candidate MB for all
+  $S' \supseteq S$.
+\end{proof}
+
+\begin{theorem}[Pruning based on maximum degrees of freedom]
+  \label{thm:prune-df}
+  At some node in the enumeration tree $(S_{i}, A_{i})$, if
+  \begin{equation}
+    \label{eq:df-max-reject}
+    1 - F(G_{S_{i}\cup A_{i}}; \df(S_{i})) > \alpha
+  \end{equation}
+  then for every subsequent node in the enumeration tree $S_{j}, j > i$
+  \begin{equation}
+    \label{eq:df-max-reject}
+    \df(S_{j}) \geq \df(S_{i}) \implies
+    1 - F(G_{S_{j}\cup A_{i}}; \df(S_{j})) > \alpha
+  \end{equation}
+  and therefore with the result from \Cref{thm:prune-stat}
+  \begin{equation}
+    \label{eq:2}
+    \forall S' \supseteq S_{j} :
+    1 - F(G_{S'}; \df(S')) > \alpha
+  \end{equation}
+\end{theorem}
+
 
 
 %%% Post matter
 \subsubsection*{Author Contributions}
-If you'd like to, you may include  a section for author contributions as is done
-in many journals. This is optional and at the discretion of the authors.
+If you'd like to, you may include a section for author contributions as
+is done in many journals. This is optional and at the discretion of the
+authors.
 
 \subsubsection*{Acknowledgments}
 Use unnumbered third level headings for the acknowledgments. All
