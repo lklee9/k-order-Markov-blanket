@@ -20,6 +20,7 @@
 % \usepackage{algorithm}
 % \usepackage{algpseudocode}
 \usepackage[ruled,vlined]{algorithm2e}
+\SetKwComment{Comment}{/* }{ */}
 \usepackage{float} %figure inside minipage
 
 % Theorem style and numbering
@@ -134,68 +135,7 @@ An exhaustive enumeration of all possible
 %%% Related Work
 \section{Background}
 
-\subsection{Interative Association Markov Blanket (IAMB)}
-\begin{minipage}[t]{0.45\linewidth}
-\begin{algorithm}[H]
-\DontPrintSemicolon
-\KwIn{Input data}
-\KwOut{Output result}
-Initialize parameters\;
-\For{each iteration}{
-    Update weights\;
-}
-\caption{Example Algorithm}
-\end{algorithm}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.45\linewidth}
-\begin{algorithm}[H]
-\DontPrintSemicolon
-\KwIn{Input data}
-\KwOut{Output result}
-Initialize parameters\;
-\For{each iteration}{
-    Update weights\;
-}
-\caption{Example Algorithm}
-\end{algorithm}
-\end{minipage}
-
-%%% Method
-\section{Method}
-\begin{figure}[t]
-  \centering
-  \begin{subfigure}{0.45\linewidth}
-    \centering
-    \input{./fig/lattice.tex}
-    \caption{Subset lattice}
-    \label{fig:lattice}
-  \end{subfigure}\hfill
-  \begin{subfigure}{0.45\linewidth}
-    \centering
-    \input{./fig/enum-tree.tex}
-    \caption{Enumeration tree}
-    \label{fig:tree}
-  \end{subfigure}
-  \caption{Comparison between lattice and tree}
-  \label{fig:comparison}
-\end{figure}
-
-\begin{definition}[Enumeration Tree]
-  An enumeration tree $\tree$ has nodes for each subset in the powerset
-  $V(\tree)=\mathcal{P}(\rmX)$. Let $A(S)$ for some $S\in V(\tree)$ be
-  the variables in its descendants not in $S$.
-
-  When traversing the enumeration tree in a depth-wise manner, let
-  $S_{i}$ be the $i$-th node visited during traversal. Then by
-  definition:
-  \begin{equation}
-    \label{eq:4}
-    S_{i}\cup A(S_{i}) \supseteq S_{j}\cup A(S_{j})
-  \end{equation}
-  where $j > i$.
-\end{definition}
-
+\subsection{G-Test}
 \begin{definition}[G-Statistic]
   \begin{equation}
     \label{eq:g-stat}
@@ -223,6 +163,84 @@ Initialize parameters\;
     =2nD_{\kl}(\rvp \| \rvq)
   \end{align*}
 \end{proof}
+
+\subsection{Interative Association Markov Blanket (IAMB)}
+\begin{minipage}[t]{0.48\linewidth}
+\begin{algorithm}[H]
+\caption{Forward Selection}
+\DontPrintSemicolon
+\KwIn{$\db$, $\rmX$, $t$, $\alpha$}
+\KwOut{Candidate Markov Blanket $\mb$}
+$\rmC \gets \rmX$\;
+$\mb \gets \{\}$\;
+\While{True}{
+  $\rmR \gets \{\rvx \mid \rvx \in \rmC,
+  \rvx \not\indep t \mid \mb\}$\;
+  \If{$\rvx$ is empty} {
+    \Return{$\mb$}\;
+  }
+  $\rvr \gets \rvx\in\rmR$ with the largest $G_{\rvx}$\;
+  Remove $\rvr$ from $\rmC$\;
+  Insert $\rvr$ into $\mb$\;
+}
+\end{algorithm}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\begin{algorithm}[H]
+\caption{Prune Candidate MB}
+\DontPrintSemicolon
+\KwIn{$\mb$}
+\KwOut{Output result}
+\For{each $\rvx\in\mb$}{
+  $\mb' \gets \mb \setminus \{\rvx\}$\;
+  \If{$\rvx \indep t \mid \mb'$}{
+    $\mb \gets \mb'$\;
+  }
+  \Return{$\mb$}\;
+}
+\end{algorithm}
+\end{minipage}
+
+\subsection{Subset Lattice and Enumeration Tree}
+\begin{figure}[t]
+  \centering
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \input{./fig/lattice.tex}
+    \caption{Subset lattice}
+    \label{fig:lattice}
+  \end{subfigure}\hfill
+  \begin{subfigure}{0.45\linewidth}
+    \centering
+    \input{./fig/enum-tree.tex}
+    \caption{Enumeration tree}
+    \label{fig:tree}
+  \end{subfigure}
+  \caption{Comparison between lattice and tree}
+  \label{fig:comparison}
+\end{figure}
+\begin{definition}[Enumeration Tree]
+  An enumeration tree $\tree$ has nodes for each subset in the powerset
+  $V(\tree)=\mathcal{P}(\rmX)$. Let $A(S)$ for some $S\in V(\tree)$ be
+  the variables in its descendants not in $S$.
+
+  When traversing the enumeration tree in a depth-wise manner, let
+  $S_{i}$ be the $i$-th node visited during traversal. Then by
+  definition:
+  \begin{equation}
+    \label{eq:4}
+    S_{i}\cup A(S_{i}) \supseteq S_{j}\cup A(S_{j})
+  \end{equation}
+  where $j > i$.
+\end{definition}
+
+
+
+
+%%% Method
+\section{Method}
+
 
 \begin{proposition}[CDF of $\chi^{2}$ is monotonic with degrees of freedom]
   \label{thm:chi2-ineq}
@@ -255,8 +273,10 @@ Initialize parameters\;
 \begin{proof}
   \begin{align*}
     F(G_{\rmX}; k)
-    &\geq F(G_{\rmY}; k) \quad \text{from \Cref{thm:dpi}}\\
-    &\geq F(G_{\rmY}; k + l) \quad  \text{from \Cref{thm:chi2-ineq}}
+    \underset{\text{\Cref{thm:dpi}}}{\geq}
+    F(G_{\rmY}; k)
+    \underset{\text{\Cref{thm:chi2-ineq}}}{\geq}    
+    \geq F(G_{\rmY}; k + l)
   \end{align*}
 \end{proof}
 
