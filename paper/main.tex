@@ -189,16 +189,17 @@ difficulty of xor
     \begin{tabular}[t]{rl}
       Method & Recall (\%)\\
       \hline
-      GS & 0\\
-      IAMB & 0\\
-      PCMB & 0\\
-      BAMB & 0\\
-      EEMB & 0\\
-      MBFS & 0\\
-      \textbf{(ours) LIAM-MB} & \textbf{1}\\
+      GS & 0.0\\
+      IAMB & 0.0\\
+      PCMB & 0.0\\
+      BAMB & 0.0\\
+      EEMB & 0.0\\
+      MBFS & 0.0\\
+      \textbf{(ours) LIAM-MB} & \textbf{1.0}\\
     \end{tabular}
 };
-\end{tikzpicture}    
+\end{tikzpicture}
+\caption{Recovering the Markov Blanket of variable $Y$}
 \end{figure}
 
 %%% Related Work
@@ -233,6 +234,8 @@ difficulty of xor
   \end{align*}
 \end{proof}
 
+
+
 \begin{lemma}[Information Monotonicity]
   \label{thm:dpi}
   For $\rmX\supseteq\rmY$ 
@@ -246,6 +249,17 @@ difficulty of xor
   See \citet[Appendix]{amari2009}.
 \end{proof}
 
+\begin{lemma}[CDF of $\chi^{2}$ is monotonic with degrees of freedom]
+  \label{thm:chi2-ineq}
+  \begin{equation}
+    \label{eq:chi2-ineq}
+    F(\rvx; k) \geq F(\rvx; k+l) 
+  \end{equation}
+  where $l \geq 0$.
+\end{lemma}
+\begin{proof}
+  See~\citet[Theorem 1]{ghosh1973}
+\end{proof}
 
 \subsection{Interative Association Markov Blanket (IAMB)}
 % \begin{minipage}[t]{0.48\linewidth}
@@ -440,16 +454,6 @@ $j>i : S_{j}$ will not be capable of rejecting the conditional
 independence test. However to acheive this we first need the following
 intermediary results.
 
-\begin{proposition}[CDF of $\chi^{2}$ is monotonic with degrees of freedom]
-  \label{thm:chi2-ineq}
-  \begin{equation}
-    \label{eq:chi2-ineq}
-    F(\rvx; k) \geq F(\rvx; k+1)
-  \end{equation}
-\end{proposition}
-\begin{proof}
-  todo
-\end{proof}
 
 
 % \begin{corollary}[Bound on p-value of G-Test]
@@ -575,6 +579,12 @@ for pruning the lattice subset during the exhaustive search process.
 \end{proof}
 This implies that at $S_{i}$, we can prune entire branch.
 
+%%% Experiments
+\section{Experiments with Synthetic Data}
+
+
+
+\section{Experiments with Benchmark Data}
 
 
 %%% Post matter

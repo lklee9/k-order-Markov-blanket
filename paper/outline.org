@@ -65,7 +65,7 @@
 - if traversed via a depth-first search
 - gurantees on the subsets relationship with one another
 ** Bound on G-Statistic
--
+- 
 ** Pruning
 *** Why limit df when upper bound test fails
 - higher df => harder test to pass
@@ -75,7 +75,13 @@
 *** early return from failed upper bound g-test
 ** Complexity
 - based on the max G-stat and df needed to *not* reject hypothesis
-*
+* Experiments with Synthetic Data
+- Boolean functions over 5 variables
+  + parity
+  + and / or
+  + exactly-k
+  + prime
+* Experiments with Benchmark Data
 * Future work
 - other methods for lattice mining step
 - better bounds on G-stat or use of another test with better bounds
