@@ -12,17 +12,28 @@
 \usepackage{tikz}
 \usetikzlibrary{positioning,graphs}
 \usetikzlibrary{trees} % needed for tidy tree layouts
+\usetikzlibrary{matrix}
+\usepackage[normalem]{ulem} % for \sout
 
 % Preamble (add to your document preamble)
 \usepackage{cleveref} % optional but recommended for nicer
 % cross-references
 \usepackage{amsmath,amssymb}
 \usepackage{amsthm}
+\usepackage{mathtools}
 % \usepackage{algorithm}
 % \usepackage{algpseudocode}
 \usepackage[ruled,vlined]{algorithm2e}
-\SetKwComment{Comment}{// }{}
+\SetKwComment{Comment}{/*}{*/}
 \usepackage{float} %figure inside minipage
+\usepackage{wrapfig}
+
+\usepackage{romannum}
+
+\usepackage{pifont}% http://ctan.org/pkg/pifont
+
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
 
 % Theorem style and numbering
 \theoremstyle{plain}                % default (italic body)
@@ -30,8 +41,8 @@
 \crefname{theorem}{thm.}{thms.}
 \Crefname{theorem}{Theorem}{Theorems}
 \newtheorem{lemma}{Lemma}      % share theorem counter
-\newtheorem{proposition}[lemma]{Proposition}
-\newtheorem{corollary}[lemma]{Corollary}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
 
 % \theoremstyle{definition}           % upright body
 \newtheorem{definition}{Definition}
@@ -120,8 +131,9 @@ dataset $\db$, target variable $t$
 originally discussed in the context of learning Bayesian
 networks~\citep{margaritis1999,tsamardinos2003}
 
-However has been later discussed and used in feature selection and
-causal discovery.
+However has been later discussed and used in feature
+selection~\cite{wang2020,tsamardinos2003a} and causal
+discovery~\citep{hu2024,ling2021}.
 %%%% Why is MB Discovery hard
 A naive approach to MB discovery would just involve enumerating over all
 the possible MBs of the target variable $t$. However the number of
@@ -133,7 +145,61 @@ possible MBs is exponential with respect to $n$,
 where $n$ is the number of variables in $\db$ other than $t$. Therefore
 this 
 
-An exhaustive enumeration of all possible 
+An exhaustive enumeration of all possible
+
+
+difficulty of xor
+
+%%%% Why there is a gap in literature
+- SOTA methods avoid this exponential search space at a cost
+- cannot recover even simple xor relations
+- example
+\begin{figure}
+  \centering
+  % \begin{subfigure}{0.7\linewidth}
+\begin{tikzpicture}
+  \node[draw, circle, inner sep=2pt] (1) at (-1.5,1.5) {$X_{1}$};
+  \node[draw, circle, inner sep=2pt] (2) at (0,1.5) {$X_{2}$};
+  \node[draw, circle, inner sep=2pt] (3) at (1.5,1.5) {$X_{3}$};
+  \node[draw, circle, inner sep=3pt] (y) at (0,0) {$Y$};
+  \draw (1) -- (y);
+  \draw (3) -- (y);
+\node (PrX) at (0, 2.5){
+    \begin{tabular}[t]{|cc|}
+      \hline
+      $\pr(X_{i}=0)$ & $\pr(X_{i}=1)$\\
+      \hline
+      0.5 & 0.5\\
+      \hline
+    \end{tabular}
+};
+\node (PrY) at (-4.5, 0.5){
+    \begin{tabular}[t]{|cc|cc|}
+      \hline
+      $X_{1}$ & $X_{2}$ & $\pr_{Y}(0)$ & $\pr_{Y}(1)$\\
+      \hline
+      0 & 0 & 1.0 & 0.0\\
+      0 & 1 & 0.0 & 1.0\\
+      1 & 0 & 0.0 & 1.0\\
+      1 & 1 & 1.0 & 0.0\\
+      \hline
+    \end{tabular}
+};
+\node (PrY) at (5, 1){
+    \begin{tabular}[t]{rl}
+      Method & Recall (\%)\\
+      \hline
+      GS & 0\\
+      IAMB & 0\\
+      PCMB & 0\\
+      BAMB & 0\\
+      EEMB & 0\\
+      MBFS & 0\\
+      \textbf{(ours) LIAM-MB} & \textbf{1}\\
+    \end{tabular}
+};
+\end{tikzpicture}    
+\end{figure}
 
 %%% Related Work
 \section{Background}
@@ -167,8 +233,22 @@ An exhaustive enumeration of all possible
   \end{align*}
 \end{proof}
 
+\begin{lemma}[Information Monotonicity]
+  \label{thm:dpi}
+  For $\rmX\supseteq\rmY$ 
+  \begin{equation}
+    \label{eq:dpi}
+    D_{\kl}(\pr_{\rmX}\|\qr_{\rmX}) \geq
+    D_{\kl}(\pr_{\rmY}\|\qr_{\rmY}) 
+  \end{equation}
+\end{lemma}
+\begin{proof}
+  See \citet[Appendix]{amari2009}.
+\end{proof}
+
+
 \subsection{Interative Association Markov Blanket (IAMB)}
-\begin{minipage}[t]{0.48\linewidth}
+% \begin{minipage}[t]{0.48\linewidth}
 \begin{algorithm}[H]
 \caption{Forward Selection (\texttt{forward})}
 \DontPrintSemicolon
@@ -187,9 +267,9 @@ $\mb \gets \{\}$\;
   Insert $\rvr$ into $\mb$\;
 }
 \end{algorithm}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.48\linewidth}
+% \end{minipage}
+% \hfill
+% \begin{minipage}[t]{0.48\linewidth}
 \begin{algorithm}[H]
 \caption{Prune Candidate MB (\texttt{prune})}
 \DontPrintSemicolon
@@ -203,49 +283,81 @@ $\mb \gets \{\}$\;
   \Return{$\mb$}\;
 }
 \end{algorithm}
-\end{minipage}
-
-\subsection{Subset Lattice and Enumeration Tree}
-\begin{figure}[t]
-  \centering
-  \begin{subfigure}{0.45\linewidth}
-    \centering
-    \input{./fig/lattice.tex}
-    \caption{Subset lattice}
-    \label{fig:lattice}
-  \end{subfigure}\hfill
-  \begin{subfigure}{0.45\linewidth}
-    \centering
-    \input{./fig/enum-tree.tex}
-    \caption{Enumeration tree}
-    \label{fig:tree}
-  \end{subfigure}
-  \caption{Comparison between lattice and tree}
-  \label{fig:comparison}
-\end{figure}
-\begin{definition}[Enumeration Tree]
-  An enumeration tree $\tree$ has nodes for each subset in the powerset
-  $V(\tree)=\mathcal{P}(\rmX)$. Let $A(S)$ for some $S\in V(\tree)$ be
-  the variables in its descendants not in $S$.
-
-  When traversing the enumeration tree in a depth-wise manner, let
-  $S_{i}$ be the $i$-th node visited during traversal. Then by
-  definition:
-  \begin{equation}
-    \label{eq:4}
-    S_{i}\cup A(S_{i}) \supseteq S_{j}\cup A(S_{j})
-  \end{equation}
-  where $j > i$.
-\end{definition}
-
-
+% \end{minipage}
 
 
 %%% Method
 \section{Lattice Incremental Association Mining for Markov Blankets
   (LIAM-MB)}
 
-\begin{minipage}[t]{0.5\linewidth}
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.275\linewidth}
+    \centering
+    \input{./fig/lattice.tex}
+    \caption{Subset Lattice}
+    \label{fig:lattice}    
+  \end{subfigure}
+  \hspace{5em}
+  \begin{subfigure}{0.325\linewidth}
+    \centering
+    \input{./fig/enum-tree.tex}
+    \caption{Enumeration tree}
+    \label{fig:tree}    
+  \end{subfigure}
+  \caption{Comparison between lattice and tree}
+  \label{fig:comparison}
+\end{figure}  
+\begin{figure}  
+  \begin{subfigure}{0.325\linewidth}
+    \centering
+    \input{./fig/enum-tree-one.tex}
+    % \caption{$\cdf(G_{a};\df(a)) \leq \alpha$\\therefore $a$ should
+    %   be in $\mb$}
+    \caption{\centering\\
+      $\cdf(G_{a};\df(a)) \leq \alpha$\\ $\implies a \not\indep t
+      \mid \mb$}
+    \label{fig:tree}    
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.325\linewidth}
+    \centering
+    \input{./fig/enum-tree-two.tex}
+    \caption{\centering\\
+      $\cdf(G_{\{a,b\}};\df(\{a,b\})) > \alpha$\\
+      $\implies \{a,b\} \indep t \mid \mb$ not rejected}
+    \label{fig:tree}    
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.325\linewidth}
+    \centering
+    \input{./fig/enum-tree-three.tex}
+    \caption{\centering\\
+      Prune nodes that have $\geq$ degrees of freedom than
+      $\df(\{a,b\})$.
+    }
+    \label{fig:tree}    
+  \end{subfigure}
+  \caption{Comparison between lattice and tree}
+  \label{fig:comparison}
+\end{figure}  
+Our approach builds upon the two-phase approach of IAMB. Specifically,
+we want to find the variables that should be in the MB of $t$ that Phase
+\romannum{1} of IAMB did not find before the last pruning step.
+Therefore, after the first phase IAMB, our approach will conduct a
+theorectically exhaustive search over all possible subsets
+$S \in \mathcal{P}(\rmX \setminus (\mb \cup \{t\}))$. For each subest
+$S$, our approach will test the null hypothesis
+$H_{0}(S): S \indep t \mid \mb$. The rejection of $H_{0}(S)$ implies
+that $S$---or at least a subset of $S$---belongs in the MB of $t$.  The
+total number of subsets in
+$\mathcal{P}(\rmX \setminus (\mb \cup \{t\}))$ is exponential in the
+size of $\rmR \coloneqq \rmX \setminus (\mb \cup \{t\})$. Therefore, by carrying out
+Phase \Romannum{1} of IAMB first, we can increase the size of $\mb$ and
+decrease the search space of the exhaustive search.
+
+% \begin{wrapfigure}{l}{0.5\linewidth}
+% \begin{minipage}[t]{\linewidth}
 \begin{algorithm}[H]
 \caption{Lattice Mining (\texttt{lattice})}
 % \DontPrintSemicolon
@@ -264,11 +376,13 @@ $\df_{\max} \gets \infty$\;
     }
     \If{$1 - \cdf(G_{S\cup A}; \df(S)) > \alpha$}{
       $\df_{\max} \gets \df_{\cur}$\;
-      \Comment{\Cref{thm:prune-stat} Pruning}
+      \Comment{Implicit pruning since any superset will have a greater
+        or equal degrees of freedom.}
       continue\; 
     }
   }
-  \Comment{\Cref{thm:prune-df} Pruning}
+  \Comment{Don't explore subsets that exceed the current maximum degrees
+  of freedom}
   $A' \gets \{a \mid a\in A, \df(S \cup \{a\}) < \df_{\max}\}$\;
   \For{$i \in [1, |A'|]$}{
     $a \gets A'_{i}$\;
@@ -278,12 +392,9 @@ $\df_{\max} \gets \infty$\;
   \Return{$\emptyset$};
 }
 \end{algorithm}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.45\linewidth}
 \begin{algorithm}[H]
 \caption{LIAM-MB}
-\DontPrintSemicolon
+% \DontPrintSemicolon
 \KwIn{$\db$, $\rmX$, $t$, $\alpha$}
 \KwOut{Output result}
 $\mb \gets \texttt{forward}(\db, \rmX, t, \alpha)$\;
@@ -300,8 +411,34 @@ $\mb \gets \texttt{forward}(\db, \rmX, t, \alpha)$\;
 $\mb \gets \texttt{prune}(\db, \mb, t, \alpha)$\;
 \Return{$\mb$}\;
 \end{algorithm}
-\end{minipage}
+% \end{minipage}  
+% \end{wrapfigure}
 
+Since the search space is the powerset $\mathcal{P}(\rmR)$, it can be
+naturally represented as a subset lattice---see \Cref{fig:lattice} for
+an example over three variables. When traversing the subset lattice in a
+depth-first order, the resulting search order can be represented as an
+enumeration tree as seen in \Cref{fig:tree}.
+
+\begin{definition}[Enumeration Tree]
+  An enumeration tree $\tree$ has nodes for each subset in the powerset
+  $V(\tree)=\mathcal{P}(\rmR)$. Let $A(S)$ for some $S\in V(\tree)$ be
+  the variables in its descendants not in $S$. Let $S_{i}$ be the $i$-th
+  node visited during a depth-wise traversal of the corresponding
+  lattice. Then by definition:
+  \begin{equation}
+    \label{eq:set-enum}
+    S_{i}\cup A(S_{i}) \supseteq S_{j}\cup A(S_{j})
+  \end{equation}
+  where $j > i$.
+\end{definition}
+
+The property in \Cref{eq:set-enum} will allow us to prune chunks of the
+search space based on properties of $S_{i}$. Specifically we desire a
+way to determine at subset $S_{i}$ which proceeding subsets
+$j>i : S_{j}$ will not be capable of rejecting the conditional
+independence test. However to acheive this we first need the following
+intermediary results.
 
 \begin{proposition}[CDF of $\chi^{2}$ is monotonic with degrees of freedom]
   \label{thm:chi2-ineq}
@@ -314,32 +451,29 @@ $\mb \gets \texttt{prune}(\db, \mb, t, \alpha)$\;
   todo
 \end{proof}
 
-\begin{lemma}[Data Processing Inequality]
-  \label{thm:dpi}
-  For $\rmX\supseteq\rmY$ 
-  \begin{equation}
-    \label{eq:dpi}
-    D_{\kl}(\pr_{\rmX}\|\qr_{\rmX}) \geq
-    D_{\kl}(\pr_{\rmY}\|\qr_{\rmY}) 
-  \end{equation}
-\end{lemma}
 
-\begin{corollary}[Bound on p-value]
-  $\forall \rmY : \rmY\subseteq\rmX$ and $l \geq 0$
-  \begin{equation}
-    \label{eq:p-val-bound}
-    F(G_{\rmX}; k) \geq F(G_{\rmY}; k+l)
-  \end{equation}
-\end{corollary}
-\begin{proof}
-  \begin{align*}
-    F(G_{\rmX}; k)
-    \underset{\text{\Cref{thm:dpi}}}{\geq}
-    F(G_{\rmY}; k)
-    \underset{\text{\Cref{thm:chi2-ineq}}}{\geq}    
-    \geq F(G_{\rmY}; k + l)
-  \end{align*}
-\end{proof}
+% \begin{corollary}[Bound on p-value of G-Test]
+%   $\forall \rmY : \rmY\subseteq\rmX$ and $l \geq 0$
+%   \begin{equation}
+%     \label{eq:p-val-bound}
+%     F(G_{\rmX}; k) \geq F(G_{\rmY}; k+l)
+%   \end{equation}
+% \end{corollary}
+% \begin{proof}
+%   \begin{align*}
+%     F(G_{\rmX}; k)
+%     % \underset{\text{\Cref{thm:dpi}}}{\geq}
+%     \geq
+%     &F(G_{\rmY}; k) &\text{\Cref{thm:dpi}}\\
+%     \geq
+%     % \underset{\text{\Cref{thm:chi2-ineq}}}{\geq}    
+%     &F(G_{\rmY}; k + l) &\text{\Cref{thm:chi2-ineq}}
+%   \end{align*}
+% \end{proof}
+
+With a relationship between nested subsets and the CDF of a $\chi^{2}$
+distribution, we can now prove the main two results that will be used
+for pruning the lattice subset during the exhaustive search process.
 
 \begin{theorem}[Pruning based on maximum G-Statistic]
   \label{thm:prune-stat}
@@ -370,7 +504,7 @@ $\mb \gets \texttt{prune}(\db, \mb, t, \alpha)$\;
     F(G_{S\cup A}; \df(S'))
     \underset{\text{\Cref{thm:dpi}}}{\geq}
     F(G_{S'}; \df(S'))\\
-    \implies 1 - F(G_{S\cup A}; \df(S)) \leq 1 - F(G_{S'}; \df(S'))\\
+    \implies 1 - F(G_{S\cup A}; \df(S)) \leq 1 - F(G_{S'}; \df(S'))
   \end{gather*}
   Consequently
   \begin{gather*}
@@ -403,6 +537,43 @@ $\mb \gets \texttt{prune}(\db, \mb, t, \alpha)$\;
     1 - F(G_{S'}; \df(S')) > \alpha
   \end{equation}
 \end{theorem}
+\begin{proof}
+  First recall from the definition of enumeration trees that
+  \begin{equation*}
+    S_{i} \cup A(S_{i}) \supseteq S_{j} \cup A(S_{j})
+  \end{equation*}
+  for all $i \geq j$. Therefore by using \Cref{thm:dpi}, we have the
+  following inequality between the CDF of the $\chi^{2}$ distribution
+  between these subsets for a fixed degree of freedom $d$
+  \begin{align*}
+    \cdf(G_{S_{i}\cup A(S_{i})}; d) \geq
+    \cdf(G_{S_{j}\cup A(S_{j})}; d)
+  \end{align*}
+  Furthermore, for any $d' \geq d$, the following inequality follows
+  from \Cref{thm:chi2-ineq}
+  \begin{equation*}
+    \cdf(G_{S_{j}\cup A(S_{j})}; d) \geq
+    \cdf(G_{S_{j}\cup A(S_{j})}; d') 
+  \end{equation*}
+  Therefore, whenever $\df(S_{j}) \geq \df(S_{i})$ is true, the
+  following holds
+  \begin{align*}
+    \df(S_{j}) \geq \df(S_{i})
+    &\implies
+    \cdf(G_{S_{i}\cup A(S_{i})}; \df(S_{i})) \geq 
+      \cdf(G_{S_{j}\cup A(S_{j})}; \df(S_{j}))\\
+    &\implies 
+    1 - \cdf(G_{S_{i}\cup A(S_{i})}; \df(S_{i})) \leq 
+      1 - \cdf(G_{S_{j}\cup A(S_{j})}; \df(S_{j}))\\
+  \end{align*}
+  and the following relation follows directly
+  \begin{align*}
+    \alpha < 1 - \cdf(G_{S_{i}\cup A(S_{i})}; \df(S_{i}))
+    \implies 
+    \alpha <  1 - \cdf(G_{S_{j}\cup A(S_{j})}; \df(S_{j}))
+  \end{align*}
+\end{proof}
+This implies that at $S_{i}$, we can prune entire branch.
 
 
 

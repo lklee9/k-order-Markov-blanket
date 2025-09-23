@@ -42,11 +42,28 @@
 ** G Test
 ** MB discovery and IAMB
 - the first method specifically for
+* Method: LIAM-MB
+- our approach builds upon the 2 step approach of IAMB
+  + Specifically we want to find variables in the MB
+  + that the first phase of IAMB did not
+- Therefore, after the first phase we will carry out
+  + a theorectically exhaustive search over
+  + all possible subsets $S\in X - MB - t$
+  + and check for conditional independece of $S$ with $t$
+  + given MB
+- The total number of subsets that will be in this search space is
+  + ....
+- Therefore One benefit of carrying out the exhaustive search
+  + after the first phase
+  + is that the larger the candidate MB found by phase 1
+  + the larger
+- 
 ** Set enumeration tree
+- Since the search space is the powerset of $X - MB - t$
+- 
 - A = vars in descendents
 - if traversed via a depth-first search
 - gurantees on the subsets relationship with one another
-* Method: LIAM-MB
 ** Bound on G-Statistic
 -
 ** Pruning
@@ -56,6 +73,8 @@
 - => we should only visit nodes with df less
 - => only visit easier tests
 *** early return from failed upper bound g-test
+** Complexity
+- based on the max G-stat and df needed to *not* reject hypothesis
 *
 * Future work
 - other methods for lattice mining step
