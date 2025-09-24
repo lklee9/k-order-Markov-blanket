@@ -213,7 +213,7 @@ difficulty of xor
 };
 \node (PrY) at (3, 1){
     \begin{tabular}[t]{rl}
-      Method & Recall (\%)\\
+      Method & Recall\\
       \hline
       GS~\citep{margaritis1999} & 0.0\\
       IAMB~\citep{tsamardinos2003} & 0.0\\
@@ -295,9 +295,9 @@ where~\citep{tsamardinos2006}
               \Biggl(\prod_{\rvs\in\rmS}|\rvs| - 1\Biggr) \cdot
               \Biggl(\prod_{\rvc\in\mb}|\rvc|\Biggr)
 \end{align*}
-is the degrees of freedomn in the statistical test. A useful property of
+is the degrees of freedomn in the statistical test. A useful yet not so well-known property of
 the $\chi^{2}$ distribution that we will use later to prove
-\Cref{thm:prune} is the fact that
+\Cref{thm:prune} is the following fact:
 
 \begin{lemma}[CDF of $\chi^{2}$ is monotonic with degrees of freedom]
   \label{thm:chi2-ineq}
@@ -311,7 +311,7 @@ the $\chi^{2}$ distribution that we will use later to prove
   See~\citet[Theorem 1]{ghosh1973}
 \end{proof}
 
-It is well known that the G-statistic is propotional to the
+On the other hand, it is well known that the G-statistic is propotional to the
 Kullback-Leibler divergence between the empirical distribution over the
 observed data $\db$ and the expected empirical distribution under the
 null hypothesis,
