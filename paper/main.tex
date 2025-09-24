@@ -25,6 +25,8 @@
 % \usepackage{algpseudocode}
 \usepackage[ruled,vlined]{algorithm2e}
 \SetKwComment{Comment}{/*}{*/}
+\crefname{algocf}{alg.}{algs.}
+\Crefname{algocf}{Algorithm}{Algorithms}
 \usepackage{float} %figure inside minipage
 \usepackage{wrapfig}
 
@@ -121,7 +123,7 @@ Sankt Augustin, Germany\\
 \end{abstract}
 
 %%% Intro
-\section{Introduction}
+\section{Introduction}\label{sec:intro}
 %%%% What is MB Discovery
 Exhaustive vs. Exact
 
@@ -158,22 +160,23 @@ difficulty of xor
   \centering
   % \begin{subfigure}{0.7\linewidth}
 \begin{tikzpicture}
-  \node[draw, circle, inner sep=2pt] (1) at (-1.5,1.5) {$X_{1}$};
-  \node[draw, circle, inner sep=2pt] (2) at (0,1.5) {$X_{2}$};
-  \node[draw, circle, inner sep=2pt] (3) at (1.5,1.5) {$X_{3}$};
+  \node[draw, circle, inner sep=2pt] (1) at (-0.75,1.5) {$X_{1}$};
+  % \node[draw, circle, inner sep=2pt] (2) at (0,1.5) {$X_{2}$};
+  \node[draw, circle, inner sep=2pt] (3) at (0.75,1.5) {$X_{3}$};
   \node[draw, circle, inner sep=3pt] (y) at (0,0) {$Y$};
   \draw (1) -- (y);
   \draw (3) -- (y);
 \node (PrX) at (0, 2.5){
     \begin{tabular}[t]{|cc|}
       \hline
-      $\pr(X_{i}=0)$ & $\pr(X_{i}=1)$\\
+      $\pr_{X_{i}}(0)$ & $\pr_{X_{i}}(1)$\\
       \hline
       0.5 & 0.5\\
       \hline
     \end{tabular}
 };
-\node (PrY) at (-4.5, 0.5){
+
+\node (PrY) at (-3.75, 0.5){
     \begin{tabular}[t]{|cc|cc|}
       \hline
       $X_{1}$ & $X_{2}$ & $\pr_{Y}(0)$ & $\pr_{Y}(1)$\\
@@ -189,52 +192,119 @@ difficulty of xor
     \begin{tabular}[t]{rl}
       Method & Recall (\%)\\
       \hline
-      GS & 0.0\\
-      IAMB & 0.0\\
-      PCMB & 0.0\\
-      BAMB & 0.0\\
-      EEMB & 0.0\\
-      MBFS & 0.0\\
-      \textbf{(ours) LIAM-MB} & \textbf{1.0}\\
+      GS~\citep{margaritis1999} & 0.0\\
+      IAMB~\citep{tsamardinos2003} & 0.0\\
+      PCMB~\citep{pena2007} & 0.0\\
+      HITON\_MB\citep{aliferis2003} & 0.0\\
+      STMB~\citep{gao2017a} & 0.0\\
+      BAMB\citep{ling2019} & 0.0\\
+      LRH\citep{liu2016} & 0.0\\
+      \textbf{LIAM-MB (ours)} & \textbf{1.0}\\
     \end{tabular}
 };
 \end{tikzpicture}
-\caption{Recovering the Markov Blanket of variable $Y$}
+\caption{
+  \centering
+  Recovering the Markov blanket (MB) of variable $Y$ when $Y$ is
+  the output of the xor boolean function between binary random variables
+  $X_{1}$ and $X_{3}$. Existing approaches are unable to recover the MB
+  and our approach strives to be the first step in plugging this gap.}
 \end{figure}
+
+%%%% Contributions
+- pointing out gap in existing approaches
+- method to prune subset lattice during exhaustive search based on g-test
 
 %%% Related Work
 \section{Background}
+- notation
+- $\rvt$ target variable
+- $\rmX$ variables
+- $\mb$ markov blanket
+\subsection{Markov Blanket}
+todo
+- markov blanket
+- conditiona indep
 
 \subsection{G-Test}
-\begin{definition}[G-Statistic]
-  \begin{equation}
-    \label{eq:g-stat}
-    G = 2 \sum_{i} O_{i}\cdot \ln\Biggl(\frac{O_{i}}{E_{i}}\Biggr)
-  \end{equation}
-\end{definition}
+The G-test is a statistical test that seeks to reject the hypothesis
+that a set of observed discrete data follows some assumed
+distribution. A common use for the G-test is to test if the dimensions
+in some multidimensional data are independent. Conducting this test
+first involves computing the G-statistic,
+\begin{equation}
+  \label{eq:g-stat}
+  G = 2 \sum_{i} O_{i}\cdot \ln\Biggl(\frac{O_{i}}{E_{i}}\Biggr),
+\end{equation}
+where $O_{i}\geq 0$ are the observed counts in the cells and $E_{i} > 0$
+are the expected counts under the distribution assumed in the null
+hypothesis.
 
-\begin{lemma}[G-Statistic and Kullback-Leibler divergence]
-  G-Statistic is propotional to the Kullback-Leibler divergence
+In this paper, we are specifically interested in using the G-test to
+test the null hypothesis that some subset $\rmS$ of the variables
+$\rmS\subset\rmX \setminus (\{\rvt\} \cup \mb)$ is conditionally
+independent to the variable $\rvt$ given the a candidate Markov blanket
+$\mb$,
+\begin{equation*}
+ H_{0}(\rmS): \rmS \indep \rvt \mid \mb.
+\end{equation*}
+The G-statistic for testing this hypothesis is
+then~\citep{tsamardinos2006}
+\begin{align*}
+  G(\rmS)
+  &= 2 \sum_{\rvx_{\rvs},\rvx_{t},\rvx_{\rvc}}
+    O(\rvx_{\rvs},\rvx_{t},\rvx_{\rvc})\cdot
+    \ln\Biggl(
+    \frac{P(\rvx_{\rvs},\rvx_{t}\mid\rvx_{\rvc}) P(\rvx_{\rvc})}
+    {P(\rvx_{\rvs}\mid\rvx_{\rvc})P(\rvx_{t}\mid\rvx_{\rvc})
+    P(\rvx_{\rvc})}\Biggr)\\
+  &= 2 \sum_{\rvx_{\rvs},\rvx_{t},\rvx_{\rvc}}
+    O(\rvx_{\rvs},\rvx_{t},\rvx_{\rvc})\cdot
+    \ln\Biggl(
+    \frac{O(\rvx_{\rvs},\rvx_{t},\rvx_{\rvc}) O(\rvx_{\rvc})}
+    {O(\rvx_{\rvs},\rvx_{\rvc})O(\rvx_{t},\rvx_{\rvc})}\Biggr).
+\end{align*}
+Under the null hypothesis, the distribution of this statistic $G(\rmS)$
+is then approximately $\chi^{2}(\df(\rmS))$ distributed
+where~\citep{tsamardinos2006}
+\begin{align*}
+  \df(\rmS) &= (|\rvt|-1) \cdot
+              \Biggl(\prod_{\rvs\in\rmS}|\rvs| - 1\Biggr) \cdot
+              \Biggl(\prod_{\rvc\in\mb}|\rvc|\Biggr)
+\end{align*}
+is the degrees of freedomn in the statistical test. A useful property of
+the $\chi^{2}$ distribution that we will use later to prove
+\Cref{thm:prune} is the fact that
+
+\begin{lemma}[CDF of $\chi^{2}$ is monotonic with degrees of freedom]
+  \label{thm:chi2-ineq}
   \begin{equation}
-    \label{eq:g-stat-kl}
-    G
-    = 2 \sum_{i} O_{i}\cdot \ln\Biggl(\frac{O_{i}}{E_{i}}\Biggr)    
-    =2nD_{\kl}(\rvp \| \rvq)
+    \label{eq:chi2-ineq}
+    F(\rvx; k) \geq F(\rvx; k+l) 
   \end{equation}
+  where $l \geq 0$.
 \end{lemma}
 \begin{proof}
-  \begin{align*}
-    G
-    &= 2 \sum_{i} O_{i}\cdot \ln\Biggl(\frac{O_{i}}{E_{i}}\Biggr)
-    = 2 \sum_{i} \rvp_{i}n\cdot
-      \ln\Biggl(\frac{\rvp_{i}n}{\rvq_{i}n}\Biggr)
-    =2n\sum_{i} \rvp_{i}\cdot
-      \ln\Biggl(\frac{\rvp_{i}}{\rvq_{i}}\Biggr)
-    =2nD_{\kl}(\rvp \| \rvq)
-  \end{align*}
+  See~\citet[Theorem 1]{ghosh1973}
 \end{proof}
 
-
+It is well known that the G-statistic is propotional to the
+Kullback-Leibler divergence between the empirical distribution over the
+observed data $\db$ and the expected empirical distribution under the
+null hypothesis,
+\begin{align*}
+  G
+  &= 2 \sum_{i} O_{i}\cdot \ln\Biggl(\frac{O_{i}}{E_{i}}\Biggr)
+    = 2 \sum_{i} \rvp_{i}n\cdot
+    \ln\Biggl(\frac{\rvp_{i}n}{\rvq_{i}n}\Biggr)
+    =2n\sum_{i} \rvp_{i}\cdot
+    \ln\Biggl(\frac{\rvp_{i}}{\rvq_{i}}\Biggr)
+    =2nD_{\kl}(\rvp \| \rvq).
+\end{align*}
+This relationship allows us to use existing results for the
+Kullback-Leibler (KL) divergence on the G-statistic. Specifically we
+will use the \emph{Information Monotonicity} of the KL divergence to
+help with proving \Cref{thm:prune} later on.
 
 \begin{lemma}[Information Monotonicity]
   \label{thm:dpi}
@@ -249,22 +319,30 @@ difficulty of xor
   See \citet[Appendix]{amari2009}.
 \end{proof}
 
-\begin{lemma}[CDF of $\chi^{2}$ is monotonic with degrees of freedom]
-  \label{thm:chi2-ineq}
-  \begin{equation}
-    \label{eq:chi2-ineq}
-    F(\rvx; k) \geq F(\rvx; k+l) 
-  \end{equation}
-  where $l \geq 0$.
-\end{lemma}
-\begin{proof}
-  See~\citet[Theorem 1]{ghosh1973}
-\end{proof}
 
-\subsection{Interative Association Markov Blanket (IAMB)}
+\subsection{Iterative Association Markov Blanket (IAMB)}
+One of the first approaches to MB discovery that sclaes up well to
+thousands of variables is Iterative Association Markov Blanket
+(IAMB)~\citep{tsamardinos2003}. Prior to IAMB, the main other algorithm
+for MB discovery that scales similarly was the Grow-Shrink (GS)
+algorithm by \citet{margaritis1999}. Both approaches use a two phase
+approach where in the first phase they iteratively test add variables
+into a candidate MB that shows some dependency to the target variable
+$\rvt$. However, in GS they only considered the pairwise relationship
+between each variable $\rvx$ and the target $\rvt$, which can make
+spouses of $\rvt$ hard to recover~\citep{tsamardinos2003}. On the other
+hand IAMB considers the relationship between $\rvt$ and each $\rvx$
+given the candidate MB that is being grown iteratively during Phase
+\Romannum{1} of the algorithm as illustrated in \Cref{alg:forward}. The
+second phase of both approaches---as illustrated in
+\Cref{alg:backward}---removes any variable in the candidate MB that do
+not belong in the MB of $\rvt$ by iteratively testing for the
+conditional independence of each variable with $\rvt$ given the
+remaining candidate MB that is iteratively pruned during this phase.
+
 % \begin{minipage}[t]{0.48\linewidth}
 \begin{algorithm}[H]
-\caption{Forward Selection (\texttt{forward})}
+\caption{Forward Selection (\texttt{forward})}\label{alg:forward}
 \DontPrintSemicolon
 \KwIn{$\db$, $\rmX$, $t$, $\alpha$}
 \KwOut{Candidate Markov Blanket $\mb$}
@@ -285,7 +363,7 @@ $\mb \gets \{\}$\;
 % \hfill
 % \begin{minipage}[t]{0.48\linewidth}
 \begin{algorithm}[H]
-\caption{Prune Candidate MB (\texttt{prune})}
+\caption{Prune Candidate MB (\texttt{backward})}\label{alg:backward}
 \DontPrintSemicolon
 \KwIn{$\db$, $\mb$, $t$, $\alpha$}
 \KwOut{Output result}
@@ -298,6 +376,16 @@ $\mb \gets \{\}$\;
 }
 \end{algorithm}
 % \end{minipage}
+
+By utilising a heuristic for constructing the candidate MB during the
+first phase, these and other similar approaches to MB discovery are
+capable of scaling well to datasets with 1000s of variables. However, as
+we have shown in \Cref{sec:intro}, the main trade-off with a heuristic
+approach is the inability to capture certain relationships between
+$\rvt$ and variables in its MB. Therefore, in the next section we will
+revisit and propose exhaustive approach that is capable capturing these
+relationships between variables in exchange for being less
+computationally efficient.
 
 
 %%% Method
@@ -355,20 +443,20 @@ $\mb \gets \{\}$\;
   \caption{Comparison between lattice and tree}
   \label{fig:comparison}
 \end{figure}  
-Our approach builds upon the two-phase approach of IAMB. Specifically,
-we want to find the variables that should be in the MB of $t$ that Phase
-\romannum{1} of IAMB did not find before the last pruning step.
-Therefore, after the first phase IAMB, our approach will conduct a
-theorectically exhaustive search over all possible subsets
+As we have discussed, our approach builds upon the two-phase approach of
+IAMB. Specifically, we want to find the variables that should be in the
+MB of $t$ that Phase \romannum{1} of IAMB did not find before the last
+pruning step.  Therefore, after the first phase IAMB, our approach will
+conduct a theorectically exhaustive search over all possible subsets
 $S \in \mathcal{P}(\rmX \setminus (\mb \cup \{t\}))$. For each subest
 $S$, our approach will test the null hypothesis
 $H_{0}(S): S \indep t \mid \mb$. The rejection of $H_{0}(S)$ implies
 that $S$---or at least a subset of $S$---belongs in the MB of $t$.  The
 total number of subsets in
 $\mathcal{P}(\rmX \setminus (\mb \cup \{t\}))$ is exponential in the
-size of $\rmR \coloneqq \rmX \setminus (\mb \cup \{t\})$. Therefore, by carrying out
-Phase \Romannum{1} of IAMB first, we can increase the size of $\mb$ and
-decrease the search space of the exhaustive search.
+size of $\rmR \coloneqq \rmX \setminus (\mb \cup \{t\})$. Therefore, by
+carrying out Phase \Romannum{1} of IAMB first, we can increase the size
+of $\mb$ and decrease the search space of the exhaustive search.
 
 % \begin{wrapfigure}{l}{0.5\linewidth}
 % \begin{minipage}[t]{\linewidth}
@@ -422,7 +510,7 @@ $\mb \gets \texttt{forward}(\db, \rmX, t, \alpha)$\;
     Insert $a$ into $\mb$\;
   }
 }
-$\mb \gets \texttt{prune}(\db, \mb, t, \alpha)$\;
+$\mb \gets \texttt{backward}(\db, \mb, t, \alpha)$\;
 \Return{$\mb$}\;
 \end{algorithm}
 % \end{minipage}  
@@ -451,78 +539,10 @@ The property in \Cref{eq:set-enum} will allow us to prune chunks of the
 search space based on properties of $S_{i}$. Specifically we desire a
 way to determine at subset $S_{i}$ which proceeding subsets
 $j>i : S_{j}$ will not be capable of rejecting the conditional
-independence test. However to acheive this we first need the following
-intermediary results.
-
-
-
-% \begin{corollary}[Bound on p-value of G-Test]
-%   $\forall \rmY : \rmY\subseteq\rmX$ and $l \geq 0$
-%   \begin{equation}
-%     \label{eq:p-val-bound}
-%     F(G_{\rmX}; k) \geq F(G_{\rmY}; k+l)
-%   \end{equation}
-% \end{corollary}
-% \begin{proof}
-%   \begin{align*}
-%     F(G_{\rmX}; k)
-%     % \underset{\text{\Cref{thm:dpi}}}{\geq}
-%     \geq
-%     &F(G_{\rmY}; k) &\text{\Cref{thm:dpi}}\\
-%     \geq
-%     % \underset{\text{\Cref{thm:chi2-ineq}}}{\geq}    
-%     &F(G_{\rmY}; k + l) &\text{\Cref{thm:chi2-ineq}}
-%   \end{align*}
-% \end{proof}
-
-With a relationship between nested subsets and the CDF of a $\chi^{2}$
-distribution, we can now prove the main two results that will be used
-for pruning the lattice subset during the exhaustive search process.
-
-\begin{theorem}[Pruning based on maximum G-Statistic]
-  \label{thm:prune-stat}
-  At some node in the enumeration tree $(S, A)$, if
-  \begin{equation}
-    \label{eq:max-reject}
-    1 - F(G_{S\cup A}; \df(S)) > \alpha
-  \end{equation}
-  where $\alpha$ is some prescribed significance level, then
-  \begin{equation}
-    \label{eq:max-pruned}
-    \forall S' \supseteq S : 1 - \cdf(G_{S'}; \df(S')) > \alpha
-  \end{equation}
-  therefore, when \Cref{eq:max-reject} is true, no superset of $S$ can
-  have their conditional independence hypothesis be
-  rejected. Consequently, we cannont definitively accept the hypothesis
-  that any superset of $S$ is in the MB of $t$.
-\end{theorem}
-\begin{proof}
-  Firstly, we know by definition that the degrees of freedom over a
-  superset of $S$ must always be greater than or equal to the degrees of
-  freedom of $S$ itself: $\forall S' \supseteq S : \df(S') \geq \df(S)$.
-  We also know from \Cref{thm:dpi}, that $G_{S\cup A(S)} \geq
-  G_{S'}$. Therefore the following inequality holds:
-  \begin{gather*}
-    F(G_{S\cup A}; \df(S))
-    \underset{\text{\Cref{thm:chi2-ineq}}}{\geq}
-    F(G_{S\cup A}; \df(S'))
-    \underset{\text{\Cref{thm:dpi}}}{\geq}
-    F(G_{S'}; \df(S'))\\
-    \implies 1 - F(G_{S\cup A}; \df(S)) \leq 1 - F(G_{S'}; \df(S'))
-  \end{gather*}
-  Consequently
-  \begin{gather*}
-    1 - F(G_{S\cup A}; \df(S)) \geq \alpha
-    \implies
-    1 - F(G_{S'}; \df(S')) \geq \alpha
-  \end{gather*}
-  and as a result we will be unable to reject the hypothesis that $S'$
-  is conditionally independent to $t$ given the candidate MB for all
-  $S' \supseteq S$.
-\end{proof}
+independence test.
 
 \begin{theorem}[Pruning based on maximum degrees of freedom]
-  \label{thm:prune-df}
+  \label{thm:prune}
   At some node in the enumeration tree $(S_{i}, A_{i})$, if
   \begin{equation}
     \label{eq:df-max-reject}
@@ -534,49 +554,52 @@ for pruning the lattice subset during the exhaustive search process.
     \df(S_{j}) \geq \df(S_{i}) \implies
     1 - F(G_{S_{j}\cup A_{i}}; \df(S_{j})) > \alpha
   \end{equation}
-  and therefore with the result from \Cref{thm:prune-stat}
-  \begin{equation}
-    \label{eq:2}
-    \forall S' \supseteq S_{j} :
-    1 - F(G_{S'}; \df(S')) > \alpha
-  \end{equation}
 \end{theorem}
 \begin{proof}
   First recall from the definition of enumeration trees that
   \begin{equation*}
     S_{i} \cup A(S_{i}) \supseteq S_{j} \cup A(S_{j})
   \end{equation*}
-  for all $i \geq j$. Therefore by using \Cref{thm:dpi}, we have the
-  following inequality between the CDF of the $\chi^{2}$ distribution
-  between these subsets for a fixed degree of freedom $d$
-  \begin{align*}
-    \cdf(G_{S_{i}\cup A(S_{i})}; d) \geq
-    \cdf(G_{S_{j}\cup A(S_{j})}; d)
-  \end{align*}
-  Furthermore, for any $d' \geq d$, the following inequality follows
-  from \Cref{thm:chi2-ineq}
-  \begin{equation*}
-    \cdf(G_{S_{j}\cup A(S_{j})}; d) \geq
-    \cdf(G_{S_{j}\cup A(S_{j})}; d') 
-  \end{equation*}
-  Therefore, whenever $\df(S_{j}) \geq \df(S_{i})$ is true, the
-  following holds
-  \begin{align*}
-    \df(S_{j}) \geq \df(S_{i})
-    &\implies
-    \cdf(G_{S_{i}\cup A(S_{i})}; \df(S_{i})) \geq 
-      \cdf(G_{S_{j}\cup A(S_{j})}; \df(S_{j}))\\
-    &\implies 
-    1 - \cdf(G_{S_{i}\cup A(S_{i})}; \df(S_{i})) \leq 
-      1 - \cdf(G_{S_{j}\cup A(S_{j})}; \df(S_{j}))\\
-  \end{align*}
-  and the following relation follows directly
+  for all $i \geq j$. Therefore, by using \Cref{thm:chi2-ineq,thm:dpi}
+  with the assumption that $\df(S_{j}) \geq \df(S_{i})$,
+  we can establish the following inequality:
+  \begin{gather*}
+    F(G_{S_{i}\cup A(S_{i})}; \df(S_{i}))
+    \underset{\text{\Cref{thm:dpi}}}{\geq}
+    F(G_{S_{j}\cup A(S_{j})}; \df(S_{i}))
+    \underset{\text{\Cref{thm:chi2-ineq}}}{\geq}
+    F(G_{S_{j}\cup A(S_{j})}; \df(S_{j}))\\
+    \implies 1 - F(G_{S_{i}\cup A(S_{i})}; \df(S_{i}))
+    \leq 1 - F(G_{S_{j}\cup A(S_{j})}; \df(S_{j}))
+  \end{gather*}
+  Therefore the following holds
   \begin{align*}
     \alpha < 1 - \cdf(G_{S_{i}\cup A(S_{i})}; \df(S_{i}))
     \implies 
     \alpha <  1 - \cdf(G_{S_{j}\cup A(S_{j})}; \df(S_{j}))
   \end{align*}
+  whenever $\df(S_{j}) \geq \df(S_{i})$.
 \end{proof}
+\begin{corollary}[Pruning Supersets]
+  \label{thm:prune-superset}
+  At some node in the enumeration tree $S_{i}$, if
+  \begin{equation}
+    \label{eq:max-reject}
+    1 - F(G_{S_{i}\cup A(S_{i})}; \df(S_{i})) > \alpha
+  \end{equation}
+  where $\alpha$ is some prescribed significance level, then it follows
+  directly from \Cref{thm:prune} that
+  \begin{equation}
+    \label{eq:max-pruned}
+    \forall S' \supseteq S : 1 - \cdf(G_{S'}; \df(S')) > \alpha
+  \end{equation}
+  since $S' \supseteq S \implies \df(S') \geq \df(S)$.
+  % therefore, when \Cref{eq:max-reject} is true, no superset of $S$ can
+  % have their conditional independence hypothesis be
+  % rejected. Consequently, we cannont definitively accept the hypothesis
+  % that any superset of $S$ is in the MB of $t$.
+\end{corollary}
+
 This implies that at $S_{i}$, we can prune entire branch.
 
 %%% Experiments

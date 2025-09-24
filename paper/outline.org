@@ -41,7 +41,21 @@
 * Notations and definitions and Background
 ** G Test
 ** MB discovery and IAMB
-- the first method specifically for
+- one of the first approaches to mb discovery that scales up well to
+  thousands of variables
+- prior to this work, the main other algorithm capable of mb discovery
+  that scales well is the grow-shrink algo
+- both approaches use a two phase approach to mb discovery
+  + the first phase being one where they admit variables into a
+  + cmb based on some statistical test (forward selection)
+  + and second being one where they prune (backward pruning)
+- The main difference...
+- Thanks to the heuristic nature
+  + are fast and scales well 
+- the problem with this and similar approaches....
+- In this paper, we will build upon IAMB directly
+  + by inserting an exhaustive search phase
+  + between "forward" and "prune"
 * Method: LIAM-MB
 - our approach builds upon the 2 step approach of IAMB
   + Specifically we want to find variables in the MB
@@ -76,6 +90,7 @@
 ** Complexity
 - based on the max G-stat and df needed to *not* reject hypothesis
 * Experiments with Synthetic Data
+- 
 - Boolean functions over 5 variables
   + parity
   + and / or
@@ -86,3 +101,5 @@
 - other methods for lattice mining step
 - better bounds on G-stat or use of another test with better bounds
 - add-on for other methods
+- multiple test correction
+- other metrics

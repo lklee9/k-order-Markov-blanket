@@ -1,3 +1,18 @@
+@article{aliferis2003,
+  title = {{{HITON}}: a novel {{Markov Blanket}} algorithm for optimal variable selection},
+  shorttitle = {{{HITON}}},
+  author = {Aliferis, C. F. and Tsamardinos, I. and Statnikov, A.},
+  year = {2003},
+  journal = {AMIA ... Annual Symposium proceedings. AMIA Symposium},
+  volume = {2003},
+  pages = {21--25},
+  issn = {1942-597X},
+  abstract = {We introduce a novel, sound, sample-efficient, and highly-scalable algorithm for variable selection for classification, regression and prediction called HITON. The algorithm works by inducing the Markov Blanket of the variable to be classified or predicted. A wide variety of biomedical tasks with different characteristics were used for an empirical evaluation. Namely, (i) bioactivity prediction for drug discovery, (ii) clinical diagnosis of arrhythmias, (iii) bibliographic text categorization, (iv) lung cancer diagnosis from gene expression array data, and (v) proteomics-based prostate cancer detection. State-of-the-art algorithms for each domain were selected for baseline comparison. RESULTS: (1) HITON reduces the number of variables in the prediction models by three orders of magnitude relative to the original variable set while improving or maintaining accuracy. (2) HITON outperforms the baseline algorithms by selecting more than two orders-of-magnitude smaller variable sets than the baselines, in the selected tasks and datasets.},
+  langid = {english},
+  pmcid = {PMC1480117},
+  pmid = {14728126}
+}
+
 @article{amari2009,
   title = {{$\alpha$} -divergence is unique, belonging to both \$f\$-divergence and bregman divergence classes},
   author = {Amari, Shun-Ichi},
@@ -72,6 +87,21 @@
   abstract = {In a Bayesian Network (BN), the Markov Blanket (MB) of a target node consists of its parents, children, and spouses, and the target node is independent of all other nodes given its MB. Finding the MB has many applications, including feature selection and BN structure learning. We propose two new Markov Blanket discovery algorithms, score-based Simultaneous Markov Blanket discovery (S2TMB) and its more efficient variant, S2TMB+, to improve the efficiency of existing score-based MB learning algorithms. The proposed methods remove the necessity of enforcing the commonly used symmetry constraint by exploiting the coexistence property between spouses and descendants of the target node. S2TMB and S2TMB+ achieve comparable accuracy and better efficiency than state-of-the-art score-based methods. S2TMB and S2TMB+ are proven sound and complete under one conjecture. Empirical results on standard MB discovery datasets demonstrate the superior performances of S2TMB and S2TMB+.}
 }
 
+@article{gao2017a,
+  title = {Efficient {{Markov Blanket Discovery}} and {{Its Application}}},
+  author = {Gao, Tian and Ji, Qiang},
+  year = {2017},
+  month = may,
+  journal = {IEEE Transactions on Cybernetics},
+  volume = {47},
+  number = {5},
+  pages = {1169--1179},
+  issn = {2168-2275},
+  doi = {10.1109/TCYB.2016.2539338},
+  urldate = {2025-09-23},
+  abstract = {In a Bayesian network (BN), a target node is independent of all other nodes given its Markov blanket (MB), and finding the MB has many applications, including feature selection and BN structure learning. We propose a new MB discovery algorithm, simultaneous MB (STMB), to improve the efficiency of the existing topology-based MB discovery algorithms. The proposed method removes the necessity of enforcing the symmetry constraint that is prevalent in existing algorithms, by exploiting the coexisting property between spouses and descendants of the target node. Since STMB mainly reduces the number of independence tests needed to complete the MB set after finding the parents-and-children set, it is applicable to all previous topology-based methods. STMB is both sound and complete. Experiments show that STMB has a comparable accuracy but much better efficiency than state-of-the-art methods. An application on benchmark feature selection datasets further demonstrates the excellent performance of STMB.}
+}
+
 @article{ghosh1973,
   title = {Some {{Monotonicity Theorems}} for {$\chi$}2, {{F}} and {{T Distributions}} with {{Applications}}},
   author = {Ghosh, B. K.},
@@ -113,6 +143,22 @@
   abstract = {Causal discovery automates the learning of causal Bayesian networks from data and has been of active interest from their beginning. With the sourcing of large data sets off the internet, interest in scaling up to very large data sets has grown. One approach to this is to parallelize search using Markov Blanket (MB) discovery as a first step, followed by a process of combining MBs in a global causal model. We develop and explore three new methods of MB discovery using Minimum Message Length (MML) and compare them empirically to the best existing methods, whether developed specifically as MB discovery or as feature selection. Our best MML method is consistently competitive and has some advantageous features.}
 }
 
+@article{ling2019,
+  title = {{{BAMB}}: {{A Balanced Markov Blanket Discovery Approach}} to {{Feature Selection}}},
+  shorttitle = {{{BAMB}}},
+  author = {Ling, Zhaolong and Yu, Kui and Wang, Hao and Liu, Lin and Ding, Wei and Wu, Xindong},
+  year = {2019},
+  month = oct,
+  journal = {ACM Trans. Intell. Syst. Technol.},
+  volume = {10},
+  number = {5},
+  pages = {52:1--52:25},
+  issn = {2157-6904},
+  doi = {10.1145/3335676},
+  urldate = {2025-09-23},
+  abstract = {The discovery of Markov blanket (MB) for feature selection has attracted much attention in recent years, since the MB of the class attribute is the optimal feature subset for feature selection. However, almost all existing MB discovery algorithms focus on either improving computational efficiency or boosting learning accuracy, instead of both. In this article, we propose a novel MB discovery algorithm for balancing efficiency and accuracy, called \&lt;underline\&gt;BA\&lt;/underline\&gt;lanced \&lt;underline\&gt;M\&lt;/underline\&gt;arkov \&lt;underline\&gt;B\&lt;/underline\&gt;lanket (BAMB) discovery. To achieve this goal, given a class attribute of interest, BAMB finds candidate PC (parents and children) and spouses and removes false positives from the candidate MB set in one go. Specifically, once a feature is successfully added to the current PC set, BAMB finds the spouses with regard to this feature, then uses the updated PC and the spouse set to remove false positives from the current MB set. This makes the PC and spouses of the target as small as possible and thus achieves a trade-off between computational efficiency and learning accuracy. In the experiments, we first compare BAMB with 8 state-of-the-art MB discovery algorithms on 7 benchmark Bayesian networks, then we use 10 real-world datasets and compare BAMB with 12 feature selection algorithms, including 8 state-of-the-art MB discovery algorithms and 4 other well-established feature selection methods. On prediction accuracy, BAMB outperforms 12 feature selection algorithms compared. On computational efficiency, BAMB is close to the IAMB algorithm while it is much faster than the remaining seven MB discovery algorithms.}
+}
+
 @article{ling2021,
   title = {Using {{Feature Selection}} for {{Local Causal Structure Learning}}},
   author = {Ling, Zhaolong and Yu, Kui and Wang, Hao and Li, Lei and Wu, Xindong},
@@ -126,6 +172,22 @@
   doi = {10.1109/TETCI.2020.2978238},
   urldate = {2025-09-11},
   abstract = {Local causal structure learning aims to discover and distinguish the direct causes and direct effects of a target variable. However, the state-of-the-art local causal structure learning algorithms need to perform an exhaustive subset search within the currently selected variables for PC (i.e., parents and children) discovery. In this article, we propose an efficient local causal structure learning algorithm around a target variable, called LCS-FS (Local Causal Structure learning by Feature Selection). First, to construct the local causal skeleton of the target, we employ feature selection for finding PC without searching for conditioning sets to speed up PC discovery, leading to improve the skeleton construction efficiency. Second, to orient edges in this local causal skeleton, we propose an efficient method to find separating sets from the subsets of PC for identifying V-structures. With the integration of feature selection and the new way of finding separating sets, LCS-FS recursively finds the spouses of Markov blankets in local causal skeleton for edge orientations, until the direct causes and direct effects of the target are distinguished. The experiments on five benchmark Bayesian networks with the number of variables from 35 to 801 validate that our algorithm achieves higher efficiency and better accuracy than the state-of-the-art local causal structure learning algorithms.}
+}
+
+@article{liu2016,
+  title = {Swamping and masking in {{Markov}} boundary discovery},
+  author = {Liu, Xuqing and Liu, Xinsheng},
+  year = {2016},
+  month = jul,
+  journal = {Machine Learning},
+  volume = {104},
+  number = {1},
+  pages = {25--54},
+  issn = {1573-0565},
+  doi = {10.1007/s10994-016-5545-0},
+  urldate = {2025-09-23},
+  abstract = {This paper considers the problems of swamping and masking in Markov boundary discovery for a target variable. There are two potential reasons for swamping and masking: one is incorrectness of some conditional independence (CI) tests, and the other is violation of local composition. First, we explain why the incorrectness of CI tests may lead to swamping and masking, analyze how to reduce the incorrectness of CI tests, and build an algorithm called LRH under local composition. For convenience, we integrate the two existing algorithms, IAMB and KIAMB, and our LRH into an algorithmic framework called LCMB. Second, since LCMB may prematurely stop searching if local composition is violated, a theoretical improvement on LCMB is made as follows: we analyze how to resume the stopped search of LCMB, construct a corresponding algorithmic framework called WLCMB, and show that its correctness only needs a more relaxed condition than that of LCMB. Finally, we apply LCMB and WLCMB to a number of Bayesian networks. The experimental results reveal that LRH is much more efficient than the existing two LCMB algorithms and that WLCMB can further improve LCMB.},
+  langid = {english}
 }
 
 @inproceedings{margaritis1999,
@@ -147,6 +209,22 @@
   month = aug,
   urldate = {2025-08-26},
   abstract = {Learning a Bayesian network structure from data is an NP-hard problem and thus exact algorithms are feasible only for small data sets. Therefore, network structures for larger networks are usually learned with various heuristics. Another approach to scaling up the structure learning is local learning. In local learning, the modeler has one or more target variables that are of special interest; he wants to learn the structure near the target variables and is not interested in the rest of the variables. In this paper, we present a score-based local learning algorithm called SLL. We conjecture that our algorithm is theoretically sound in the sense that it is optimal in the limit of large sample size. Empirical results suggest that SLL is competitive when compared to the constraint-based HITON algorithm. We also study the prospects of constructing the network structure for the whole node set based on local results by presenting two algorithms and comparing them to several heuristics.}
+}
+
+@article{pena2007,
+  title = {Towards scalable and data efficient learning of {{Markov}} boundaries},
+  author = {Pe{\~n}a, Jose M. and Nilsson, Roland and Bj{\"o}rkegren, Johan and Tegn{\'e}r, Jesper},
+  year = {2007},
+  month = jul,
+  journal = {International Journal of Approximate Reasoning},
+  series = {Eighth {{European Conference}} on {{Symbolic}} and {{Quantitative Approaches}} to {{Reasoning}} with {{Uncertainty}} ({{ECSQARU}} 2005)},
+  volume = {45},
+  number = {2},
+  pages = {211--232},
+  issn = {0888-613X},
+  doi = {10.1016/j.ijar.2006.06.008},
+  urldate = {2025-09-23},
+  abstract = {We propose algorithms for learning Markov boundaries from data without having to learn a Bayesian network first. We study their correctness, scalability and data efficiency. The last two properties are important because we aim to apply the algorithms to identify the minimal set of features that is needed for probabilistic classification in databases with thousands of features but few instances, e.g. gene expression databases. We evaluate the algorithms on synthetic and real databases, including one with 139,351 features.}
 }
 
 @article{schluter2014,
