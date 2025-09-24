@@ -90,12 +90,21 @@
 ** Complexity
 - based on the max G-stat and df needed to *not* reject hypothesis
 * Experiments with Synthetic Data
-- 
-- Boolean functions over 5 variables
+- In order to empirically determine situations where
+  + a heuristic approach to MB discovery might not capture 
+  + in this section
+- Specifically the boolean function we will use are:
   + parity
   + and / or
   + exactly-k
   + prime
+- A bn with the nodes and connectivity in fig
+  + CPT based on the boolean function, 1 for pr=1 when func is truee
+- We use pgmpy to construct
+  + sample 10 sets of 500 samples using bn forward sample in pgmmpy
+  + seed used during sampling is the i-th sample
+- Find the mb of class var
+- Boolean functions over 5 variables
 * Experiments with Benchmark Data
 * Future work
 - other methods for lattice mining step
