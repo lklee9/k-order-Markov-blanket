@@ -160,21 +160,41 @@ difficulty of xor
   \centering
   % \begin{subfigure}{0.7\linewidth}
 \begin{tikzpicture}
-  \node[draw, circle, inner sep=2pt] (1) at (-0.75,1.5) {$X_{1}$};
+  \node[draw, circle, inner sep=2pt] (1) at (-2.5,3) {$X_{1}$};
   % \node[draw, circle, inner sep=2pt] (2) at (0,1.5) {$X_{2}$};
-  \node[draw, circle, inner sep=2pt] (3) at (0.75,1.5) {$X_{3}$};
-  \node[draw, circle, inner sep=3pt] (y) at (0,0) {$Y$};
+  \node[draw, circle, inner sep=2pt] (3) at (-1.5,3) {$X_{2}$};
+  \node[draw, circle, inner sep=3pt] (y) at (-2,2) {$Y$};
   \draw (1) -- (y);
   \draw (3) -- (y);
-\node (PrX) at (0, 2.5){
+
+% \node (PrX) at (0, 2.5){
+%     \begin{tabular}[t]{|cc|}
+%       \hline
+%       $\pr_{X_{i}}(0)$ & $\pr_{X_{i}}(1)$\\
+%       \hline
+%       0.5 & 0.5\\
+%       \hline
+%     \end{tabular}
+% };
+\node (PrX1) at (-4.5, 2){
     \begin{tabular}[t]{|cc|}
       \hline
-      $\pr_{X_{i}}(0)$ & $\pr_{X_{i}}(1)$\\
+      $\pr_{X_{1}}(0)$ & $\pr_{X_{1}}(1)$\\
       \hline
       0.5 & 0.5\\
       \hline
     \end{tabular}
 };
+\node (PrX2) at (-4.5, 3){
+    \begin{tabular}[t]{|cc|}
+      \hline
+      $\pr_{X_{2}}(0)$ & $\pr_{X_{2}}(1)$\\
+      \hline
+      0.5 & 0.5\\
+      \hline
+    \end{tabular}
+};
+
 
 \node (PrY) at (-3.75, 0.5){
     \begin{tabular}[t]{|cc|cc|}
@@ -188,7 +208,7 @@ difficulty of xor
       \hline
     \end{tabular}
 };
-\node (PrY) at (5, 1){
+\node (PrY) at (3, 1){
     \begin{tabular}[t]{rl}
       Method & Recall (\%)\\
       \hline
