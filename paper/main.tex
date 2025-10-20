@@ -8,6 +8,9 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{subcaption}
 \usepackage{url}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{enumitem}
 
 \usepackage{tikz}
 \usetikzlibrary{positioning,graphs}
@@ -162,7 +165,7 @@ difficulty of xor
 \begin{figure}
   \centering
   % \begin{subfigure}{0.7\linewidth}
-\begin{tikzpicture}
+  \begin{tikzpicture}
   \node[draw, circle, inner sep=2pt] (1) at (-2.5,3) {$X_{1}$};
   % \node[draw, circle, inner sep=2pt] (2) at (0,1.5) {$X_{2}$};
   \node[draw, circle, inner sep=2pt] (3) at (-1.5,3) {$X_{2}$};
@@ -170,15 +173,15 @@ difficulty of xor
   \draw (1) -- (y);
   \draw (3) -- (y);
 
-% \node (PrX) at (0, 2.5){
-%     \begin{tabular}[t]{|cc|}
-%       \hline
-%       $\pr_{X_{i}}(0)$ & $\pr_{X_{i}}(1)$\\
-%       \hline
-%       0.5 & 0.5\\
-%       \hline
-%     \end{tabular}
-% };
+  % \node (PrX) at (0, 2.5){
+  % \begin{tabular}[t]{|cc|}
+  %   \hline
+  %   $\pr_{X_{i}}(0)$ & $\pr_{X_{i}}(1)$\\
+  %   \hline
+  %   0.5 & 0.5\\
+  %   \hline
+  % \end{tabular}
+  % };
 \node (PrX1) at (-4.5, 2){
     \begin{tabular}[t]{|cc|}
       \hline
@@ -211,17 +214,17 @@ difficulty of xor
       \hline
     \end{tabular}
 };
-\node (PrY) at (3, 1){
-    \begin{tabular}[t]{rl}
-      Method & Recall\\
+\node (PrY) at (3, 1.5){
+    \begin{tabular}[t]{lr}
+      Method & Recall (\%)\\
       \hline
       GS~\citep{margaritis1999} & 0.0\\
       IAMB~\citep{tsamardinos2003} & 0.0\\
-      PCMB~\citep{pena2007} & 0.0\\
       HITON\_MB\citep{aliferis2003} & 0.0\\
+      PCMB~\citep{pena2007} & 0.0\\
+      LRH\citep{liu2016} & 0.0\\
       STMB~\citep{gao2017a} & 0.0\\
       BAMB\citep{ling2019} & 0.0\\
-      LRH\citep{liu2016} & 0.0\\
       \textbf{LIAM-MB (ours)} & \textbf{1.0}\\
     \end{tabular}
 };
@@ -269,7 +272,7 @@ $\rmS\subset\rmX \setminus (\{\rvt\} \cup \mb)$ is conditionally
 independent to the variable $\rvt$ given the a candidate Markov blanket
 $\mb$,
 \begin{equation*}
- H_{0}(\rmS): \rmS \indep \rvt \mid \mb.
+  H_{0}(\rmS): \rmS \indep \rvt \mid \mb.
 \end{equation*}
 The G-statistic for testing this hypothesis is
 then~\citep{tsamardinos2006}
@@ -365,38 +368,38 @@ remaining candidate MB that is iteratively pruned during this phase.
 
 % \begin{minipage}[t]{0.48\linewidth}
 \begin{algorithm}[H]
-\caption{Forward Selection (\texttt{forward})}\label{alg:forward}
-\DontPrintSemicolon
-\KwIn{$\db$, $\rmX$, $t$, $\alpha$}
-\KwOut{Candidate Markov Blanket $\mb$}
-$\rmC \gets \rmX$\;
-$\mb \gets \{\}$\;
-\While{True}{
-  $\rmR \gets \{\rvx \mid \rvx \in \rmC,
-  \rvx \not\indep t \mid \mb\}$\;
-  \If{$\rvx$ is empty} {
-    \Return{$\mb$}\;
+  \caption{Forward Selection (\texttt{forward})}\label{alg:forward}
+  \DontPrintSemicolon
+  \KwIn{$\db$, $\rmX$, $t$, $\alpha$}
+  \KwOut{Candidate Markov Blanket $\mb$}
+  $\rmC \gets \rmX$\;
+  $\mb \gets \{\}$\;
+  \While{True}{
+    $\rmR \gets \{\rvx \mid \rvx \in \rmC,
+    \rvx \not\indep t \mid \mb\}$\;
+    \If{$\rvx$ is empty} {
+      \Return{$\mb$}\;
+    }
+    $\rvr \gets \rvx\in\rmR$ with the largest $G_{\rvx}$\;
+    Remove $\rvr$ from $\rmC$\;
+    Insert $\rvr$ into $\mb$\;
   }
-  $\rvr \gets \rvx\in\rmR$ with the largest $G_{\rvx}$\;
-  Remove $\rvr$ from $\rmC$\;
-  Insert $\rvr$ into $\mb$\;
-}
 \end{algorithm}
 % \end{minipage}
 % \hfill
 % \begin{minipage}[t]{0.48\linewidth}
 \begin{algorithm}[H]
-\caption{Prune Candidate MB (\texttt{backward})}\label{alg:backward}
-\DontPrintSemicolon
-\KwIn{$\db$, $\mb$, $t$, $\alpha$}
-\KwOut{Output result}
-\For{each $\rvx\in\mb$}{
-  $\mb' \gets \mb \setminus \{\rvx\}$\;
-  \If{$\rvx \indep t \mid \mb'$}{
-    $\mb \gets \mb'$\;
+  \caption{Prune Candidate MB (\texttt{backward})}\label{alg:backward}
+  \DontPrintSemicolon
+  \KwIn{$\db$, $\mb$, $t$, $\alpha$}
+  \KwOut{Output result}
+  \For{each $\rvx\in\mb$}{
+    $\mb' \gets \mb \setminus \{\rvx\}$\;
+    \If{$\rvx \indep t \mid \mb'$}{
+      $\mb \gets \mb'$\;
+    }
+    \Return{$\mb$}\;
   }
-  \Return{$\mb$}\;
-}
 \end{algorithm}
 % \end{minipage}
 
@@ -438,7 +441,7 @@ computationally efficient.
     \centering
     \input{./fig/enum-tree-one.tex}
     % \caption{$\cdf(G_{a};\df(a)) \leq \alpha$\\therefore $a$ should
-    %   be in $\mb$}
+    % be in $\mb$}
     \caption{\centering\\
       $\cdf(G_{a};\df(a)) \leq \alpha$\\ $\implies a \not\indep t
       \mid \mb$}
@@ -482,59 +485,59 @@ carrying out Phase \Romannum{1} of IAMB first, we can increase the size
 of $\mb$ and decrease the search space of the exhaustive search.
 
 % \begin{wrapfigure}{l}{0.5\linewidth}
-% \begin{minipage}[t]{\linewidth}
+%   \begin{minipage}[t]{\linewidth}
 \begin{algorithm}[H]
-\caption{Lattice Mining (\texttt{lattice})}
-% \DontPrintSemicolon
-\KwIn{$\db$, $\rmX$, $t$, $\mb$, $\alpha$}
-\KwOut{Output result}
-$\rmS \gets [\emptyset]$\;
-$\rmA \gets [\rmX]$\;
-$\df_{\max} \gets \infty$\; 
-\For{each $\rvx\in\mb$}{
-  $S \gets \pop(\rmS)$\;
-  $A \gets \pop(\rmA)$\;
-  $\df_{\cur} \gets \df(\rvs)$\;
-  \If{$|S| > 0$}{
-    \If{$S \not\indep t \mid \mb$}{
-      \Return{$S$}\;
+  \caption{Lattice Mining (\texttt{lattice})}
+  % \DontPrintSemicolon
+  \KwIn{$\db$, $\rmX$, $t$, $\mb$, $\alpha$}
+  \KwOut{Output result}
+  $\rmS \gets [\emptyset]$\;
+  $\rmA \gets [\rmX]$\;
+  $\df_{\max} \gets \infty$\; 
+  \For{each $\rvx\in\mb$}{
+    $S \gets \pop(\rmS)$\;
+    $A \gets \pop(\rmA)$\;
+    $\df_{\cur} \gets \df(\rvs)$\;
+    \If{$|S| > 0$}{
+      \If{$S \not\indep t \mid \mb$}{
+        \Return{$S$}\;
+      }
+      \If{$1 - \cdf(G_{S\cup A}; \df(S)) > \alpha$}{
+        $\df_{\max} \gets \df_{\cur}$\;
+        \Comment{Pruning of supersets according to
+          \Cref{thm:prune-superset}.}
+        continue\; 
+      }
     }
-    \If{$1 - \cdf(G_{S\cup A}; \df(S)) > \alpha$}{
-      $\df_{\max} \gets \df_{\cur}$\;
-      \Comment{Implicit pruning since any superset will have a greater
-        or equal degrees of freedom.}
-      continue\; 
+    \Comment{Don't explore subsets that exceed the current maximum degrees
+      of freedom via \Cref{thm:prune}.}
+    $A' \gets \{a \mid a\in A, \df(S \cup \{a\}) < \df_{\max}\}$\;
+    \For{$i \in [1, |A'|]$}{
+      $a \gets A'_{i}$\;
+      push $S \cup \{a\}$ on to $\rmS$\;
+      push $A'[1,\ldots,i-1]$ on to $\rmA$\;
     }
+    \Return{$\emptyset$};
   }
-  \Comment{Don't explore subsets that exceed the current maximum degrees
-  of freedom}
-  $A' \gets \{a \mid a\in A, \df(S \cup \{a\}) < \df_{\max}\}$\;
-  \For{$i \in [1, |A'|]$}{
-    $a \gets A'_{i}$\;
-    push $S \cup \{a\}$ on to $\rmS$\;
-    push $A'[1,\ldots,i-1]$ on to $\rmA$\;
-  }
-  \Return{$\emptyset$};
-}
 \end{algorithm}
 \begin{algorithm}[H]
-\caption{LIAM-MB}
-% \DontPrintSemicolon
-\KwIn{$\db$, $\rmX$, $t$, $\alpha$}
-\KwOut{Output result}
-$\mb \gets \texttt{forward}(\db, \rmX, t, \alpha)$\;
-\While{$|\rmX| > 0$}{
-  $S \gets \texttt{lattice}(\db, \rmX, t, \mb, \alpha)$\;
-  \If{$S==\emptyset$}{
-    break\;
+  \caption{LIAM-MB}
+  % \DontPrintSemicolon
+  \KwIn{$\db$, $\rmX$, $t$, $\alpha$}
+  \KwOut{Output result}
+  $\mb \gets \texttt{forward}(\db, \rmX, t, \alpha)$\;
+  \While{$|\rmX| > 0$}{
+    $S \gets \texttt{lattice}(\db, \rmX, t, \mb, \alpha)$\;
+    \If{$S==\emptyset$}{
+      break\;
+    }
+    \For{$a \in S$}{
+      Remove $a$ from $\rmX$\;
+      Insert $a$ into $\mb$\;
+    }
   }
-  \For{$a \in S$}{
-    Remove $a$ from $\rmX$\;
-    Insert $a$ into $\mb$\;
-  }
-}
-$\mb \gets \texttt{backward}(\db, \mb, t, \alpha)$\;
-\Return{$\mb$}\;
+  $\mb \gets \texttt{backward}(\db, \mb, t, \alpha)$\;
+  \Return{$\mb$}\;
 \end{algorithm}
 % \end{minipage}  
 % \end{wrapfigure}
@@ -630,22 +633,92 @@ This implies that at $S_{i}$, we can prune entire branch.
 - 
 
 %%% Experiments
-\section{Experiments with Synthetic Data}
+\section{Experiments}\label{sec:exp}
+Throughout this section we will compare our approach against existing
+methods for Markov blanket discovery. Specifically we will compare
+against the following nine Markov blanket discovery mehtods:
+\begin{itemize}
+\item GS~\citep{margaritis1999}. 
+\item IAMB~\citep{tsamardinos2003}.
+\item HITON~\citep{aliferis2003}.
+\item PCMB~\citep{pena2007}.
+\item LRH~\citep{liu2016}.
+\item STMB~\citep{gao2017a}.
+\item BAMB~\citep{ling2019}.
+\end{itemize}
+For our experiments, we will use the implementation of these methods
+found in the \texttt{pyCausalFS} python library~\citep{yu2020a} with a
+significance level of $0.01$ for any statistical tests. When comparing
+the methods above we will use the metric \emph{recall}---the percentage
+of the variables in the true Markov blanket recovered by the Markov
+blanket discovery method.
 
 
+\subsection{Experiments with Synthetic Bayesian Networks}
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[every node/.style={draw, circle, inner sep=2pt}]
+  \node[inner sep=3.5pt] (y) at (0,0) {$Y$};
+  \node (x1) at (-3,1.5) {$X_{1}$};
+  \node (x2) at (-1.5,1.5) {$X_{2}$};
+  \node (x3) at (0,1.5) {$X_{3}$};
+  \node (x4) at (1.5,1.5) {$X_{4}$};
+  \node (x5) at (3,1.5) {$X_{5}$};
 
-\section{Experiments with Benchmark Data}
+  \node (x6) at (-3,0) {$X_{6}$};
+  \node (x7) at (-1.5,0) {$X_{7}$};
+  \node (x8) at (1.5,0) {$X_{8}$};
+  \node (x9) at (3,0) {$X_{9}$};
+
+  \draw (x1) -- (y);
+  \draw (x2) -- (y);
+  \draw (x3) -- (y);
+  \draw (x4) -- (y);
+  \draw (x5) -- (y);
+  \end{tikzpicture}
+\end{figure}
+In order to empirically determine situations where non-exhaustive
+heuristic approaches might have difficulty discovering the Markov
+blanket of a variable, in this section we will keep it simple focus on
+discovering the Markov blanket of variables that are the output of some
+Boolean function. Specifically, we will use following Boolean functions:
+\begin{description}[align=right,labelwidth=7em]
+\item[parity:]     
+  $f(X_{1},\ldots,X_{5}) = (\sum_{i=1}^{5}X_{i}) \mod 2$
+\item[prime:]      
+  $f(X_{1},\ldots,X_{5}) = \bigl[(\sum_{i=1}^{5}X_{i}) \text{ is prime}\bigr]$
+\item[exactly-$k$:] 
+  $f(X_{1},\ldots,X_{5}; k) = \bigl[(\sum_{i=1}^{5}X_{i}) = k\bigr]$
+\item[and:]        
+  $f(X_{1},\ldots,X_{5}) = \bigl[(\sum_{i=1}^{5}X_{i}) = 5\bigr]$
+\item[or:]         
+  $f(X_{1},\ldots,X_{5}) = \bigl[(\sum_{i=1}^{5}X_{i}) \geq 1\bigr]$
+\end{description}
+We then construct a Bayesian network for each 
+
+
+% \input{./tab/syn}
+
+\begin{table}
+  \centering
+  \input{./tab/syn-neat}
+  \caption{Synthetic Results}
+  \label{tab:syn}
+\end{table}
+
+\subsection{Experiments with Benchmark Bayesian Networks}
 
 
 %%% Post matter
-\subsubsection*{Author Contributions}
-If you'd like to, you may include a section for author contributions as
-is done in many journals. This is optional and at the discretion of the
-authors.
+% \subsubsection*{Author Contributions}
+% If you'd like to, you may include a section for author contributions
+% as is done in many journals. This is optional and at the discretion of
+% the authors.
 
-\subsubsection*{Acknowledgments}
-Use unnumbered third level headings for the acknowledgments. All
-acknowledgments, including those to funding agencies, go at the end of the paper.
+% \subsubsection*{Acknowledgments}
+% Use unnumbered third level headings for the acknowledgments. All
+% acknowledgments, including those to funding agencies, go at the end of
+% the paper.
 
 
 
