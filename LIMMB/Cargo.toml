@@ -1,0 +1,16 @@
+[package]
+name = "LIMMB"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "LIMMB"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = "0.24.0"
+rand = "0.9.2"
+num = "0.4.3"
+statrs = "0.18.0"
+bit-set = "0.8"
