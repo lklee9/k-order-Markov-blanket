@@ -1,7 +1,7 @@
-use std::collections::{hash_map::Keys, BTreeSet, HashMap, HashSet};
+use std::collections::{hash_map::Keys, BTreeSet, HashMap};
 
-use crate::dataset::{self, DataSet};
-use crate::metadata::{self, MetaData};
+use crate::dataset::{DataSet};
+use crate::probability::Probability;
 
 pub struct ProbabilityMap<'a> {
     dataset: &'a DataSet,
@@ -9,12 +9,48 @@ pub struct ProbabilityMap<'a> {
     comb_to_freq: HashMap<Vec<usize>, usize>,
 }
 
-impl<'a> ProbabilityMap<'a> {
-    pub fn new(dataset: &'a DataSet) -> Self {
+impl<'a> Probability<'a> for ProbabilityMap<'a> {
+    fn new(dataset: &'a DataSet) -> Self {
         let atts: BTreeSet<usize> = (0..dataset.natts).collect();
         return ProbabilityMap::new_marg(dataset, atts);
     }
+    fn get_combs(&self) -> Vec<Vec<usize>> {
+        return self.comb_to_freq.keys().cloned().collect();
+    }
+    fn get_atts(&self) -> &BTreeSet<usize> {
+        return &self.atts;
+    }
+    
+    fn get_dataset(&self) -> &DataSet {
+        return &self.dataset;
+    }
+    
+    fn get_size(&self) -> usize {
+        return self.comb_to_freq.len();
+    }
+    
+    fn p(&self, comb: &Vec<usize>) -> f64 {
+        match self.comb_to_freq.get(comb) {
+            Some(&v) => (v as f64) / (self.dataset.sample_size as f64),
+            None => 0.0,
+        }
+    }
 
+    fn f(&self, comb: &Vec<usize>) -> usize {
+        match self.comb_to_freq.get(comb) {
+            Some(&v) => v,
+            None => 0,
+        }
+    }
+
+    fn f_map(&self, vals: &HashMap<usize, usize>) -> usize {
+        let comb: Vec<usize> =
+            self.atts.iter().map(|a| vals[a]).collect();
+        self.f(&comb)
+    }
+}
+
+impl<'a> ProbabilityMap<'a> {
     pub fn new_marg(dataset: &'a DataSet, vars: BTreeSet<usize>) -> Self {
         let mut comb_to_freq: HashMap<Vec<usize>, usize> =
             HashMap::new();
@@ -46,41 +82,6 @@ impl<'a> ProbabilityMap<'a> {
         }
     }
 
-    pub fn get_atts(&self) -> &BTreeSet<usize> {
-        return &self.atts;
-    }
-
-    pub fn get_size(&self) -> usize {
-        return self.comb_to_freq.len();
-    }
-
-    pub fn get_dataset(&self) -> &DataSet {
-        return &self.dataset;
-    }
-
-    pub fn p(&self, comb: &Vec<usize>) -> f64 {
-        match self.comb_to_freq.get(comb) {
-            Some(&v) => (v as f64) / (self.dataset.sample_size as f64),
-            None => 0.0,
-        }
-    }
-
-    pub fn f(&self, comb: &Vec<usize>) -> usize {
-        match self.comb_to_freq.get(comb) {
-            Some(&v) => v,
-            None => 0,
-        }
-    }
-
-    pub fn f_map(&self, vals: &HashMap<usize, usize>) -> usize {
-        let comb: Vec<usize> =
-            self.atts.iter().map(|a| vals[a]).collect();
-        self.f(&comb)
-    }
-
-    pub fn get_combs(&self) -> Keys<'_, Vec<usize>, usize> {
-        return self.comb_to_freq.keys();
-    }
 
     pub fn marginalize(&self, marg: &BTreeSet<usize>) -> Self {
         let mut comb_to_freq_m: HashMap<Vec<usize>, usize> =

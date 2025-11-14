@@ -1,9 +1,10 @@
-use std::collections::{hash_map::Keys, BTreeSet, HashMap, HashSet};
-use std::iter::once;
+use std::collections::{hash_map::Keys, BTreeSet, HashMap};
 
 use bit_set::BitSet;
 
-use crate::dataset::{self, DataSet};
+use crate::dataset::DataSet;
+use crate::probability::Probability;
+
 
 pub struct ProbabilityTIDs<'a> {
     dataset: &'a DataSet,
@@ -11,11 +12,49 @@ pub struct ProbabilityTIDs<'a> {
     comb_to_tid: HashMap<Vec<usize>, BitSet>,
 }
 
-impl<'a> ProbabilityTIDs<'a> {
-    pub fn new(dataset: &'a DataSet) -> Self {
+impl<'a> Probability<'a> for ProbabilityTIDs<'a> {
+    fn new(dataset: &'a DataSet) -> Self {
         let atts: BTreeSet<usize> = (0..dataset.natts).collect();
         return ProbabilityTIDs::new_marg(dataset, atts);
     }
+    fn get_combs(&self) -> Vec<Vec<usize>> {
+        return self.comb_to_tid.keys().cloned().collect();
+    }
+    fn get_atts(&self) -> &BTreeSet<usize> {
+        return &self.atts;
+    }
+    fn get_dataset(&self) -> &DataSet {
+        return &self.dataset;
+    }
+    fn get_size(&self) -> usize {
+        return self.comb_to_tid.len();
+    }
+
+    fn p(&self, comb: &Vec<usize>) -> f64 {
+        match self.comb_to_tid.get(comb) {
+            Some(v) => {
+                (v.len() as f64) / (self.dataset.sample_size as f64)
+            }
+            None => 0.0,
+        }
+    }
+
+    fn f(&self, comb: &Vec<usize>) -> usize {
+        match self.comb_to_tid.get(comb) {
+            Some(v) => v.len(),
+            None => 0,
+        }
+    }
+
+    fn f_map(&self, vals: &HashMap<usize, usize>) -> usize {
+        let comb: Vec<usize> =
+            self.atts.iter().map(|a| vals[a]).collect();
+        self.f(&comb)
+    }
+
+}
+
+impl<'a> ProbabilityTIDs<'a> {
 
     pub fn new_marg(
         dataset: &'a DataSet,
@@ -97,41 +136,5 @@ impl<'a> ProbabilityTIDs<'a> {
         }
     }
 
-    pub fn get_atts(&self) -> &BTreeSet<usize> {
-        return &self.atts;
-    }
 
-    pub fn get_size(&self) -> usize {
-        return self.comb_to_tid.len();
-    }
-
-    pub fn get_dataset(&self) -> &DataSet {
-        return &self.dataset;
-    }
-
-    pub fn p(&self, comb: &Vec<usize>) -> f64 {
-        match self.comb_to_tid.get(comb) {
-            Some(v) => {
-                (v.len() as f64) / (self.dataset.sample_size as f64)
-            }
-            None => 0.0,
-        }
-    }
-
-    pub fn f(&self, comb: &Vec<usize>) -> usize {
-        match self.comb_to_tid.get(comb) {
-            Some(v) => v.len(),
-            None => 0,
-        }
-    }
-
-    pub fn f_map(&self, vals: &HashMap<usize, usize>) -> usize {
-        let comb: Vec<usize> =
-            self.atts.iter().map(|a| vals[a]).collect();
-        self.f(&comb)
-    }
-
-    pub fn get_combs(&self) -> Keys<'_, Vec<usize>, BitSet> {
-        return self.comb_to_tid.keys();
-    }
 }

@@ -7,11 +7,11 @@ use std::usize::MAX;
 
 use crate::dataset::{self, DataSet};
 use crate::g2test::{
-    self, chi_square_p_val, g2, g2_df, g2_stat, g2_stat_with_probs,
-    g2_stat_with_tids, TestResult,
+    self, chi_square_p_val, g2, g2_df, g2_df_eff, g2_stat, g2_stat_with_probs, TestResult
 };
 use crate::metadata::MetaData;
 use crate::prob_map::{self, ProbabilityMap};
+use crate::probability::Probability;
 use crate::prob_tids::ProbabilityTIDs;
 
 // compute conditional g test between T and x
@@ -101,8 +101,15 @@ pub fn mafia_tid(
         .iter()
         .map(|&a| (a, g2(prob, att_t, &once(a).collect(), mb).pval))
         .collect();
+    let nvals_h: HashMap<usize, usize> = atts
+        .iter()
+        .map(|&a| (a, prob.get_dataset().nvals[a]))
+        .collect();
+    // atts.reverse();
     atts.sort_by(|a, b| {
-        heuristic[b].partial_cmp(&heuristic[a]).unwrap()
+        nvals_h[a].cmp(&nvals_h[b])
+        // heuristic[b].partial_cmp(&heuristic[a]).unwrap()
+        // heuristic[a].partial_cmp(&heuristic[b]).unwrap()
     });
     // Create probs
     let prob_c: ProbabilityTIDs =
@@ -136,6 +143,7 @@ pub fn mafia_tid(
     let mut iter: usize = 0;
     let mut max_df: usize = MAX;
     while !stack_current.is_empty() {
+        println!("");
         assert![stack_to_add_nvals.len() == stack_to_add.len()];
         if stack_to_add.is_empty() {
             continue;
@@ -157,6 +165,9 @@ pub fn mafia_tid(
         if cur.len() > max_mb_size {
             continue;
         }
+        // let cur_df = g2_df_eff(
+        //         &prob_xtc, &prob_xc, &prob_tc, &prob_c,
+        // );
         let cur_df = g2_df(data, att_t, &cur, mb);
         // Give up if current df is already too high
         if cur_df >= max_df {
@@ -167,7 +178,7 @@ pub fn mafia_tid(
         if cur.len() > 0 {
             num_ci += 1;
             // Check if current atts reject H0, return cur if rejected
-            let cur_stat = g2_stat_with_tids(
+            let cur_stat = g2_stat_with_probs(
                 &prob_xtc, &prob_xc, &prob_tc, &prob_c,
             );
             let cur_pval = chi_square_p_val(cur_stat, cur_df);
@@ -180,6 +191,7 @@ pub fn mafia_tid(
             }
             // if H0 not rejected and atts empty skip
             if atts.is_empty() {
+                print!("\t empty res...");
                 continue;
             }
             // Get the upper bound statistic with the rem vars to add
@@ -198,7 +210,8 @@ pub fn mafia_tid(
             // println!("nvals: {}", nvals.len());
             // * nvals.iter().min().unwrap();
             let pval: f64 = chi_square_p_val(upper_stat, cur_df);
-            // print!("\t upper pval: {}", pval);
+            print!("\t upper stat: {}", upper_stat);
+            print!("\t lower pval: {}", pval);
             // print!("\t smallest pval: {}", smallest_pval);
             if pval > alpha {
                 max_df = cur_df;
@@ -252,6 +265,7 @@ pub fn mafia_tid(
         let mut next_atts: Vec<usize> = Vec::with_capacity(atts.len());
         for a in atts {
             let mut next_cur = cur.clone();
+            // next_atts.push(a);
             next_cur.insert(a);
             let next_df = g2_df(data, att_t, &next_cur, mb);
             if next_df < max_df {
@@ -301,7 +315,8 @@ pub fn mafia(
         .map(|&a| (a, g2(prob, att_t, &once(a).collect(), mb).pval))
         .collect();
     atts.sort_by(|a, b| {
-        heuristic[b].partial_cmp(&heuristic[a]).unwrap()
+        // heuristic[b].partial_cmp(&heuristic[a]).unwrap()
+        heuristic[a].partial_cmp(&heuristic[b]).unwrap()
     });
     // Create probs
     let prob_c: ProbabilityMap = prob.marginalize(&mb);
@@ -424,10 +439,8 @@ pub fn mine(
     use_tid: bool,
 ) {
     let data = prob.get_dataset();
-    let mut cmb: BTreeSet<usize> = res.mb.clone();
-    let mut num_ci: usize = res.num_ci_test;
     let mut atts: BTreeSet<usize> =
-        prob.get_atts().difference(&cmb).cloned().collect();
+        prob.get_atts().difference(&res.mb).cloned().collect();
     atts.remove(&att_target);
     let mut it: usize = 0;
     let mut converged: bool = false;
@@ -439,22 +452,23 @@ pub fn mine(
         })
         .collect();
     while !converged && !atts.is_empty() {
+        prune(res, &prob, att_target, alpha);
         it += 1;
         print!(
             "\n{}: mb size: {} \t att rem: {} \t mb: [",
             it,
-            cmb.len(),
+            res.mb.len(),
             atts.len()
         );
-        for a in cmb.iter() {
+        for a in res.mb.iter() {
             print!("{},", a);
         }
         println!("]");
         // let res: Option<(BTreeSet<usize>, usize)> =
         //     mafia(&cmb, prob, att_target, max_mb_size, alpha);
-        let res: Option<(BTreeSet<usize>, usize)> = if use_tid {
+        let tmp_res: Option<(BTreeSet<usize>, usize)> = if use_tid {
             mafia_tid(
-                &cmb,
+                &res.mb,
                 prob,
                 &atom_probs,
                 &atts,
@@ -463,13 +477,13 @@ pub fn mine(
                 alpha,
             )
         } else {
-            mafia(&cmb, prob, &atts, att_target, max_mb_size, alpha)
+            mafia(&res.mb, prob, &atts, att_target, max_mb_size, alpha)
         };
-        match res {
+        match tmp_res {
             Some(r) => {
-                num_ci += r.1;
+                res.num_ci_test += r.1;
                 for y in r.0 {
-                    cmb.insert(y);
+                    res.mb.insert(y);
                     atts.remove(&y);
                 }
             }
@@ -480,15 +494,13 @@ pub fn mine(
     }
     print!(
         "\nfinal: mb size: {} \t att rem: {}\t mb: [",
-        cmb.len(),
+        res.mb.len(),
         atts.len()
     );
-    for a in cmb.iter() {
+    for a in res.mb.iter() {
         print!("{},", a);
     }
     println!("]");
-    res.mb = cmb;
-    res.num_ci_test = num_ci;
 }
 
 pub fn backward_select(
@@ -550,6 +562,7 @@ pub fn prune(
     att_target: usize,
     alpha: f64,
 ) {
+    println!("\nPruning...");
     let mut cmb: BTreeSet<usize> = res.mb.clone();
     let mut num_ci: usize = res.num_ci_test;
     let data = prob.get_dataset();
