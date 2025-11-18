@@ -104,6 +104,7 @@ fn run_nested_assoc_mine(
                 converged = true;
             }
         }
+        num_ci += prune(&mut cmb, &prob, att_target, alpha, df_limit);
     }
     // num_ci += prune(&mut cmb, &prob, att_target, alpha, df_limit);
     print!(

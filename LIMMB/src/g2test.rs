@@ -32,6 +32,7 @@ pub fn g2_stat_with_probs<'a>(
     prob_c: &impl Probability<'a>,
 ) -> f64 {
     let mut stat: f64 = 0.0;
+    let N: usize = prob_xtc.get_dataset().sample_size;
     // print!("tc: [");
     // for a in prob_tc.get_atts() {
     //     print!("{},", a);
@@ -42,6 +43,9 @@ pub fn g2_stat_with_probs<'a>(
     //     print!("{},", a);
     // }
     // println!("]");
+    let mut invalid = false;
+    let mut num_valid_cells: usize = 0;
+    let mut num_cells = 0;
     for comb in prob_xtc.get_combs() {
         let vals: HashMap<usize, usize> = prob_xtc
             .get_atts()
@@ -58,6 +62,11 @@ pub fn g2_stat_with_probs<'a>(
         //     stat, s_xtc, s_xc, s_tc, s_c
         // );
         if s_xtc != 0.0 {
+            let e: f64 = (N as f64) * (s_xc / s_c) * (s_tc / s_c);
+            if e >= 5.0 {
+                num_valid_cells += 1;
+            }
+            num_cells += 1;
             // println!("cur1: {}", (s_xtc * s_c / (s_xc * s_tc)));
             // println!("cur2: {}", (s_xtc * s_c / (s_xc * s_tc)).ln());
             if s_xc == 0.0 || s_tc == 0.0 {
@@ -65,6 +74,11 @@ pub fn g2_stat_with_probs<'a>(
             }
             stat += s_xtc * (s_xtc * s_c / (s_xc * s_tc)).ln();
         }
+    }
+    let valid_ratio = (num_valid_cells as f64) / (num_cells as f64);
+    print!("\tvalid_ratio={}", valid_ratio);
+    if valid_ratio < 0.8 {
+        print!("\tWARNING: test might be invalid!!!");
     }
     stat * 2.0
 }
