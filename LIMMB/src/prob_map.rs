@@ -1,12 +1,13 @@
 use std::collections::{hash_map::Keys, BTreeSet, HashMap};
 
 use crate::dataset::{DataSet};
+use crate::prob_tids::ProbabilityTIDs;
 use crate::probability::Probability;
 
 pub struct ProbabilityMap<'a> {
-    dataset: &'a DataSet,
-    atts: BTreeSet<usize>,
-    comb_to_freq: HashMap<Vec<usize>, usize>,
+    pub dataset: &'a DataSet,
+    pub atts: BTreeSet<usize>,
+    pub comb_to_freq: HashMap<Vec<usize>, usize>,
 }
 
 impl<'a> Probability<'a> for ProbabilityMap<'a> {
@@ -34,6 +35,12 @@ impl<'a> Probability<'a> for ProbabilityMap<'a> {
             Some(&v) => (v as f64) / (self.dataset.sample_size as f64),
             None => 0.0,
         }
+    }
+    
+    fn p_map(&self, vals: &HashMap<usize, usize>) -> f64 {
+        let comb: Vec<usize> =
+            self.atts.iter().map(|a| vals[a]).collect();
+        self.p(&comb)
     }
 
     fn f(&self, comb: &Vec<usize>) -> usize {
@@ -149,5 +156,20 @@ impl<'a> ProbabilityMap<'a> {
             }
         }
         return max_val;
+    }
+}
+
+
+impl<'a> From<ProbabilityTIDs<'a>> for ProbabilityMap<'a> {
+    fn from(prob_tids: ProbabilityTIDs<'a>) -> Self {
+        let mut comb_to_freq: HashMap<Vec<usize>, usize> = HashMap::new();
+        for (comb, tid) in prob_tids.comb_to_tid.iter() {
+            comb_to_freq.insert(comb.clone(), tid.len());
+        }
+        ProbabilityMap {
+            dataset: prob_tids.dataset,
+            atts: prob_tids.atts.clone(),
+            comb_to_freq: comb_to_freq,
+        }
     }
 }

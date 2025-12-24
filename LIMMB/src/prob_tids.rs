@@ -3,13 +3,14 @@ use std::collections::{hash_map::Keys, BTreeSet, HashMap};
 use bit_set::BitSet;
 
 use crate::dataset::DataSet;
+use crate::prob_map::ProbabilityMap;
 use crate::probability::Probability;
 
 
 pub struct ProbabilityTIDs<'a> {
-    dataset: &'a DataSet,
-    atts: BTreeSet<usize>,
-    comb_to_tid: HashMap<Vec<usize>, BitSet>,
+    pub dataset: &'a DataSet,
+    pub atts: BTreeSet<usize>,
+    pub comb_to_tid: HashMap<Vec<usize>, BitSet>,
 }
 
 impl<'a> Probability<'a> for ProbabilityTIDs<'a> {
@@ -39,6 +40,12 @@ impl<'a> Probability<'a> for ProbabilityTIDs<'a> {
         }
     }
 
+    fn p_map(&self, vals: &HashMap<usize, usize>) -> f64 {
+        let comb: Vec<usize> =
+            self.atts.iter().map(|a| vals[a]).collect();
+        self.p(&comb)
+    }
+    
     fn f(&self, comb: &Vec<usize>) -> usize {
         match self.comb_to_tid.get(comb) {
             Some(v) => v.len(),
@@ -55,7 +62,6 @@ impl<'a> Probability<'a> for ProbabilityTIDs<'a> {
 }
 
 impl<'a> ProbabilityTIDs<'a> {
-
     pub fn new_marg(
         dataset: &'a DataSet,
         vars: BTreeSet<usize>,
@@ -135,6 +141,5 @@ impl<'a> ProbabilityTIDs<'a> {
             comb_to_tid: self.comb_to_tid.clone(),
         }
     }
-
 
 }
