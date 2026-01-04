@@ -41,12 +41,31 @@ pub fn nested_assoc_mine(
         .collect();
     // Get remaining atts and sort by pval
     let mut atts: Vec<usize> = init_atts.iter().cloned().collect();
-    let xs_badness: HashMap<usize, f64> = atts
+    let tmp_prob_tc: ProbabilityTIDs = ProbabilityTIDs::new_marg(
+        data,
+        mb.union(&BTreeSet::from([att_t])).cloned().collect(),
+    );
+    let xs_g: HashMap<usize, f64> = atts
         .iter()
         .map(|a| {
             (
                 *a,
-                SCI::new(
+                GTest::new(
+                    &tmp_prob_tc.merge(&prob_atoms[*a]).into(),
+                    att_t,
+                    &BTreeSet::from([*a]),
+                    mb,
+                )
+                .get_badness(),
+            )
+        })
+        .collect();
+    let xs_g_mi: HashMap<usize, f64> = atts
+        .iter()
+        .map(|a| {
+            (
+                *a,
+                GTest::new(
                     &prob_atoms[att_t].merge(&prob_atoms[*a]).into(),
                     att_t,
                     &BTreeSet::from([*a]),
@@ -57,7 +76,10 @@ pub fn nested_assoc_mine(
         })
         .collect();
     atts.sort_by(|a, b| {
-        xs_badness[b].partial_cmp(&xs_badness[a]).unwrap()
+        xs_g_mi[b].partial_cmp(&xs_g_mi[a]).unwrap()
+    });
+    atts.sort_by(|a, b| {
+        xs_g[b].partial_cmp(&xs_g[a]).unwrap()
     });
     // Mining loop
     let mut queue_to_add: VecDeque<Vec<usize>> =
@@ -89,6 +111,7 @@ pub fn nested_assoc_mine(
         print!("]");
         // Only check stuff if cur is non empty
         if cur.len() > 0 {
+            // let too_weak: bool = if use_gtest && cur.len() <= 1 {
             let too_weak: bool = if use_gtest {
                 let df: usize =
                     g2_df(data, att_t, &cur, &top_nval_mb_vars);
@@ -129,8 +152,8 @@ pub fn nested_assoc_mine(
             let mut mb_sorted: Vec<usize> =
                 mb.iter().cloned().collect();
             mb_sorted.sort_by(|a, b| {
-                mb_att_to_badness[a]
-                    .partial_cmp(&mb_att_to_badness[b])
+                mb_att_to_badness[b]
+                    .partial_cmp(&mb_att_to_badness[a])
                     .unwrap()
             });
             println!("\nSorted mb atts:");
@@ -209,7 +232,8 @@ fn find_deps(
     let att_mb_set: BTreeSet<usize> = att_mb.iter().cloned().collect();
     assert![init_mb.is_subset(&att_mb_set)];
     // let eff_max_sub_mb_size: usize = max_sub_mb_size + init_mb.len();
-    let eff_max_sub_mb_size: usize = max_sub_mb_size - 1;
+    // let eff_max_sub_mb_size: usize = max_sub_mb_size - 1;
+    let eff_max_sub_mb_size: usize = max_sub_mb_size;
     let mut num_ci: usize = 0;
     // Mining loop
     let mut atts: Vec<usize> = att_mb.clone();
@@ -234,6 +258,7 @@ fn find_deps(
     let mut stack_to_add: Vec<Vec<usize>> = vec![atts];
     let mut stack_added: Vec<BTreeSet<usize>> = vec![init_mb.clone()];
     let mut stack_prob: Vec<ProbabilityTIDs> = vec![prob_xtc];
+    let mut num_dep: usize = 0;
     let mut iter: usize = 0;
     while !stack_added.is_empty() {
         iter += 1;
@@ -249,6 +274,8 @@ fn find_deps(
         print!("]");
         // Run CI Test
         num_ci += 1;
+        let num_var = cur_mb.len() + att_xs.len() + 1;
+        // let ci: Box<dyn CITest> = if use_gtest && num_var <= 5 {
         let ci: Box<dyn CITest> = if use_gtest {
             let tmp = GTest::new(
                 &cur_prob.clone().into(),
@@ -278,6 +305,7 @@ fn find_deps(
                 // print!("\n\t\tFOUND DEPS: [");
                 // cur_mb.iter().for_each(|a| print!("{},", a));
                 // print!("]");
+                num_dep += 1;
                 let inner_res = inner_mb_mine(
                     att_mb,
                     att_xs,
@@ -290,6 +318,7 @@ fn find_deps(
                     alpha,
                     use_gtest,
                 );
+                num_ci += inner_res.num_ci;
                 if inner_res.badness < min_res.badness {
                     min_res = inner_res;
                 }
@@ -319,7 +348,12 @@ fn find_deps(
             stack_prob.push(cur_prob.merge(&prob_atoms[a]));
         }
     }
-    return min_res;
+    return InnerMineRes {
+        xs: min_res.xs,
+        is_in_mb: false,
+        num_ci: num_ci,
+        badness: -1.0 * (num_dep as f64),
+    };
 }
 
 /*
@@ -346,6 +380,8 @@ pub fn inner_mb_mine(
     att_mb.iter().for_each(|a| print!("{},", a));
     print!("], with init_mb: [");
     init_mb.iter().for_each(|a| print!("{},", a));
+    print!("], with prob dom: [");
+    prob_xt.get_atts().iter().for_each(|a| print!("{},", a));
     println!("]");
     let att_mb_set: BTreeSet<usize> = att_mb.iter().cloned().collect();
     assert![init_mb.is_subset(&att_mb_set)];
@@ -361,7 +397,7 @@ pub fn inner_mb_mine(
             print!("\t\t\t\t{}. [", i);
             dep.iter().for_each(|a| print!("{},", a));
             println!("]");
-            if att_mb_set.is_subset(&dep) {
+            if att_mb_set == *dep {
                 println!("\t\t\t\tFOUND EXISTING DEP!!");
                 return InnerMineRes {
                     xs: att_xs.clone(),
@@ -405,8 +441,8 @@ pub fn inner_mb_mine(
             to_add.iter().for_each(|v| print!("{},", v));
             print!("]");
             num_ci += 1;
-            let ci: Box<dyn CITest> = if use_gtest && cur_mb.len() <= 3
-            {
+            let total_vars = cur_mb.len() + att_xs.len() + 1;
+            let ci: Box<dyn CITest> = if use_gtest && total_vars <= 5 {
                 let tmp = GTest::new(
                     &cur_prob.clone().into(),
                     att_t,

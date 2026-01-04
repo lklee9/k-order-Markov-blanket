@@ -140,6 +140,8 @@ pub fn g2_df_eff<'a>(
     t: usize,
     prob_c: &impl Probability<'a>,
 ) -> usize {
+    // Tsamardinos, I., Brown, L. E., & Aliferis, C. F. (2006).
+    // Steck, H., & Jaakkola, T. S. (2002).
     let data = prob_c.get_dataset();
     let mut df: usize = 1;
     for v in x {
