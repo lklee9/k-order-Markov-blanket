@@ -1,16 +1,71 @@
+%%%%%%%% ICML 2026 EXAMPLE LATEX SUBMISSION FILE %%%%%%%%%%%%%%%%%
 
-\documentclass{article} % For LaTeX2e
-\usepackage{iclr2026_conference,times}
+\documentclass{article}
 
-% Optional math commands from https://github.com/goodfeli/dlbook_notation.
-\input{math_commands.tex}
+% Recommended, but optional, packages for figures and better typesetting:
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs} % for professional tables
 
-\usepackage[hidelinks]{hyperref}
+% hyperref makes hyperlinks in the resulting PDF.
+% If your build breaks (sometimes temporarily if a hyperlink spans a page)
+% please comment out the following usepackage line and replace
+% \usepackage{icml2026} with \usepackage[nohyperref]{icml2026} above.
+\usepackage{hyperref}
+
+
+% Attempt to make hyperref and algorithmic work together better:
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+% Use the following line for the initial blind version submitted for review:
+\usepackage{icml2026}
+
+% For preprint, use
+% \usepackage[preprint]{icml2026}
+
+% If accepted, instead use the following line for the camera-ready submission:
+% \usepackage[accepted]{icml2026}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{amsthm}
+
+
+% if you use cleveref..
+\usepackage[capitalize,noabbrev]{cleveref}
+
+
 \usepackage{subcaption}
 \usepackage{url}
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{enumitem}
+\usepackage{pifont} % Required for \ding
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% Todonotes is useful during development; simply uncomment the next line
+%    and comment out the line below the next line to turn off comments
+%\usepackage[disable,textsize=tiny]{todonotes}
+\usepackage[textsize=tiny]{todonotes}
+
+% The \icmltitle you define below is probably too long as a header.
+% Therefore, a short form for the running title is supplied here:
+\icmltitlerunning{Submission and Formatting Instructions for ICML 2026}
 
 \usepackage{tikz}
 \usetikzlibrary{positioning,graphs}
@@ -18,52 +73,50 @@
 \usetikzlibrary{matrix}
 \usepackage[normalem]{ulem} % for \sout
 
-% Preamble (add to your document preamble)
-\usepackage{cleveref} % optional but recommended for nicer
-% cross-references
-\usepackage{amsmath,amssymb}
-\usepackage{amsthm}
-\usepackage{mathtools}
 % \usepackage{algorithm}
 % \usepackage{algpseudocode}
-\usepackage[ruled,vlined]{algorithm2e}
-\SetKwComment{Comment}{/*}{*/}
-\crefname{algocf}{alg.}{algs.}
-\Crefname{algocf}{Algorithm}{Algorithms}
-\usepackage{float} %figure inside minipage
-\usepackage{wrapfig}
+% \usepackage[ruled,vlined]{algorithm2e}
+% \SetKwComment{Comment}{/*}{*/}
+% \crefname{algocf}{alg.}{algs.}
+% \Crefname{algocf}{Algorithm}{Algorithms}
+% \usepackage{float} %figure inside minipage
+% \usepackage{wrapfig}
 
 \usepackage{romannum}
-
-\usepackage{pifont}% http://ctan.org/pkg/pifont
 
 \newcommand{\cmark}{\ding{51}}%
 \newcommand{\xmark}{\ding{55}}%
 
-% Theorem style and numbering
-\theoremstyle{plain}                % default (italic body)
-\newtheorem{theorem}{Theorem} % numbered per section
-\crefname{theorem}{thm.}{thms.}
-\Crefname{theorem}{Theorem}{Theorems}
-\newtheorem{lemma}{Lemma}      % share theorem counter
-\newtheorem{proposition}{Proposition}
-\newtheorem{corollary}{Corollary}
 
-% \theoremstyle{definition}           % upright body
-\newtheorem{definition}{Definition}
-\newtheorem{conjecture}{Conjecture}
+% The \icmltitle you define below is probably too long as a header.
+% Therefore, a short form for the running title is supplied here:
+\icmltitlerunning{High-Order Markov Blanket Discovery}
+
+\input{math\_commands}
+
+\begin{document}
 
 
-% \title{Exhaustive Markov Blanket Discovery\\
-%   on the Subset Lattice}
-\title{exhaustive markov blanket discovery:\\
-  the suprising inability of existing methods
-  \\at discovering xor relationships\\
-  and a first step at closing this gap.  }
+\twocolumn[
+\icmltitle{High-Order Markov Blanket Discovery:\\
+  The suprising inability of existing methods
+  at discovering xor relationships
+  and a first step at closing this gap. 
+}
 
-% Authors must not appear in the submitted version. They should be hidden
-% as long as the \iclrfinalcopy macro remains commented out below.
-% Non-anonymous submissions will be rejected without review.
+  % It is OKAY to include author information, even for blind submissions: the
+  % style file will automatically remove it for you unless you've provided
+  % the [accepted] option to the icml2026 package.
+
+  % List of affiliations: The first argument should be a (short) identifier you
+  % will use later to specify author affiliations Academic affiliations
+  % should list Department, University, City, Region, Country Industry
+  % affiliations should list Company, City, Region, Country
+
+  % You can specify symbols, otherwise they are numbered in order. Ideally, you
+  % should not use this facility. Affiliations will be numbered in order of
+  % appearance and this is the preferred way.
+  \icmlsetsymbol{equal}{*}
 
 \author{Loong Kuan Lee \& Ragavi Krishnamoorthy\\
 Hybrid Intelligence\\
@@ -83,25 +136,45 @@ Fraunhofer IAIS\\
 Sankt Augustin, Germany\\
 \texttt{nico.piatkowski@iais.fraunhofer.de}\\
 }
+  
+  \begin{icmlauthorlist}
+    \icmlauthor{Loong Kuan Lee}{iais}
+    \icmlauthor{Ragavi Krishnamoorthy}{iais}
+    \icmlauthor{Allegra Cuzzocera}{it}
+    \icmlauthor{Nico Piatkowski}{iais}
+  \end{icmlauthorlist}
 
-% The \author macro works with any number of authors. There are two commands
-% used to separate the names and addresses of multiple authors: \And and \AND.
-%
-% Using \And between authors leaves it to \LaTeX{} to determine where to break
-% the lines. Using \AND forces a linebreak at that point. So, if \LaTeX{}
-% puts 3 of 4 authors names on the first line, and the last on the second
-% line, try using \AND instead of \And before the third author name.
+  \icmlaffiliation{iais}{
+    Hybrid Intelligence, Fraunhofer IAIS, Sankt Augustin, Germany
+  }
+  \icmlaffiliation{it}{
+    Department of Physics Ettore Pancini,
+    University of Naples Federico II, Naples, Italy}
+  \icmlcorrespondingauthor{Loong Kuan Lee}{
+    loong.kuan.lee@iais.fraunhofer.de}
+  % You may provide any keywords that you find helpful for describing your
+  % paper; these are used to populate the "keywords" metadata in the PDF but
+  % will not be shown in the document
+  \icmlkeywords{Markov Blanket,Bayesian Networks,Markov Random
+    Fields,Probabilistic Graphical Models}
 
-\newcommand{\fix}{\marginpar{FIX}}
-\newcommand{\new}{\marginpar{NEW}}
+  \vskip 0.3in
+]
 
-%\iclrfinalcopy % Uncomment for camera-ready version, but NOT for submission.
-\begin{document}
+% this must go after the closing bracket ] following \twocolumn[ ...
 
+% This command actually creates the footnote in the first column listing the
+% affiliations and the copyright notice. The command takes one argument, which
+% is text to display at the start of the footnote. The \icmlEqualContribution
+% command is standard text for equal contribution. Remove it (just {}) if you
+% do not need this facility.
 
-\maketitle
+% Use ONE of the following lines. DO NOT remove the command.
+% If you have no special notice, KEEP empty braces:
+\printAffiliationsAndNotice{}  % no special notice (required even if empty)
+% Or, if applicable, use the standard equal contribution text:
+% \printAffiliationsAndNotice{\icmlEqualContribution}
 
-%%% Abstract
 \begin{abstract}
   The problem of learning the Markov blanket (MB) of a variable from
   data has applications in many areas such as learning Bayesian
@@ -366,42 +439,42 @@ not belong in the MB of $\rvt$ by iteratively testing for the
 conditional independence of each variable with $\rvt$ given the
 remaining candidate MB that is iteratively pruned during this phase.
 
-% \begin{minipage}[t]{0.48\linewidth}
-\begin{algorithm}[H]
-  \caption{Forward Selection (\texttt{forward})}\label{alg:forward}
-  \DontPrintSemicolon
-  \KwIn{$\db$, $\rmX$, $t$, $\alpha$}
-  \KwOut{Candidate Markov Blanket $\mb$}
-  $\rmC \gets \rmX$\;
-  $\mb \gets \{\}$\;
-  \While{True}{
-    $\rmR \gets \{\rvx \mid \rvx \in \rmC,
-    \rvx \not\indep t \mid \mb\}$\;
-    \If{$\rvx$ is empty} {
-      \Return{$\mb$}\;
-    }
-    $\rvr \gets \rvx\in\rmR$ with the largest $G_{\rvx}$\;
-    Remove $\rvr$ from $\rmC$\;
-    Insert $\rvr$ into $\mb$\;
-  }
-\end{algorithm}
-% \end{minipage}
-% \hfill
-% \begin{minipage}[t]{0.48\linewidth}
-\begin{algorithm}[H]
-  \caption{Prune Candidate MB (\texttt{backward})}\label{alg:backward}
-  \DontPrintSemicolon
-  \KwIn{$\db$, $\mb$, $t$, $\alpha$}
-  \KwOut{Output result}
-  \For{each $\rvx\in\mb$}{
-    $\mb' \gets \mb \setminus \{\rvx\}$\;
-    \If{$\rvx \indep t \mid \mb'$}{
-      $\mb \gets \mb'$\;
-    }
-    \Return{$\mb$}\;
-  }
-\end{algorithm}
-% \end{minipage}
+% % \begin{minipage}[t]{0.48\linewidth}
+% \begin{algorithm}[H]
+%   \caption{Forward Selection (\texttt{forward})}\label{alg:forward}
+%   \DontPrintSemicolon
+%   \KwIn{$\db$, $\rmX$, $t$, $\alpha$}
+%   \KwOut{Candidate Markov Blanket $\mb$}
+%   $\rmC \gets \rmX$\;
+%   $\mb \gets \{\}$\;
+%   \While{True}{
+%     $\rmR \gets \{\rvx \mid \rvx \in \rmC,
+%     \rvx \not\indep t \mid \mb\}$\;
+%     \If{$\rvx$ is empty} {
+%       \Return{$\mb$}\;
+%     }
+%     $\rvr \gets \rvx\in\rmR$ with the largest $G_{\rvx}$\;
+%     Remove $\rvr$ from $\rmC$\;
+%     Insert $\rvr$ into $\mb$\;
+%   }
+% \end{algorithm}
+% % \end{minipage}
+% % \hfill
+% % \begin{minipage}[t]{0.48\linewidth}
+% \begin{algorithm}[H]
+%   \caption{Prune Candidate MB (\texttt{backward})}\label{alg:backward}
+%   \DontPrintSemicolon
+%   \KwIn{$\db$, $\mb$, $t$, $\alpha$}
+%   \KwOut{Output result}
+%   \For{each $\rvx\in\mb$}{
+%     $\mb' \gets \mb \setminus \{\rvx\}$\;
+%     \If{$\rvx \indep t \mid \mb'$}{
+%       $\mb \gets \mb'$\;
+%     }
+%     \Return{$\mb$}\;
+%   }
+% \end{algorithm}
+% % \end{minipage}
 
 By utilising a heuristic for constructing the candidate MB during the
 first phase, these and other similar approaches to MB discovery are
@@ -468,7 +541,12 @@ computationally efficient.
   \end{subfigure}
   \caption{Comparison between lattice and tree}
   \label{fig:comparison}
-\end{figure}  
+\end{figure}
+
+\begin{proposition}[Maximum Testable Degrees of Freedom given a Dataset]
+  The  over all the variables of 
+\end{proposition}
+
 As we have discussed, our approach builds upon the two-phase approach of
 IAMB. Specifically, we want to find the variables that should be in the
 MB of $t$ that Phase \romannum{1} of IAMB did not find before the last
@@ -486,59 +564,59 @@ of $\mb$ and decrease the search space of the exhaustive search.
 
 % \begin{wrapfigure}{l}{0.5\linewidth}
 %   \begin{minipage}[t]{\linewidth}
-\begin{algorithm}[H]
-  \caption{Lattice Mining (\texttt{lattice})}
-  % \DontPrintSemicolon
-  \KwIn{$\db$, $\rmX$, $t$, $\mb$, $\alpha$}
-  \KwOut{Output result}
-  $\rmS \gets [\emptyset]$\;
-  $\rmA \gets [\rmX]$\;
-  $\df_{\max} \gets \infty$\; 
-  \For{each $\rvx\in\mb$}{
-    $S \gets \pop(\rmS)$\;
-    $A \gets \pop(\rmA)$\;
-    $\df_{\cur} \gets \df(\rvs)$\;
-    \If{$|S| > 0$}{
-      \If{$S \not\indep t \mid \mb$}{
-        \Return{$S$}\;
-      }
-      \If{$1 - \cdf(G_{S\cup A}; \df(S)) > \alpha$}{
-        $\df_{\max} \gets \df_{\cur}$\;
-        \Comment{Pruning of supersets according to
-          \Cref{thm:prune-superset}.}
-        continue\; 
-      }
-    }
-    \Comment{Don't explore subsets that exceed the current maximum degrees
-      of freedom via \Cref{thm:prune}.}
-    $A' \gets \{a \mid a\in A, \df(S \cup \{a\}) < \df_{\max}\}$\;
-    \For{$i \in [1, |A'|]$}{
-      $a \gets A'_{i}$\;
-      push $S \cup \{a\}$ on to $\rmS$\;
-      push $A'[1,\ldots,i-1]$ on to $\rmA$\;
-    }
-    \Return{$\emptyset$};
-  }
-\end{algorithm}
-\begin{algorithm}[H]
-  \caption{LIAM-MB}
-  % \DontPrintSemicolon
-  \KwIn{$\db$, $\rmX$, $t$, $\alpha$}
-  \KwOut{Output result}
-  $\mb \gets \texttt{forward}(\db, \rmX, t, \alpha)$\;
-  \While{$|\rmX| > 0$}{
-    $S \gets \texttt{lattice}(\db, \rmX, t, \mb, \alpha)$\;
-    \If{$S==\emptyset$}{
-      break\;
-    }
-    \For{$a \in S$}{
-      Remove $a$ from $\rmX$\;
-      Insert $a$ into $\mb$\;
-    }
-  }
-  $\mb \gets \texttt{backward}(\db, \mb, t, \alpha)$\;
-  \Return{$\mb$}\;
-\end{algorithm}
+% \begin{algorithm}[H]
+%   \caption{Lattice Mining (\texttt{lattice})}
+%   % \DontPrintSemicolon
+%   \KwIn{$\db$, $\rmX$, $t$, $\mb$, $\alpha$}
+%   \KwOut{Output result}
+%   $\rmS \gets [\emptyset]$\;
+%   $\rmA \gets [\rmX]$\;
+%   $\df_{\max} \gets \infty$\; 
+%   \For{each $\rvx\in\mb$}{
+%     $S \gets \pop(\rmS)$\;
+%     $A \gets \pop(\rmA)$\;
+%     $\df_{\cur} \gets \df(\rvs)$\;
+%     \If{$|S| > 0$}{
+%       \If{$S \not\indep t \mid \mb$}{
+%         \Return{$S$}\;
+%       }
+%       \If{$1 - \cdf(G_{S\cup A}; \df(S)) > \alpha$}{
+%         $\df_{\max} \gets \df_{\cur}$\;
+%         \Comment{Pruning of supersets according to
+%           \Cref{thm:prune-superset}.}
+%         continue\; 
+%       }
+%     }
+%     \Comment{Don't explore subsets that exceed the current maximum degrees
+%       of freedom via \Cref{thm:prune}.}
+%     $A' \gets \{a \mid a\in A, \df(S \cup \{a\}) < \df_{\max}\}$\;
+%     \For{$i \in [1, |A'|]$}{
+%       $a \gets A'_{i}$\;
+%       push $S \cup \{a\}$ on to $\rmS$\;
+%       push $A'[1,\ldots,i-1]$ on to $\rmA$\;
+%     }
+%     \Return{$\emptyset$};
+%   }
+% \end{algorithm}
+% \begin{algorithm}[H]
+%   \caption{LIAM-MB}
+%   % \DontPrintSemicolon
+%   \KwIn{$\db$, $\rmX$, $t$, $\alpha$}
+%   \KwOut{Output result}
+%   $\mb \gets \texttt{forward}(\db, \rmX, t, \alpha)$\;
+%   \While{$|\rmX| > 0$}{
+%     $S \gets \texttt{lattice}(\db, \rmX, t, \mb, \alpha)$\;
+%     \If{$S==\emptyset$}{
+%       break\;
+%     }
+%     \For{$a \in S$}{
+%       Remove $a$ from $\rmX$\;
+%       Insert $a$ into $\mb$\;
+%     }
+%   }
+%   $\mb \gets \texttt{backward}(\db, \mb, t, \alpha)$\;
+%   \Return{$\mb$}\;
+% \end{algorithm}
 % \end{minipage}  
 % \end{wrapfigure}
 
@@ -699,12 +777,12 @@ We then construct a Bayesian network for each
 
 % \input{./tab/syn}
 
-\begin{table}
+\begin{table*}
   \centering
   \input{./tab/syn-neat}
   \caption{Synthetic Results}
   \label{tab:syn}
-\end{table}
+\end{table*}
 
 \subsection{Experiments with Benchmark Bayesian Networks}
 
@@ -731,3 +809,8 @@ You may include other additional sections here.
 
 
 \end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
