@@ -75,12 +75,8 @@ pub fn nested_assoc_mine(
             )
         })
         .collect();
-    atts.sort_by(|a, b| {
-        xs_g_mi[b].partial_cmp(&xs_g_mi[a]).unwrap()
-    });
-    atts.sort_by(|a, b| {
-        xs_g[b].partial_cmp(&xs_g[a]).unwrap()
-    });
+    atts.sort_by(|a, b| xs_g_mi[b].partial_cmp(&xs_g_mi[a]).unwrap());
+    atts.sort_by(|a, b| xs_g[b].partial_cmp(&xs_g[a]).unwrap());
     // Mining loop
     let mut queue_to_add: VecDeque<Vec<usize>> =
         VecDeque::from(vec![atts.iter().cloned().collect()]);
@@ -255,6 +251,7 @@ fn find_deps(
     for a in init_mb {
         prob_xtc = prob_xtc.merge(&prob_atoms[*a]);
     }
+    let mut found_seps: Vec<BTreeSet<usize>> = Vec::new();
     let mut stack_to_add: Vec<Vec<usize>> = vec![atts];
     let mut stack_added: Vec<BTreeSet<usize>> = vec![init_mb.clone()];
     let mut stack_prob: Vec<ProbabilityTIDs> = vec![prob_xtc];
@@ -272,67 +269,77 @@ fn find_deps(
         print!("], to add: [");
         to_add.iter().for_each(|v| print!("{},", v));
         print!("]");
-        // Run CI Test
-        num_ci += 1;
-        let num_var = cur_mb.len() + att_xs.len() + 1;
-        // let ci: Box<dyn CITest> = if use_gtest && num_var <= 5 {
-        let ci: Box<dyn CITest> = if use_gtest {
-            let tmp = GTest::new(
-                &cur_prob.clone().into(),
-                att_t,
-                att_xs,
-                &cur_mb,
-            );
-            print!(
-                "\tres_stat: {}, res_df: {}, res_p: {}",
-                tmp.stat, tmp.df, tmp.pval,
-            );
-            Box::new(tmp)
-        } else {
-            let tmp = SCI::new(
-                &cur_prob.clone().into(),
-                att_t,
-                att_xs,
-                &cur_mb,
-            );
-            print!("\tres_stat: {}", tmp.stat);
-            Box::new(tmp)
-        };
-        // If CI Test is strong enough check result of test
-        if !ci.is_too_weak() && cur_mb.len() <= eff_max_sub_mb_size {
-            if ci.is_not_cond_indep(alpha) && cur_mb != *init_mb {
-                // This subset is gives depedency, return current mb
-                // print!("\n\t\tFOUND DEPS: [");
-                // cur_mb.iter().for_each(|a| print!("{},", a));
-                // print!("]");
-                num_dep += 1;
-                let inner_res = inner_mb_mine(
-                    att_mb,
-                    att_xs,
+        // Check if cur_mb is subset of a know sep
+        let mut is_seperated: bool = false;
+        for sep in found_seps.iter() {
+            if cur_mb.is_subset(sep) {
+                is_seperated = true;
+            }
+        }
+        if !is_seperated {
+            // Run CI Test
+            num_ci += 1;
+            let num_var = cur_mb.len() + att_xs.len() + 1;
+            // let ci: Box<dyn CITest> = if use_gtest && num_var <= 5 {
+            let ci: Box<dyn CITest> = if use_gtest {
+                let tmp = GTest::new(
+                    &cur_prob.clone().into(),
                     att_t,
+                    att_xs,
                     &cur_mb,
-                    prob_atoms,
-                    prob_xt,
-                    known_xs_deps,
-                    max_sub_mb_size,
-                    alpha,
-                    use_gtest,
                 );
-                num_ci += inner_res.num_ci;
-                if inner_res.badness < min_res.badness {
-                    min_res = inner_res;
+                print!(
+                    "\tres_stat: {}, res_df: {}, res_p: {}",
+                    tmp.stat, tmp.df, tmp.pval,
+                );
+                Box::new(tmp)
+            } else {
+                let tmp = SCI::new(
+                    &cur_prob.clone().into(),
+                    att_t,
+                    att_xs,
+                    &cur_mb,
+                );
+                print!("\tres_stat: {}", tmp.stat);
+                Box::new(tmp)
+            };
+            // If CI Test is strong enough check result of test
+            if !ci.is_too_weak() && cur_mb.len() <= eff_max_sub_mb_size
+            {
+                if ci.is_not_cond_indep(alpha) && cur_mb != *init_mb {
+                    // This subset is gives depedency, return current mb
+                    // print!("\n\t\tFOUND DEPS: [");
+                    // cur_mb.iter().for_each(|a| print!("{},", a));
+                    // print!("]");
+                    num_dep += 1;
+                    let inner_res = inner_mb_mine(
+                        att_mb,
+                        att_xs,
+                        att_t,
+                        &cur_mb,
+                        prob_atoms,
+                        prob_xt,
+                        known_xs_deps,
+                        max_sub_mb_size,
+                        alpha,
+                        use_gtest,
+                    );
+                    num_ci += inner_res.num_ci;
+                    if inner_res.badness < min_res.badness {
+                        min_res = inner_res;
+                    }
                 }
+                if min_res.is_in_mb {
+                    return min_res;
+                }
+            } else {
+                print!(
+                    "\tTEST TOO WEAK! {} {}<={}",
+                    ci.is_too_weak(),
+                    cur_mb.len(),
+                    eff_max_sub_mb_size
+                );
             }
-            if min_res.is_in_mb {
-                return min_res;
-            }
-        } else {
-            print!(
-                "\tTEST TOO WEAK! {} {}<={}",
-                ci.is_too_weak(),
-                cur_mb.len(),
-                eff_max_sub_mb_size
-            );
         }
         if cur_mb.len() == eff_max_sub_mb_size {
             continue;
@@ -487,7 +494,7 @@ pub fn inner_mb_mine(
                         xs: att_xs.clone(),
                         is_in_mb: false,
                         num_ci: num_ci,
-                        badness: ci.get_badness(),
+                        badness: max_bad,
                     };
                 } else if cur_mb != *init_mb || init_mb.len() == 0 {
                     accepted_once = true;
@@ -582,7 +589,8 @@ pub fn prune(
             num_ci += res.num_ci;
             if !res.is_in_mb {
                 reses.push(res);
-            } else {
+            }
+            else {
                 remaining.remove(&x);
             }
         }

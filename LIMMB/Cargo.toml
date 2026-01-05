@@ -10,6 +10,7 @@ crate-type = ["cdylib"]
 
 [profile.release]
 debug=true
+strip=false
 
 [dependencies]
 pyo3 = "0.24.0"
@@ -18,3 +19,4 @@ num = "0.4.3"
 statrs = "0.18.0"
 bit-set = "0.8"
 log = "0.4.29"
+itertools = "0.12"
