@@ -1,4 +1,5 @@
-* Abstract
+* Old
+** Abstract
 - what markov disccovery is
 - why markov blanket discovery is useful
 - however hard problem, large search space
@@ -25,7 +26,7 @@
   compares to existing Markov blanket discovery approaches
 - Further experiments on common benchmark datasets will show the cost of
   the exact nature of LIAM-MB, paticularly when compared to IAMB
-* Intro
+** Intro
 - What is it
   + find markov blanket
   + origins
@@ -34,13 +35,13 @@
 - Generally how methods avoid hardness
 - trade off: some high order relationships no captured
 - xor mini-experiment
-* Related Work
+** Related Work
 - Recent Review: [cite:@yu2020a]
 - Best method for xor so far: [cite:@gao2017]
 - G2 test: [cite:@tsamardinos2006]
-* Notations and definitions and Background
-** G Test
-** MB discovery and IAMB
+** Notations and definitions and Background
+*** G Test
+*** MB discovery and IAMB
 - one of the first approaches to mb discovery that scales up well to
   thousands of variables
 - prior to this work, the main other algorithm capable of mb discovery
@@ -56,7 +57,7 @@
 - In this paper, we will build upon IAMB directly
   + by inserting an exhaustive search phase
   + between "forward" and "prune"
-* Method: LIAM-MB
+** Method: LIAM-MB
 - our approach builds upon the 2 step approach of IAMB
   + Specifically we want to find variables in the MB
   + that the first phase of IAMB did not
@@ -72,24 +73,24 @@
   + is that the larger the candidate MB found by phase 1
   + the larger
 - 
-** Set enumeration tree
+*** Set enumeration tree
 - Since the search space is the powerset of $X - MB - t$
 - 
 - A = vars in descendents
 - if traversed via a depth-first search
 - gurantees on the subsets relationship with one another
-** Bound on G-Statistic
+*** Bound on G-Statistic
 - 
-** Pruning
-*** Why limit df when upper bound test fails
+*** Pruning
+**** Why limit df when upper bound test fails
 - higher df => harder test to pass
 - => any subset will fail any test at or above this df
 - => we should only visit nodes with df less
 - => only visit easier tests
-*** early return from failed upper bound g-test
-** Complexity
+**** early return from failed upper bound g-test
+*** Complexity
 - based on the max G-stat and df needed to *not* reject hypothesis
-* Experiments
+** Experiments
 - Throughout this section we will compare
   + our appproach
   + to other approach
@@ -97,7 +98,7 @@
 - pycausalfs implementation of methods
 - alpha = 0.01
 - recall as a measure of acc
-* Experiments with Synthetic Data
+** Experiments with Synthetic Data
 - In order to empirically determine situations where
   + a heuristic approach to MB discovery might not capture 
   + in this section
@@ -113,7 +114,7 @@
   + seed used during sampling is the i-th sample
 - We then tasked them to learn the mb of each var
 - we then report the recall
-* Experiments with Benchmark Data
+** Experiments with Benchmark Data
 - To further compare our approach 
 - as a sanity check
 - commonly used benchmark data
@@ -122,9 +123,27 @@
 - we use 5000 sample versions
 - results averaged over 10 runs
 - find the MB of the top 10 variables with the largest MB
-* Future work
+** Future work
 - other methods for lattice mining step
 - better bounds on G-stat or use of another test with better bounds
 - add-on for other methods
 - multiple test correction
 - other metrics
+* New
+- how does limited samples affect faithfulness
+** Intro
+** Probabilistic Graphical Models and Independece
+** The Faithfulness Assumption
+** When is Faithfulness Violated
+*** High order interactions
+*** When samples are limited
+** kOMB: An algorithm for high-order markov blanket discovery
+*** What would be nice in theory
+*** What we need to do with limited samples
+*** Statistical Test
+** Pruning the Search Space of kOMB
+- We found that it reduced the visited nodes by x%
+** Experiments
+*** Parity
+*** Known Benchmarks
+**** at different k orders

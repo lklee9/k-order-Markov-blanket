@@ -1,48 +1,52 @@
-%%%%%%%% ICML 2026 EXAMPLE LATEX SUBMISSION FILE %%%%%%%%%%%%%%%%%
+% \documentclass{uai2026} % for initial submission
+%\documentclass[accepted]{uai2026} % after acceptance, for a revised version; 
+% also before submission to see how the non-anonymous paper would look like 
+                        
+%% There is a class option to choose the math font
+\documentclass[mathfont=ptmx]{uai2026} % ptmx math instead of Computer
+                                         % Modern (has noticeable issues)
+% \documentclass[mathfont=newtx]{uai2026} % newtx fonts (improves upon
+                                          % ptmx; less tested, no support)
+% NOTE: Only keep *one* line above as appropriate, as it will be replaced
+%       automatically for papers to be published. Do not make any other
+%       change above this note for an accepted version.
 
-\documentclass{article}
+%% Choose your variant of English; be consistent
+% \usepackage[american]{babel}
+\usepackage[british]{babel}
 
-% Recommended, but optional, packages for figures and better typesetting:
+%% Some suggested packages, as needed:
+\usepackage{natbib} % has a nice set of citation styles and commands
+    \bibliographystyle{plainnat}
+    \renewcommand{\bibsection}{\subsubsection*{References}}
+\usepackage{mathtools} % amsmath with fixes and additions
+% \usepackage{siunitx} % for proper typesetting of numbers and units
+\usepackage{booktabs} % commands to create good-looking tables
+
 \usepackage{microtype}
-\usepackage{graphicx}
-\usepackage{subcaption}
-\usepackage{booktabs} % for professional tables
 
-% hyperref makes hyperlinks in the resulting PDF.
-% If your build breaks (sometimes temporarily if a hyperlink spans a page)
-% please comment out the following usepackage line and replace
-% \usepackage{icml2026} with \usepackage[nohyperref]{icml2026} above.
-\usepackage{hyperref}
-
-
-% Attempt to make hyperref and algorithmic work together better:
-\newcommand{\theHalgorithm}{\arabic{algorithm}}
-
-% Use the following line for the initial blind version submitted for review:
-\usepackage{icml2026}
-
-% For preprint, use
-% \usepackage[preprint]{icml2026}
-
-% If accepted, instead use the following line for the camera-ready submission:
-% \usepackage[accepted]{icml2026}
-
-\usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{mathtools}
 \usepackage{amsthm}
 
 
 % if you use cleveref..
 \usepackage[capitalize,noabbrev]{cleveref}
 
-
 \usepackage{subcaption}
 \usepackage{url}
-\usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{enumitem}
 \usepackage{pifont} % Required for \ding
+
+%% Provided macros
+% \smaller: Because the class footnote size is essentially LaTeX's \small,
+%           redefining \footnotesize, we provide the original \footnotesize
+%           using this macro.
+%           (Use only sparingly, e.g., in drawings, as it is quite small.)
+
+%% Self-defined macros
+\newcommand{\swap}[3][-]{#3#1#2} % just an example
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % THEOREMS
@@ -62,10 +66,6 @@
 %    and comment out the line below the next line to turn off comments
 %\usepackage[disable,textsize=tiny]{todonotes}
 \usepackage[textsize=tiny]{todonotes}
-
-% The \icmltitle you define below is probably too long as a header.
-% Therefore, a short form for the running title is supplied here:
-\icmltitlerunning{Submission and Formatting Instructions for ICML 2026}
 
 \usepackage{tikz}
 \usetikzlibrary{positioning,graphs}
@@ -88,92 +88,38 @@
 \newcommand{\xmark}{\ding{55}}%
 
 
-% The \icmltitle you define below is probably too long as a header.
-% Therefore, a short form for the running title is supplied here:
-\icmltitlerunning{High-Order Markov Blanket Discovery}
 
 \input{math\_commands}
 
+\title{High-Order Markov Blanket Discovery\\
+  via a Weak k-Order Faithfulness Assumption}
+
+% The standard author block has changed for UAI 2026 to provide
+% more space for long author lists and allow for complex affiliations
+%
+% All author information is authomatically removed by the class for the
+% anonymous submission version of your paper, so you can already add your
+% information below.
+%
+% Add authors
+\author[1]{\href{mailto:<loong.kuan.lee@iais.fraunhofer.de>?Subject=Your UAI 2026 paper}{Loong~Kuan~Lee}{}}
+\author[1]{Ragavi~Krishnamoorthy}
+\author[2]{Allegra~Cuzzocera}
+\author[1]{Nico~Piatkowski}
+% Add affiliations after the authors
+\affil[1]{%
+  Hybrid Intelligence\\
+  Fraunhofer IAIS\\
+  Sankt Augustin, Germany\\
+}
+\affil[2]{%
+  Department of Physics Ettore Pancini \\
+  University of Naples Federico II \\
+  Naples, Italy \\
+}
+
 \begin{document}
-
-
-\twocolumn[
-\icmltitle{High-Order Markov Blanket Discovery:\\
-  The suprising inability of existing methods
-  at discovering xor relationships
-  and a first step at closing this gap. 
-}
-
-  % It is OKAY to include author information, even for blind submissions: the
-  % style file will automatically remove it for you unless you've provided
-  % the [accepted] option to the icml2026 package.
-
-  % List of affiliations: The first argument should be a (short) identifier you
-  % will use later to specify author affiliations Academic affiliations
-  % should list Department, University, City, Region, Country Industry
-  % affiliations should list Company, City, Region, Country
-
-  % You can specify symbols, otherwise they are numbered in order. Ideally, you
-  % should not use this facility. Affiliations will be numbered in order of
-  % appearance and this is the preferred way.
-  \icmlsetsymbol{equal}{*}
-
-\author{Loong Kuan Lee \& Ragavi Krishnamoorthy\\
-Hybrid Intelligence\\
-Fraunhofer IAIS\\
-Sankt Augustin, Germany\\
-\texttt{\{loong.kuan.lee,ragavi.krishnamoorthy\}@iais.fraunhofer.de}\\
-\And
-Allegra Cuzzocera\\
-Department of Physics Ettore Pancini \\
-University of Naples Federico II \\
-Naples, Italy \\
-\texttt{allegra.cuzzocrea@unina.it} \\
-\And
-Nico Piatkowski \\
-Hybrid Intelligence\\
-Fraunhofer IAIS\\
-Sankt Augustin, Germany\\
-\texttt{nico.piatkowski@iais.fraunhofer.de}\\
-}
-  
-  \begin{icmlauthorlist}
-    \icmlauthor{Loong Kuan Lee}{iais}
-    \icmlauthor{Ragavi Krishnamoorthy}{iais}
-    \icmlauthor{Allegra Cuzzocera}{it}
-    \icmlauthor{Nico Piatkowski}{iais}
-  \end{icmlauthorlist}
-
-  \icmlaffiliation{iais}{
-    Hybrid Intelligence, Fraunhofer IAIS, Sankt Augustin, Germany
-  }
-  \icmlaffiliation{it}{
-    Department of Physics Ettore Pancini,
-    University of Naples Federico II, Naples, Italy}
-  \icmlcorrespondingauthor{Loong Kuan Lee}{
-    loong.kuan.lee@iais.fraunhofer.de}
-  % You may provide any keywords that you find helpful for describing your
-  % paper; these are used to populate the "keywords" metadata in the PDF but
-  % will not be shown in the document
-  \icmlkeywords{Markov Blanket,Bayesian Networks,Markov Random
-    Fields,Probabilistic Graphical Models}
-
-  \vskip 0.3in
-]
-
-% this must go after the closing bracket ] following \twocolumn[ ...
-
-% This command actually creates the footnote in the first column listing the
-% affiliations and the copyright notice. The command takes one argument, which
-% is text to display at the start of the footnote. The \icmlEqualContribution
-% command is standard text for equal contribution. Remove it (just {}) if you
-% do not need this facility.
-
-% Use ONE of the following lines. DO NOT remove the command.
-% If you have no special notice, KEEP empty braces:
-\printAffiliationsAndNotice{}  % no special notice (required even if empty)
-% Or, if applicable, use the standard equal contribution text:
-% \printAffiliationsAndNotice{\icmlEqualContribution}
+\maketitle
 
 \begin{abstract}
   The problem of learning the Markov blanket (MB) of a variable from
