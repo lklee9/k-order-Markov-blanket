@@ -37,6 +37,7 @@
 \usepackage{multirow}
 \usepackage{enumitem}
 \usepackage{pifont} % Required for \ding
+\usepackage{cancel}
 
 %% Provided macros
 % \smaller: Because the class footnote size is essentially LaTeX's \small,
@@ -75,12 +76,12 @@
 
 % \usepackage{algorithm}
 % \usepackage{algpseudocode}
-% \usepackage[ruled,vlined]{algorithm2e}
-% \SetKwComment{Comment}{/*}{*/}
-% \crefname{algocf}{alg.}{algs.}
-% \Crefname{algocf}{Algorithm}{Algorithms}
-% \usepackage{float} %figure inside minipage
-% \usepackage{wrapfig}
+\usepackage[ruled,vlined]{algorithm2e}
+\SetKwComment{Comment}{/*}{*/}
+\crefname{algocf}{alg.}{algs.}
+\Crefname{algocf}{Algorithm}{Algorithms}
+\usepackage{float} %figure inside minipage
+\usepackage{wrapfig}
 
 \usepackage{romannum}
 
@@ -434,6 +435,117 @@ computationally efficient.
 
 
 %%% Method
+\section{kOMB}
+
+\begin{definition}[Graphoid Axioms]
+  t
+  \begin{enumerate}
+  \item Symmetry:
+    $\rmX \indep{} \rmY \mid \rmZ \implies \rmY\indep{}\rmX\mid\rmZ$
+  \item Decomposition:
+    $\rmX \indep{} \rmY \cup \rmW \mid \rmZ \implies
+    \rmX\indep{}\rmY\mid\rmZ$
+  \item Weak Union:
+    $\rmX\indep{}\rmY\cup\rmW\mid\rmZ \implies \rmX\indep{}\rmY \mid
+    \rmW\cup\rmZ$
+  \item Contraction:
+    $(\rmX\indep{}\rmY \mid \rmW\cup\rmZ) \wedge
+    (\rmX\indep{}\rmW\mid\rmZ)\implies \rmX\indep{}\rmY\cup\rmW\mid\rmZ$
+  \end{enumerate}
+\end{definition}
+
+\begin{lemma}[Inverse Weak Union]
+  Let $\rmV$ be a set of random variable and
+  $\rmX, \rmY, \rmZ \subset \rmV$ be disjoint subsets of $\rmV$. Then,
+  $\forall \rmS \subseteq \rmZ \setminus (\rmX \cup \rmY \cup \rmZ)$
+  \begin{equation}
+    \label{eq:2}
+    \rmX \dep{} \rmY \mid \rmS \cup \rmZ
+    \implies \bigl(\rmX \cup \rmZ\bigr) \dep{} \rmY \mid \rmS
+  \end{equation}
+\end{lemma}
+
+\begin{definition}[$k$-associated]
+  For a set of random variables $\rmV$, let $Y\in\rmV$ and
+  $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$ be distinct random
+  variables in $\rmV$. Then $Y$ is $k$-associated to $\rmX$ if
+  $\forall \rmS \subseteq \rmV \setminus \{Y\} \cup \rmX$ the following
+  holds,
+  \begin{gather}
+    \label{eq:k-assoc}
+    \forall X_{i}\in\rmX : X_{i} \dep{P} Y \mid \rmS \cup
+    \bigl(\rmX \setminus \{X_{i}\}\bigr)\\
+    \forall X_{i},X_{j}\in\rmX : X_{i} \dep{P} X_{j} \mid \rmS \cup
+    \bigl(\{Y\} \cup \rmX \setminus \{X_{i}, X_{j}\}\bigr).
+  \end{gather}
+  Borrowing from the notation in \cite{marx2020}, we use the notation
+  $Y\assoc{k}\rmX$ to denote that $Y$ is $k$-associated to $\rmX$.
+\end{definition}
+which results in DAGs with a collider structure, or a UG with a clique
+over all the variables.
+
+\begin{definition}[$k$-associations]
+  Let $Y\in\rmV$ and $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$ be
+  distinct random variables from $\rmV$. We use the notation 
+  \begin{equation}
+    \label{eq:4}
+    Y\assoc{\leq k}\rmX,
+  \end{equation}
+  to denote the existance of some association between $Y$ and some
+  subset of $\rmX$,
+  $\exists \rmZ \subseteq \rmX : Y\assoc{|\rmZ|}\rmZ$.
+\end{definition}
+
+\begin{lemma}[Ruling out $k$-associations]
+  For distinct random variables $Y\in\rmV$ and
+  $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$, the following holds
+  for all $\rmS \subset \rmV \setminus \rmX \cup \{Y\}$
+  \begin{equation}
+    \label{eq:3}
+    Y\indep{}\rmX \mid \rmS
+    \implies
+    \forall \rmZ\subseteq\rmX : Y\indep{}\rmZ \mid \rmS \cup
+    (\rmX\setminus\rmZ)
+  \end{equation}
+  as a consequence of the weak union graphoid axiom.
+\end{lemma}
+
+\begin{algorithm}
+  \caption{kOMB}
+  % \DontPrintSemicolon
+  \KwIn{$\db$, $\rmX$, $t$, $\mb$, $\alpha$}
+  \KwOut{Output result}
+  $\rmS \gets [\emptyset]$\;
+  $\rmA \gets [\rmX]$\;
+  $\df_{\max} \gets \infty$\; 
+  \For{each $\rvx\in\mb$}{
+    $S \gets \pop(\rmS)$\;
+    $A \gets \pop(\rmA)$\;
+    $\df_{\cur} \gets \df(\rvs)$\;
+    \If{$|S| > 0$}{
+      \If{$S \not\indep t \mid \mb$}{
+        \Return{$S$}\;
+      }
+      \If{$1 - \cdf(G_{S\cup A}; \df(S)) > \alpha$}{
+        $\df_{\max} \gets \df_{\cur}$\;
+        \Comment{Pruning of supersets according to
+          \Cref{thm:prune-superset}.}
+        continue\; 
+      }
+    }
+    \Comment{Don't explore subsets that exceed the current maximum degrees
+      of freedom via \Cref{thm:prune}.}
+    $A' \gets \{a \mid a\in A, \df(S \cup \{a\}) < \df_{\max}\}$\;
+    \For{$i \in [1, |A'|]$}{
+      $a \gets A'_{i}$\;
+      push $S \cup \{a\}$ on to $\rmS$\;
+      push $A'[1,\ldots,i-1]$ on to $\rmA$\;
+    }
+    \Return{$\emptyset$};
+  }
+\end{algorithm}
+
+
 \section{Lattice Incremental Association Mining for Markov Blankets
   (LIAM-MB)}
 

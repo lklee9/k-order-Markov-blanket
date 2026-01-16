@@ -139,6 +139,12 @@
 *** When samples are limited
 ** kOMB: An algorithm for high-order markov blanket discovery
 *** What would be nice in theory
+**** Algorithm
+1. find $\mathbf{X}\subset\mathbf{V}$ s.t.
+   $\mathbf{X}$ and $Y$ are strictly $k$-associated
+   - done by first finding $\mathbf{X}$ where its loosely
+     $k$-associated, i.e. combination of lower order 
+2. 
 *** What we need to do with limited samples
 *** Statistical Test
 ** Pruning the Search Space of kOMB

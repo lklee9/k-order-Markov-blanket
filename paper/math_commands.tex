@@ -72,12 +72,18 @@
 \def\df{{\textit{df}}}
 \def\cdf{{F_{\chi^{2}}}}
 \def\tree{{\mathcal{T}}}
-\newcommand{\indep}{\!\perp\!\!\!\perp}
+% \newcommand{\perpperp}{\protect\mathpalette{\protect\independenT}{\perp}}
+% \def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
+\newcommand{\perpperp}{\perp\!\!\!\!\!\perp}
+\newcommand{\indep}[1]{\perpperp_{#1}}
+\newcommand{\dep}[1]{\:\cancel{\perpperp}_{#1}\:}
 \def\mb{{\text{MB}}}
 \newcommand{\pop}{\text{pop}}
 \newcommand{\push}{\text{push}}
 % \newcommand{\max}{\text{max}}
 \newcommand{\cur}{\text{cur}}
+\newcommand{\assoc}[1]{\text{---}_{\,#1}\,}
+\newcommand{\strict}[1]{\stackrel{\mathclap{\normalfont\mbox{s}}}{\text{---}}_{\,#1}\,}
 
 % Random variables
 \def\reta{{\textnormal{$\eta$}}}
