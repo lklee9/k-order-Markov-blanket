@@ -74,7 +74,7 @@
 \def\tree{{\mathcal{T}}}
 % \newcommand{\perpperp}{\protect\mathpalette{\protect\independenT}{\perp}}
 % \def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
-\newcommand{\perpperp}{\perp\!\!\!\!\!\perp}
+\newcommand{\perpperp}{\Perp}
 \newcommand{\indep}[1]{\perpperp_{#1}}
 \newcommand{\dep}[1]{\:\cancel{\perpperp}_{#1}\:}
 \def\mb{{\text{MB}}}
@@ -83,6 +83,7 @@
 % \newcommand{\max}{\text{max}}
 \newcommand{\cur}{\text{cur}}
 \newcommand{\assoc}[1]{\text{---}_{\,#1}\,}
+\newcommand{\notassoc}[1]{\cancel{\vphantom{x}\text{---}}_{\,#1}\,}
 \newcommand{\strict}[1]{\stackrel{\mathclap{\normalfont\mbox{s}}}{\text{---}}_{\,#1}\,}
 
 % Random variables
@@ -493,7 +494,7 @@
 \newcommand{\pdecode}{p_{\rm{decoder}}}
 \newcommand{\precons}{p_{\rm{reconstruct}}}
 
-\newcommand{\laplace}{\mathrm{Laplace}} % Laplace distribution
+% \newcommand{\laplace}{\mathrm{Laplace}} % Laplace distribution
 
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\Ls}{\mathcal{L}}
@@ -526,3 +527,9 @@
 \DeclareMathOperator{\sign}{sign}
 \DeclareMathOperator{\Tr}{Tr}
 \let\ab\allowbreak
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: main.tex
+%%% TeX-master: "main"
+%%% End:

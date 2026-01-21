@@ -130,7 +130,15 @@
 - multiple test correction
 - other metrics
 * New
+- a notation of k-assoc
+  + that is compatible with previous notions of 2/3-assoc
+- for k-assoc we need to consider assoc between 2 vars
+  + via some set of vars
 - how does limited samples affect faithfulness
+- 3-assoc requires conditioning on entire cmb to work
+  + also requires assumption 1
+  + to prevent spouses from canceling each other
+  + does cancellation result in higher order assocs?
 ** Intro
 ** Probabilistic Graphical Models and Independece
 ** The Faithfulness Assumption
@@ -144,7 +152,8 @@
    $\mathbf{X}$ and $Y$ are strictly $k$-associated
    - done by first finding $\mathbf{X}$ where its loosely
      $k$-associated, i.e. combination of lower order 
-2. 
+2.
+**** Proof
 *** What we need to do with limited samples
 *** Statistical Test
 ** Pruning the Search Space of kOMB

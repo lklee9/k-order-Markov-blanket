@@ -1,9 +1,9 @@
-% \documentclass{uai2026} % for initial submission
+\documentclass{uai2026} % for initial submission
 %\documentclass[accepted]{uai2026} % after acceptance, for a revised version; 
 % also before submission to see how the non-anonymous paper would look like 
                         
 %% There is a class option to choose the math font
-\documentclass[mathfont=ptmx]{uai2026} % ptmx math instead of Computer
+% \documentclass[mathfont=ptmx]{uai2026} % ptmx math instead of Computer
                                          % Modern (has noticeable issues)
 % \documentclass[mathfont=newtx]{uai2026} % newtx fonts (improves upon
                                           % ptmx; less tested, no support)
@@ -27,6 +27,8 @@
 
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage[tighter]{newtxtext}
+\usepackage[slantedGreek]{newtxmath} % TODO: add options; version
 
 
 % if you use cleveref..
@@ -472,41 +474,79 @@ computationally efficient.
   $\forall \rmS \subseteq \rmV \setminus \{Y\} \cup \rmX$ the following
   holds,
   \begin{gather}
-    \label{eq:k-assoc}
+    \label{eq:k-assoc-1}
     \forall X_{i}\in\rmX : X_{i} \dep{P} Y \mid \rmS \cup
     \bigl(\rmX \setminus \{X_{i}\}\bigr)\\
+    \label{eq:k-assoc-2}
     \forall X_{i},X_{j}\in\rmX : X_{i} \dep{P} X_{j} \mid \rmS \cup
     \bigl(\{Y\} \cup \rmX \setminus \{X_{i}, X_{j}\}\bigr).
   \end{gather}
   Borrowing from the notation in \cite{marx2020}, we use the notation
   $Y\assoc{k}\rmX$ to denote that $Y$ is $k$-associated to $\rmX$.
 \end{definition}
-which results in DAGs with a collider structure, or a UG with a clique
-over all the variables.
+\Cref{eq:k-assoc-2} prevents chains like
+$X_{1}\rightarrow Y \rightarrow X_{2}$ to be included in this definition.
+
+\begin{definition}[Strictly $k$-associated]
+  For random variables $Y\in\rmV$ and $Y\cancel{\in}\rmX\subset\rmV$,
+  $Y$ is strictly $k$-associated with $X$ if and only
+  if there is no strict subset of $\rmX$ that is associated with $Y$,
+  \begin{equation}
+    \label{eq:5}
+    Y\strict{k}\rmX \iff \forall \rmZ \subset \rmX :
+    Y \notassoc{|\rmZ|} \rmZ
+  \end{equation}
+\end{definition}
+
+$Y\strict{k}\rmX$ results in DAGs with a collider structure, or a UG with
+a clique over all the variables. $Y\assoc{k}\rmX$ results in something
+like stochastic \texttt{AND} operator.
 
 \begin{definition}[$k$-associations]
   Let $Y\in\rmV$ and $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$ be
-  distinct random variables from $\rmV$. We use the notation 
+  distinct random variables from $\rmV$. We use the notation
+  $Y\assoc{\leq k}\rmX$ to denote the existance of some association
+  between $Y$ and the variables in $\rmX$ with at least one of the
+  variables in $\rmX$ 
   \begin{equation}
     \label{eq:4}
-    Y\assoc{\leq k}\rmX,
+    \forall X\in\rmX \;\vphantom{\in}\;
+    \exists \rmZ \subseteq \rmX\setminus\{X\} :
+    Y\assoc{|\rmZ|+1}\rmZ\cup\{X\}.
   \end{equation}
-  to denote the existance of some association between $Y$ and some
-  subset of $\rmX$,
-  $\exists \rmZ \subseteq \rmX : Y\assoc{|\rmZ|}\rmZ$.
+  The strict counterpart of this definition $Y\strict{\leq k}\rmX$
+  has the additional property that $\forall X\in\rmX$ and for some $\rmZ
+  \subset \rmX \setminus \{X\}$
+  \begin{equation}
+    \label{eq:6}
+    \exists X \in \rmX : 
+    \forall \rmZ \subset \rmX\setminus\{X\} :
+    Y\notassoc{|\rmZ|+1}\rmZ\cup\{X\},
+  \end{equation}
+  or in other words, there's a variable $X\in\rmX$ that requires every
+  other variable in $\rmX$ to be associated to $Y$.
 \end{definition}
+
+\begin{definition}[$k$-Adjacency Faithfulness]
+  
+\end{definition}
+
 
 \begin{lemma}[Ruling out $k$-associations]
   For distinct random variables $Y\in\rmV$ and
   $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$, the following holds
   for all $\rmS \subset \rmV \setminus \rmX \cup \{Y\}$
-  \begin{equation}
+  \begin{gather}
     \label{eq:3}
+    \begin{aligned}
     Y\indep{}\rmX \mid \rmS
     \implies
-    \forall \rmZ\subseteq\rmX : Y\indep{}\rmZ \mid \rmS \cup
-    (\rmX\setminus\rmZ)
-  \end{equation}
+    &\forall \rmZ\subseteq\rmX : Y\indep{}\rmZ \mid \rmS \cup
+      (\rmX\setminus\rmZ)\\
+      \implies
+      &\neg(Y\assoc{\leq k}\rmX)
+    \end{aligned}
+  \end{gather}
   as a consequence of the weak union graphoid axiom.
 \end{lemma}
 
