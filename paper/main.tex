@@ -456,17 +456,6 @@ computationally efficient.
   \end{enumerate}
 \end{definition}
 
-\begin{lemma}[Inverse Weak Union]
-  Let $\rmV$ be a set of random variable and
-  $\rmX, \rmY, \rmZ \subset \rmV$ be disjoint subsets of $\rmV$. Then,
-  $\forall \rmS \subseteq \rmZ \setminus (\rmX \cup \rmY \cup \rmZ)$
-  \begin{equation}
-    \label{eq:2}
-    \rmX \dep{} \rmY \mid \rmS \cup \rmZ
-    \implies \bigl(\rmX \cup \rmZ\bigr) \dep{} \rmY \mid \rmS
-  \end{equation}
-\end{lemma}
-
 \begin{definition}[$k$-associated]
   For a set of random variables $\rmV$, let $Y\in\rmV$ and
   $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$ be distinct random
@@ -544,10 +533,37 @@ like stochastic \texttt{AND} operator.
     &\forall \rmZ\subseteq\rmX : Y\indep{}\rmZ \mid \rmS \cup
       (\rmX\setminus\rmZ)\\
       \implies
-      &\neg(Y\assoc{\leq k}\rmX)
+      &Y\notassoc{\leq k}\rmX
     \end{aligned}
   \end{gather}
   as a consequence of the weak union graphoid axiom.
+\end{lemma}
+
+\subsection{Algorithm}
+\begin{lemma}[Inverse Weak Union]
+  Let $\rmV$ be a set of random variable and
+  $\rmX, \rmY, \rmZ \subset \rmV$ be disjoint subsets of $\rmV$. Then,
+  $\forall \rmS \subseteq \rmZ \setminus (\rmX \cup \rmY \cup \rmZ)$
+  \begin{equation}
+    \label{eq:2}
+    \rmX \dep{} \rmY \mid \rmS \cup \rmZ
+    \implies \bigl(\rmX \cup \rmZ\bigr) \dep{} \rmY \mid \rmS
+  \end{equation}
+\end{lemma}
+
+\begin{lemma}[Inverse Decomposition]
+  For random variables $\rmX \subset \rmV$ and
+  $Y,Z \in \rmV$, if
+  \begin{equation}
+    \label{eq:7}
+    \bigl(\rmX \indep{} Y \mid \rmS\bigr)
+    \wedge
+    \bigl(\rmX \cup \{Z\} \dep{} Y \mid \rmS\bigr)
+  \end{equation}
+  then one of the following must be the case:
+  \begin{enumerate}
+  \item $Y\assoc{k}$ 
+  \end{enumerat}
 \end{lemma}
 
 \begin{algorithm}
