@@ -80,6 +80,7 @@
 % \usepackage{algpseudocode}
 \usepackage[ruled,vlined]{algorithm2e}
 \SetKwComment{Comment}{/*}{*/}
+\SetKwInput{Inv}{Invariant}
 \crefname{algocf}{alg.}{algs.}
 \Crefname{algocf}{Algorithm}{Algorithms}
 \usepackage{float} %figure inside minipage
@@ -456,6 +457,10 @@ computationally efficient.
   \end{enumerate}
 \end{definition}
 
+\begin{definition}[Unfaithful $k$-order interaction]
+  
+\end{definition}
+
 \begin{definition}[$k$-associated]
   For a set of random variables $\rmV$, let $Y\in\rmV$ and
   $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$ be distinct random
@@ -492,34 +497,57 @@ a clique over all the variables. $Y\assoc{k}\rmX$ results in something
 like stochastic \texttt{AND} operator.
 
 \begin{definition}[$k$-associations]
-  Let $Y\in\rmV$ and $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$ be
+  Let $Y\in\rmV$ and $\rmX\subset\rmV$ where $|\rmX| \leq k$ be
   distinct random variables from $\rmV$. We use the notation
   $Y\assoc{\leq k}\rmX$ to denote the existance of some association
   between $Y$ and the variables in $\rmX$ with at least one of the
   variables in $\rmX$ 
   \begin{equation}
     \label{eq:4}
-    \forall X\in\rmX \;\vphantom{\in}\;
-    \exists \rmZ \subseteq \rmX\setminus\{X\} :
-    Y\assoc{|\rmZ|+1}\rmZ\cup\{X\}.
+    Y\assoc{\leq k}\rmX \iff
+    |\rmX| \leq k \wedge
+    \exists \rmZ \subseteq \rmX :
+    Y\assoc{|\rmZ|}\rmZ
   \end{equation}
-  The strict counterpart of this definition $Y\strict{\leq k}\rmX$
-  has the additional property that $\forall X\in\rmX$ and for some $\rmZ
-  \subset \rmX \setminus \{X\}$
+  and the strict counterpart
   \begin{equation}
-    \label{eq:6}
-    \exists X \in \rmX : 
-    \forall \rmZ \subset \rmX\setminus\{X\} :
-    Y\notassoc{|\rmZ|+1}\rmZ\cup\{X\},
+    \label{eq:10}
+    Y\strict{\leq k}\rmX \iff
+    |\rmX| \leq k \wedge
+    Y\strict{|\rmX|}\rmX
   \end{equation}
-  or in other words, there's a variable $X\in\rmX$ that requires every
-  other variable in $\rmX$ to be associated to $Y$.
 \end{definition}
 
 \begin{definition}[$k$-Adjacency Faithfulness]
-  
+  Given the probabilistic graphical model $\model=(\gr, \pr)$ where $\gr
+  = (\verts, \edges)$, then $\gr$ is $k$-adjacent faithful to $\pr$ if
+  and only if
+  \begin{equation}
+    \label{eq:8}
+    \forall (Y,X) \in \edges \:\,\:
+    \exists \rmX \subseteq \mb(Y) :
+    X \in \rmX \wedge Y\strict{\leq k}\rmX
+  \end{equation}
+  or in other words for all adjacent variables $(Y,X)$ in $\gr$, there
+  exists a subset $\rmX$ of the Markov blanket of $Y$ that contains $X$
+  such that $Y$ is \emph{strictly} $|\rmX|$-associated to $\rmX$.
 \end{definition}
 
+
+
+\subsection{Theoretical Algorithm}
+\begin{lemma}[Inverse Weak Union]
+  Let $\rmV$ be a set of random variable and
+  $\rmX, \rmY, \rmZ \subset \rmV$ be disjoint subsets of $\rmV$.  Also
+  assume without loss of generality that $|\rmX\cup\rmZ|\leq k$.  Then,
+  if $\forall \rmS \subseteq \rmZ \setminus (\rmX \cup \rmY \cup \rmZ)$
+  \begin{equation}
+    \label{eq:2}
+    \rmX \dep{} \rmY \mid \rmS \cup \rmZ
+    \implies \bigl(\rmX \cup \rmZ\bigr) \dep{} \rmY \mid \rmS\\
+  \end{equation}
+  which is just the contrapositive of the weak union graphoid axiom.
+\end{lemma}
 
 \begin{lemma}[Ruling out $k$-associations]
   For distinct random variables $Y\in\rmV$ and
@@ -528,10 +556,10 @@ like stochastic \texttt{AND} operator.
   \begin{gather}
     \label{eq:3}
     \begin{aligned}
-    Y\indep{}\rmX \mid \rmS
-    \implies
-    &\forall \rmZ\subseteq\rmX : Y\indep{}\rmZ \mid \rmS \cup
-      (\rmX\setminus\rmZ)\\
+      Y\indep{}\rmX \mid \rmS
+      \implies
+      &\forall \rmZ\subseteq\rmX : Y\indep{}\rmZ \mid \rmS \cup
+        (\rmX\setminus\rmZ)\\
       \implies
       &Y\notassoc{\leq k}\rmX
     \end{aligned}
@@ -539,67 +567,152 @@ like stochastic \texttt{AND} operator.
   as a consequence of the weak union graphoid axiom.
 \end{lemma}
 
-\subsection{Algorithm}
-\begin{lemma}[Inverse Weak Union]
-  Let $\rmV$ be a set of random variable and
-  $\rmX, \rmY, \rmZ \subset \rmV$ be disjoint subsets of $\rmV$. Then,
-  $\forall \rmS \subseteq \rmZ \setminus (\rmX \cup \rmY \cup \rmZ)$
+\begin{lemma}[Finding $k$-associations]
+  For distinct random variables $Y\in\rmV$ and
+  $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$, the following holds
+  for all $\rmS \subset \rmV \setminus \rmX \cup \{Y\}$
   \begin{equation}
-    \label{eq:2}
-    \rmX \dep{} \rmY \mid \rmS \cup \rmZ
-    \implies \bigl(\rmX \cup \rmZ\bigr) \dep{} \rmY \mid \rmS
+    \label{eq:11}
+    \rmX \dep{} Y \mid \rmS
+    \implies \exists \rmZ \subseteq \rmX : Y\strict{|\rmZ|}\rmZ
+  \end{equation}
+\end{lemma}
+\begin{proof}[Proof by induction]
+  With subsets of $\rmX$ of size $1$, $[\rmX]^{1}=\{A\subseteq \rmX
+  \mid |A| = 1\}$, we know that
+  \begin{equation}
+    \label{eq:12}
+    Y \assoc{1} [\rmX]^{1} \iff Y \strict{1} [\rmX]^{1}.
+  \end{equation}
+  Therefore, any association found is a strict association.
+
+  Now assume that $Y$ is not associated with any subsets in
+  $[\rmX]^{k}\cup \ldots \cup [\rmX]^{1}$. Then we know that if $Y$ is
+  associated with any subset in $[\rmX]^{k+1}$, it also implies a strict
+  association. Therefore the existance of any association implies a
+  strict association for some subset.
+\end{proof}
+
+\begin{lemma}[kOMB $k$-associations detection]
+  For random variables $\rmX \subset \rmV$ and
+  $Y,Z \in \rmV$, asumming $Z\in \mb(Y)$ and $k$-Adjacency Faithfulness
+  \begin{equation} 
+    \label{eq:7}
+    \begin{aligned}
+      &\bigl(\rmX \indep{} Y \mid \rmS\bigr)
+        \wedge
+        \bigl(\rmX \cup \{Z\} \dep{} Y \mid \rmS\bigr)\\
+      &\implies \exists \rmW \subseteq \rmX :
+         Y\strict{|\rmW|+1}\rmW \cup \{Z\}
+    \end{aligned}
   \end{equation}
 \end{lemma}
 
-\begin{lemma}[Inverse Decomposition]
-  For random variables $\rmX \subset \rmV$ and
-  $Y,Z \in \rmV$, if
-  \begin{equation}
-    \label{eq:7}
-    \bigl(\rmX \indep{} Y \mid \rmS\bigr)
-    \wedge
-    \bigl(\rmX \cup \{Z\} \dep{} Y \mid \rmS\bigr)
-  \end{equation}
-  then one of the following must be the case:
-  \begin{enumerate}
-  \item $Y\assoc{k}$ 
-  \end{enumerat}
-\end{lemma}
+\begin{theorem}[Strict $k$-association filtering]
+  
+\end{theorem}
 
 \begin{algorithm}
   \caption{kOMB}
   % \DontPrintSemicolon
-  \KwIn{$\db$, $\rmX$, $t$, $\mb$, $\alpha$}
+  \KwIn{$\db$, $\rmX$, $Y$, $\mb$, $\alpha$, $k$}
   \KwOut{Output result}
-  $\rmS \gets [\emptyset]$\;
-  $\rmA \gets [\rmX]$\;
-  $\df_{\max} \gets \infty$\; 
-  \For{each $\rvx\in\mb$}{
-    $S \gets \pop(\rmS)$\;
-    $A \gets \pop(\rmA)$\;
-    $\df_{\cur} \gets \df(\rvs)$\;
-    \If{$|S| > 0$}{
-      \If{$S \not\indep t \mid \mb$}{
-        \Return{$S$}\;
-      }
-      \If{$1 - \cdf(G_{S\cup A}; \df(S)) > \alpha$}{
-        $\df_{\max} \gets \df_{\cur}$\;
-        \Comment{Pruning of supersets according to
-          \Cref{thm:prune-superset}.}
-        continue\; 
-      }
-    }
-    \Comment{Don't explore subsets that exceed the current maximum degrees
-      of freedom via \Cref{thm:prune}.}
-    $A' \gets \{a \mid a\in A, \df(S \cup \{a\}) < \df_{\max}\}$\;
-    \For{$i \in [1, |A'|]$}{
-      $a \gets A'_{i}$\;
-      push $S \cup \{a\}$ on to $\rmS$\;
-      push $A'[1,\ldots,i-1]$ on to $\rmA$\;
-    }
-    \Return{$\emptyset$};
+  $\verts' \gets \verts \setminus Y$\;
+  $\rmS \gets \emptyset$\tcp{CMB}
+  \While{$\exists \rmX \in [\verts']^{\leq k} :
+    Y\strict{|\rmX|}\rmX$}{
+    $\rmS \gets \rmS \cup \rmX$\;
   }
+  \While{$\exists X \in \rmS : Y \indep{\pr} X \mid \rmS \setminus X$}{
+    $\rmS \gets \rmS \setminus X$\;
+  }
+  \Return{$\rmS$}\;
 \end{algorithm}
+
+\subsection{Pratical Algorithm}
+
+\begin{algorithm}
+  \caption{kOMB (Pratical Implementation)}
+  % \DontPrintSemicolon
+  \SetKwProg{Fn}{Function}{:}{}
+  \KwIn{$\db$, $\rmX$, $Y$, $\mb$, $\alpha$, $k$}
+  \KwOut{Output result}
+  \Fn{kOMB($Y$, $\rmS$, $\rmX$, $\rmV'$)}{
+    $Y$, $\rmS$, $\rmX$, $\rmV'$
+  }
+  $\verts' \gets \verts \setminus Y$\;
+  $\rmS \gets \emptyset$\tcp{CMB}
+  \While{$\exists \rmX \in [\verts']^{\leq k} :
+    Y\strict{|\rmX|}\rmX$}{
+    $\rmS \gets \rmS \cup \rmX$\;
+  }
+  \While{$\exists X \in \rmS : Y \indep{\pr} X \mid \rmS \setminus X$}{
+    $\rmS \gets \rmS \setminus X$\;
+  }
+  \Return{$\rmS$}\;
+\end{algorithm}
+
+
+\begin{algorithm}
+  \caption{Find Separator, $\forall \rmS$}
+  % \DontPrintSemicolon
+  \KwIn{$Y$, $\rmX$, $\rmS$, $\alpha$}
+  \KwOut{Output result}
+  \Inv{$\rmX \dep{} Y \mid \rmS$}
+  \While{$\exists X \in \rmX : Y \indep{} X \mid \rmS \cup \rmX'
+    \setminus X$} {
+    $\rmX \gets \rmX \setminus X$\;
+  }
+  \Return{$\rmX$}\;
+\end{algorithm}
+
+\begin{algorithm}
+  \caption{Find $k$-Associations, $\exists \rmX$}
+  % \DontPrintSemicolon
+  \KwIn{$Y$, $\rmX$, $\rmS$, $\alpha$}
+  \KwOut{Output result}
+  \Inv{$\rmX \dep{} Y \mid \rmS$}
+  \While{$\exists X \in \rmX : Y \indep{} X \mid \rmS \cup \rmX'
+    \setminus X$} {
+    $\rmX \gets \rmX \setminus X$\;
+  }
+  \Return{$\rmX$}\;
+\end{algorithm}
+
+\begin{algorithm}
+  \caption{Filter for Strict Association, $\exists \rmX$}
+  % \DontPrintSemicolon
+  \KwIn{$Y$, $\rmX$, $\rmS$, $\alpha$}
+  \KwOut{Output result}
+  \Inv{$\rmX \dep{} Y \mid \rmS$}
+  \While{$\exists X \in \rmX : Y \indep{} X \mid \rmS \cup \rmX'
+    \setminus X$} {
+    $\rmX \gets \rmX \setminus X$\;
+  }
+  \Return{$\rmX$}\;
+\end{algorithm}
+
+
+\begin{algorithm}
+  \caption{Is Strict Associated?, $\exists \rmX$}
+  % \DontPrintSemicolon
+  \KwIn{$Y$, $\rmX$, $\rmS$, $\alpha$}
+  \KwOut{Output result}
+  \If{$Y \dep{} \rmX \mid \rmS$}{
+    
+  }
+  \While{$\exists X \in \rmX : Y \indep{} X \mid \rmS \cup \rmX'
+    \setminus X$} {
+    $\rmX \gets \rmX \setminus X$\;
+  }
+  \Return{$\rmX$}\;
+\end{algorithm}
+
+
+\subsection{Pratical Algorithm}
+\begin{definition}[Bounded Separator Assumption]
+  needed for practical algorithm
+\end{definition}
 
 
 \section{Lattice Incremental Association Mining for Markov Blankets

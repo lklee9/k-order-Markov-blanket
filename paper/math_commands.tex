@@ -82,9 +82,15 @@
 \newcommand{\push}{\text{push}}
 % \newcommand{\max}{\text{max}}
 \newcommand{\cur}{\text{cur}}
-\newcommand{\assoc}[1]{\text{---}_{\,#1}\,}
+\newcommand{\assocdash}[1]{\stackrel{\mathclap{\normalfont\mbox{#1}}}{\text{---}}}
+\newcommand{\assoc}[1]{\assocdash{}_{\,#1}}
 \newcommand{\notassoc}[1]{\cancel{\vphantom{x}\text{---}}_{\,#1}\,}
-\newcommand{\strict}[1]{\stackrel{\mathclap{\normalfont\mbox{s}}}{\text{---}}_{\,#1}\,}
+\newcommand{\strict}[1]{\assocdash{s}_{\,#1}}
+\newcommand{\model}{\mathcal{M}}
+\newcommand{\gr}{\mathcal{G}}
+\newcommand{\verts}{\bm{V}}
+\newcommand{\edges}{\bm{E}}
+\newcommand{\cmb}{\text{cmb}}
 
 % Random variables
 \def\reta{{\textnormal{$\eta$}}}
