@@ -536,7 +536,7 @@ like stochastic \texttt{AND} operator.
 
 
 \subsection{Theoretical Algorithm}
-\begin{lemma}[Inverse Weak Union]
+\begin{lemma}[Inverse Weak Union]\label{lemma:inv-weak-union}
   Let $\rmV$ be a set of random variable and
   $\rmX, \rmY, \rmZ \subset \rmV$ be disjoint subsets of $\rmV$.  Also
   assume without loss of generality that $|\rmX\cup\rmZ|\leq k$.  Then,
@@ -612,6 +612,10 @@ like stochastic \texttt{AND} operator.
   
 \end{theorem}
 
+\begin{definition}[Bounded Separator Assumption]
+  needed for practical algorithm
+\end{definition}
+
 \begin{algorithm}
   \caption{kOMB}
   % \DontPrintSemicolon
@@ -629,22 +633,17 @@ like stochastic \texttt{AND} operator.
   \Return{$\rmS$}\;
 \end{algorithm}
 
-\subsection{Pratical Algorithm}
-
 \begin{algorithm}
   \caption{kOMB (Pratical Implementation)}
   % \DontPrintSemicolon
   \SetKwProg{Fn}{Function}{:}{}
-  \KwIn{$\db$, $\rmX$, $Y$, $\mb$, $\alpha$, $k$}
+  \KwIn{$\db$, $\rmX$, $Y$, $\mb$, $\alpha$, $k$, $l$}
   \KwOut{Output result}
-  \Fn{kOMB($Y$, $\rmS$, $\rmX$, $\rmV'$)}{
-    $Y$, $\rmS$, $\rmX$, $\rmV'$
-  }
   $\verts' \gets \verts \setminus Y$\;
   $\rmS \gets \emptyset$\tcp{CMB}
-  \While{$\exists \rmX \in [\verts']^{\leq k} :
-    Y\strict{|\rmX|}\rmX$}{
-    $\rmS \gets \rmS \cup \rmX$\;
+  \Repeat{$\rmX' = \emptyset$}{
+    $\rmX' \gets $ find\_assoc($Y$, $\emptyset$, $\rmS$, $\verts'$)\;
+    $\rmS \gets \rmS \cup \rmX'$
   }
   \While{$\exists X \in \rmS : Y \indep{\pr} X \mid \rmS \setminus X$}{
     $\rmS \gets \rmS \setminus X$\;
@@ -652,67 +651,125 @@ like stochastic \texttt{AND} operator.
   \Return{$\rmS$}\;
 \end{algorithm}
 
-
 \begin{algorithm}
-  \caption{Find Separator, $\forall \rmS$}
+  \caption{Practical Conditional Independence Test}
   % \DontPrintSemicolon
-  \KwIn{$Y$, $\rmX$, $\rmS$, $\alpha$}
-  \KwOut{Output result}
-  \Inv{$\rmX \dep{} Y \mid \rmS$}
-  \While{$\exists X \in \rmX : Y \indep{} X \mid \rmS \cup \rmX'
-    \setminus X$} {
-    $\rmX \gets \rmX \setminus X$\;
+  \SetKwProg{Fn}{Function}{:}{}
+  % \KwIn{$Y$, $X$, $\rmX$, $\rmS$, $k$, $l$, $\alpha$}
+  % \KwOut{is $Y \dep{} X \mid \rmX \cup \rmS$?}
+  % \Inv{$\rmX \dep{} Y \mid \rmS$}
+  \Fn{not\_ci($Y$, $X$, $\rmX$, $\rmS$, $k$, $l$, $\alpha$)}{
+    \KwOut{is $Y \dep{} X \mid \rmX \cup \rmS$?}
+    \For{$\rmZ \in [\rmS]^{\leq k - 1 - |\rmX|}$}{
+      $\rmX' \gets \rmZ \cup \rmX$\;
+      $\rmS' \gets \rmS \setminus \rmZ$\;
+      % $p \gets$ p-value of test $H_{0}: Y \indep{} X \mid \rmX'$\;
+      \If{$H_{0}: Y \dep{} X \mid \rmX'$}{
+        \If{no\_seps($Y$, $X$, $\rmX'$, $\rmS'$, $l$, $\alpha$)}{
+          \Return{True}\;
+        }
+      }
+    }
+    \Return{False}\;
   }
-  \Return{$\rmX$}\;
+  \Fn{no\_seps($Y$, $X$, $\rmX'$, $\rmS'$, $l$, $\alpha$)}{
+    \Inv{$X \dep{} Y \mid \rmX'$}
+    % max\_p $\gets 1$\;
+    \For{$\rmS' \in [\rmS']^{\leq l}$}{
+      % max\_p $\gets \min(\text{min\_p}, p)$\;
+      \If{$Y \indep{} X \mid \rmX' \cup \rmS'$}{
+        \Return{False}\;
+      }
+    }
+    \Return{True}\;
+  }
 \end{algorithm}
 
 \begin{algorithm}
-  \caption{Find $k$-Associations, $\exists \rmX$}
+  \caption{Association Mining}
   % \DontPrintSemicolon
-  \KwIn{$Y$, $\rmX$, $\rmS$, $\alpha$}
-  \KwOut{Output result}
-  \Inv{$\rmX \dep{} Y \mid \rmS$}
-  \While{$\exists X \in \rmX : Y \indep{} X \mid \rmS \cup \rmX'
-    \setminus X$} {
-    $\rmX \gets \rmX \setminus X$\;
+  \SetKwProg{Fn}{Function}{:}{}
+  \Fn{make\_strict($Y$, $X$, $\rmX$, $\rmS$)}{
+    \Inv{$Y \dep{} X \mid \rmX \cup \rmS$}
+    \KwOut{$\rmX'\subseteq\rmX$ s.t. $Y \dep{} X \mid \rmX' \cup \rmS$
+      and $\forall X'\in\rmX' : Y \indep{} X \mid \rmS \cup \rmX'
+      \setminus X'$}
+    \While{$\exists X' \in \rmX : Y \dep{} X \mid \rmS \cup \rmX
+      \setminus X'$}{
+      remove $X'$ from $\rmX$\;
+    }
+    \Return{$\rmX'$}\;
   }
-  \Return{$\rmX$}\;
-\end{algorithm}
-
-\begin{algorithm}
-  \caption{Filter for Strict Association, $\exists \rmX$}
-  % \DontPrintSemicolon
-  \KwIn{$Y$, $\rmX$, $\rmS$, $\alpha$}
-  \KwOut{Output result}
-  \Inv{$\rmX \dep{} Y \mid \rmS$}
-  \While{$\exists X \in \rmX : Y \indep{} X \mid \rmS \cup \rmX'
-    \setminus X$} {
-    $\rmX \gets \rmX \setminus X$\;
+  \Fn{find\_assoc($Y$, $\rmX$, $\rmS$, $\rmV'$, $k$, $l$)}{
+    \KwOut{$\rmX\subseteq\rmV'\setminus\rmS$
+      such that $Y \dep{} \rmX \mid \rmS$}
+    \If{$|\rmX| \geq k$}{
+      \Return{$\emptyset$}\;
+    }
+    \For{$X \in \rmV'\setminus\rmS$}{
+      \If{not\_ci($Y$, $X$, $\rmX$, $\rmS$, $k$, $l$)}{
+        \tcp{$Y \dep{} X \mid \rmX \cup \rmS$}
+        \Return{make\_strict($Y$, $X$, $\rmX$, $\rmS$)}\;
+      }
+      $\rmX' \gets $ find\_assoc(
+      $Y$, $\rmX\cup X$, $\rmS$,
+      $\rmV' \setminus X$, $k$, $l$, $\alpha$)\;
+      \If{$\rmX' \neq \emptyset$}{
+        \Return{$\rmX'$}\;
+      }
+    }
+    \Return{$\emptyset$}\;
   }
-  \Return{$\rmX$}\;
-\end{algorithm}
-
-
-\begin{algorithm}
-  \caption{Is Strict Associated?, $\exists \rmX$}
-  % \DontPrintSemicolon
-  \KwIn{$Y$, $\rmX$, $\rmS$, $\alpha$}
-  \KwOut{Output result}
-  \If{$Y \dep{} \rmX \mid \rmS$}{
-    
-  }
-  \While{$\exists X \in \rmX : Y \indep{} X \mid \rmS \cup \rmX'
-    \setminus X$} {
-    $\rmX \gets \rmX \setminus X$\;
-  }
-  \Return{$\rmX$}\;
 \end{algorithm}
 
 
-\subsection{Pratical Algorithm}
-\begin{definition}[Bounded Separator Assumption]
-  needed for practical algorithm
-\end{definition}
+\begin{lemma}
+  \begin{equation}
+    \label{eq:13}
+    \begin{aligned}
+      &Y \dep{} X \mid \rmS \cup \rmX
+        % \wedge
+        % \forall X'\in\rmX :
+        \bigwedge_{X'\in\rmX}
+        Y \indep{} X \mid \rmS \cup \rmX
+      \setminus X'\\
+      &\implies \forall X'\in\rmX :
+        Y \dep{} X' \mid \rmS \cup X \cup \rmX \setminus X'
+    \end{aligned}
+  \end{equation}
+  by contraction
+\end{lemma}
+\begin{proof}
+  Assume that for some $X'\in\rmX$
+  \begin{equation}
+    \label{eq:6}
+    Y \indep{} X' \mid \rmS \cup X \cup \rmX \setminus X'
+  \end{equation}
+  By the contraction graphoid axiom we know that
+  \begin{equation}
+    \label{eq:9}
+    \begin{aligned}
+      &(Y \indep{} X' \mid \rmS \cup X \cup \rmX \setminus X')
+        \wedge (Y \indep{} X \mid \rmS \cup \rmX \setminus X')\\
+      &\implies Y \indep{} \{X', X\} \mid \rmS \cup \rmX \setminus X'
+    \end{aligned}
+  \end{equation}
+  However this contracdicts what we know from \Cref{lemma:inv-weak-union}
+  that is 
+  \begin{equation}
+    \label{eq:14}
+    Y\dep{}X\mid \rmS \cup \rmX
+    \implies Y \dep{} \{X,X'\} \mid \rmS \cup \rmX \setminus X'
+  \end{equation}
+  Therefore, our initial assumption is not possible and that for all
+  $X'\in\rmX$
+  \begin{equation}
+    \label{eq:15}
+    Y \dep{} X' \mid \rmS \cup X \cup \rmX \setminus X'
+  \end{equation}
+  by contradiction.
+\end{proof}
+
 
 
 \section{Lattice Incremental Association Mining for Markov Blankets
