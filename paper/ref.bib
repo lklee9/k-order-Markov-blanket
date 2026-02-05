@@ -300,6 +300,21 @@
   abstract = {We propose algorithms for learning Markov boundaries from data without having to learn a Bayesian network first. We study their correctness, scalability and data efficiency. The last two properties are important because we aim to apply the algorithms to identify the minimal set of features that is needed for probabilistic classification in databases with thousands of features but few instances, e.g. gene expression databases. We evaluate the algorithms on synthetic and real databases, including one with 139,351 features.}
 }
 
+@inproceedings{ramsey2006,
+  title = {Adjacency-faithfulness and conservative causal inference},
+  booktitle = {Proceedings of the {{Twenty-Second Conference}} on {{Uncertainty}} in {{Artificial Intelligence}}},
+  author = {Ramsey, Joseph and Spirtes, Peter and Zhang, Jiji},
+  year = 2006,
+  month = jul,
+  series = {{{UAI}}'06},
+  pages = {401--408},
+  publisher = {AUAI Press},
+  address = {Arlington, Virginia, USA},
+  urldate = {2026-02-03},
+  abstract = {Most causal discovery algorithms in the literature exploit an assumption usually referred to as the Causal Faithfulness or Stability Condition. In this paper, we highlight two components of the condition used in constraint-based algorithms, which we call "Adjacency-Faithfulness" and "Orientation-Faithfulness." We point out that assuming Adjacency-Faithfulness is true, it is possible to test the validity of Orientation-Faithfulness. Motivated by this observation, we explore the consequence of making only the Adjacency-Faithfulness assumption. We show that the familiar PC algorithm has to be modified to be correct under the weaker, Adjacency-Faithfulness assumption. The modified algorithm, called Conservative PC (CPC), checks whether Orientation-Faithfulness holds in the orientation phase, and if not, avoids drawing certain causal conclusions the PC algorithm would draw. However, if the stronger, standard causal Faithfulness condition actually obtains, the CPC algorithm outputs the same pattern as the PC algorithm does in the large sample limit.We also present a simulation study showing that the CPC algorithm runs almost as fast as the PC algorithm, and outputs significantly fewer false causal arrowheads than the PC algorithm does on realistic sample sizes.},
+  isbn = {978-0-9749039-2-7}
+}
+
 @article{schluter2014,
   title = {A survey on independence-based {{Markov}} networks learning},
   author = {Schl{\"u}ter, Federico},
