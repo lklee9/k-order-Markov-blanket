@@ -457,6 +457,21 @@ computationally efficient.
   \end{enumerate}
 \end{definition}
 
+\begin{lemma}[Inverse Weak Union]\label{lemma:inv-weak-union}
+  Let $\rmV$ be a set of random variable and
+  $\rmX, \rmY, \rmZ \subset \rmV$ be disjoint subsets of $\rmV$.  Also
+  assume without loss of generality that $|\rmX\cup\rmZ|\leq k$.  Then,
+  if $\forall \rmS \subseteq \rmZ \setminus (\rmX \cup \rmY \cup \rmZ)$
+  \begin{equation}
+    \label{eq:2}
+    \rmX \dep{} \rmY \mid \rmS \cup \rmZ
+    \implies \bigl(\rmX \cup \rmZ\bigr) \dep{} \rmY \mid \rmS\\
+  \end{equation}
+  which is just the contrapositive of the weak union graphoid axiom.
+\end{lemma}
+
+
+
 \begin{definition}[Power Sets of Limited Size]
   Let $\rmX$ be a set of elements and $k\leq |\rmX|$ be some natural
   number smaller than the cardinality of $\rmX$. Then we use the
@@ -489,22 +504,6 @@ computationally efficient.
   on.
 \end{definition}
 
-\begin{definition}[$k$-Order Adjacency Faithfulness]
-  Given the probabilistic graphical model $\model=(\gr, \pr)$ where
-  $\gr = (\verts, \edges)$, then $\gr$ is $k$-adjacent faithful to $\pr$
-  if and only if $\forall (Y,X) \in \edges$ and
-  $\forall \rmS \subseteq \verts \setminus \{Y,X\}$,
-  \begin{equation}
-    \label{eq:8}
-    \exists \rmX \in [\mb(Y) \setminus X]^{\leq k-1}:
-    Y \dep{\pr} X \mid \rmS \cup \rmX.
-  \end{equation}
-  In other words, for any adjacent variables $(Y,X)$ in $\gr$, there
-  must be a subset of the Markov blanket of $Y$ that $Y$ and $X$ are
-  always conditionally dependent with respect to, regardless of any
-  other variables they are conditioned on.
-\end{definition}
-
 \begin{definition}[$k$-Order Dependence]
   For a set of random variables $\rmV$, let $Y,X\in\rmV$ and
   $\rmZ=\{Z_{1},Z_{2},\ldots,Z_{k}\}\subset\rmV$ be distinct random
@@ -517,11 +516,11 @@ computationally efficient.
     := \forall \rmS \subseteq \rmV \setminus \{Y,X\} :
     Y \dep{\pr} X \mid \rmZ \cup \rmS.
   \end{equation}
-  We say that $Y$ and $X$ are associated w.r.t. $\rmZ$. Of course under
-  this definition there might be some strict subset $\rmZ' \subset \rmZ$
-  where $\kdep{Y,X}{\rmZ'}$ still holds. Therefore we say $Y$ and $X$
-  are $|\rmZ|$-order dependent w.r.t $\rmZ$ only if this is not the
-  case,
+  Here we say that $Y$ and $X$ are associated w.r.t. $\rmZ$. Of course
+  under this definition there might be some strict subset
+  $\rmZ' \subset \rmZ$ where $\kdep{Y,X}{\rmZ'}$ still holds. Therefore
+  we say $Y$ and $X$ are $|\rmZ|$-order dependent w.r.t $\rmZ$ only if
+  this is not the case,
   \begin{gather}
     \begin{aligned}
       &\kdep{\rmV}{Y,X}{\rmZ}\\
@@ -537,20 +536,25 @@ $Y\strict{k}\rmX$ results in DAGs with a collider structure, or a UG with
 a clique over all the variables. $Y\assoc{k}\rmX$ results in something
 like stochastic \texttt{AND} operator.
 
-\subsection{Theoretical Algorithm}
-\begin{lemma}[Inverse Weak Union]\label{lemma:inv-weak-union}
-  Let $\rmV$ be a set of random variable and
-  $\rmX, \rmY, \rmZ \subset \rmV$ be disjoint subsets of $\rmV$.  Also
-  assume without loss of generality that $|\rmX\cup\rmZ|\leq k$.  Then,
-  if $\forall \rmS \subseteq \rmZ \setminus (\rmX \cup \rmY \cup \rmZ)$
+\begin{definition}[$k$-Order Adjacency Faithfulness]
+  Given the probabilistic graphical model $\model=(\gr, \pr)$ where
+  $\gr = (\verts, \edges)$, then $\gr$ is $k$-adjacent faithful to $\pr$
+  if and only if $\forall (Y,X) \in \edges$ and
+  $\forall \rmS \subseteq \verts \setminus \{Y,X\}$,
   \begin{equation}
-    \label{eq:2}
-    \rmX \dep{} \rmY \mid \rmS \cup \rmZ
-    \implies \bigl(\rmX \cup \rmZ\bigr) \dep{} \rmY \mid \rmS\\
+    \label{eq:8}
+    \exists \rmZ \in \power{\leq k-1}(\mb(Y) \setminus X):
+    \kdep{\verts}{Y,X}{\rmZ}.
   \end{equation}
-  which is just the contrapositive of the weak union graphoid axiom.
-\end{lemma}
+  In other words, for any adjacent variables $(Y,X)$ in $\gr$, there
+  must be a subset of the Markov blanket of $Y$ that $Y$ and $X$ are
+  always conditionally dependent with respect to, regardless of any
+  other variables they are conditioned on.
+\end{definition}
 
+
+
+\subsection{Theoretical Algorithm}
 \begin{lemma}[Ruling out $k$-associations]
   For distinct random variables $Y\in\rmV$ and
   $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$, the following holds
