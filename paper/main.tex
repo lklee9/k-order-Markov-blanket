@@ -555,77 +555,79 @@ like stochastic \texttt{AND} operator.
 
 
 \subsection{Theoretical Algorithm}
-\begin{lemma}[Ruling out $k$-associations]
-  For distinct random variables $Y\in\rmV$ and
-  $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$, the following holds
-  for all $\rmS \subset \rmV \setminus \rmX \cup \{Y\}$
-  \begin{gather}
-    \label{eq:3}
-    \begin{aligned}
-      Y\indep{}\rmX \mid \rmS
-      \implies
-      &\forall \rmZ\subseteq\rmX : Y\indep{}\rmZ \mid \rmS \cup
-        (\rmX\setminus\rmZ)\\
-      \implies
-      &Y\notassoc{\leq k}\rmX
-    \end{aligned}
-  \end{gather}
-  as a consequence of the weak union graphoid axiom.
-\end{lemma}
+% \begin{lemma}[Ruling out $k$-associations]
+%   For distinct random variables $Y\in\rmV$ and
+%   $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$, the following holds
+%   for all $\rmS \subset \rmV \setminus \rmX \cup \{Y\}$
+%   \begin{gather}
+%     \label{eq:3}
+%     \begin{aligned}
+%       Y\indep{}\rmX \mid \rmS
+%       \implies
+%       &\forall \rmZ\subseteq\rmX : Y\indep{}\rmZ \mid \rmS \cup
+%         (\rmX\setminus\rmZ)\\
+%       \implies
+%       &Y\notassoc{\leq k}\rmX
+%     \end{aligned}
+%   \end{gather}
+%   as a consequence of the weak union graphoid axiom.
+% \end{lemma}
 
-\begin{lemma}[Finding $k$-associations]
-  For distinct random variables $Y\in\rmV$ and
-  $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$, the following holds
-  for all $\rmS \subset \rmV \setminus \rmX \cup \{Y\}$
-  \begin{equation}
-    \label{eq:11}
-    \rmX \dep{} Y \mid \rmS
-    \implies \exists \rmZ \subseteq \rmX : Y\strict{|\rmZ|}\rmZ
-  \end{equation}
-\end{lemma}
-\begin{proof}[Proof by induction]
-  With subsets of $\rmX$ of size $1$, $[\rmX]^{1}=\{A\subseteq \rmX
-  \mid |A| = 1\}$, we know that
-  \begin{equation}
-    \label{eq:12}
-    Y \assoc{1} [\rmX]^{1} \iff Y \strict{1} [\rmX]^{1}.
-  \end{equation}
-  Therefore, any association found is a strict association.
+% \begin{lemma}[Finding $k$-associations]
+%   For distinct random variables $Y\in\rmV$ and
+%   $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$, the following holds
+%   for all $\rmS \subset \rmV \setminus \rmX \cup \{Y\}$
+%   \begin{equation}
+%     \label{eq:11}
+%     \rmX \dep{} Y \mid \rmS
+%     \implies \exists \rmZ \subseteq \rmX : Y\strict{|\rmZ|}\rmZ
+%   \end{equation}
+% \end{lemma}
+% \begin{proof}[Proof by induction]
+%   With subsets of $\rmX$ of size $1$, $[\rmX]^{1}=\{A\subseteq \rmX
+%   \mid |A| = 1\}$, we know that
+%   \begin{equation}
+%     \label{eq:12}
+%     Y \assoc{1} [\rmX]^{1} \iff Y \strict{1} [\rmX]^{1}.
+%   \end{equation}
+%   Therefore, any association found is a strict association.
 
-  Now assume that $Y$ is not associated with any subsets in
-  $[\rmX]^{k}\cup \ldots \cup [\rmX]^{1}$. Then we know that if $Y$ is
-  associated with any subset in $[\rmX]^{k+1}$, it also implies a strict
-  association. Therefore the existance of any association implies a
-  strict association for some subset.
-\end{proof}
+%   Now assume that $Y$ is not associated with any subsets in
+%   $[\rmX]^{k}\cup \ldots \cup [\rmX]^{1}$. Then we know that if $Y$ is
+%   associated with any subset in $[\rmX]^{k+1}$, it also implies a strict
+%   association. Therefore the existance of any association implies a
+%   strict association for some subset.
+% \end{proof}
 
-\begin{lemma}[kOMB $k$-associations detection]
-  For random variables $\rmX \subset \rmV$ and
-  $Y,Z \in \rmV$, asumming $Z\in \mb(Y)$ and $k$-Adjacency Faithfulness
-  \begin{equation} 
-    \label{eq:7}
-    \begin{aligned}
-      &\bigl(\rmX \indep{} Y \mid \rmS\bigr)
-        \wedge
-        \bigl(\rmX \cup \{Z\} \dep{} Y \mid \rmS\bigr)\\
-      &\implies \exists \rmW \subseteq \rmX :
-         Y\strict{|\rmW|+1}\rmW \cup \{Z\}
-    \end{aligned}
-  \end{equation}
-\end{lemma}
+% \begin{lemma}[kOMB $k$-associations detection]
+%   For random variables $\rmX \subset \rmV$ and
+%   $Y,Z \in \rmV$, asumming $Z\in \mb(Y)$ and $k$-Adjacency Faithfulness
+%   \begin{equation} 
+%     \label{eq:7}
+%     \begin{aligned}
+%       &\bigl(\rmX \indep{} Y \mid \rmS\bigr)
+%         \wedge
+%         \bigl(\rmX \cup \{Z\} \dep{} Y \mid \rmS\bigr)\\
+%       &\implies \exists \rmW \subseteq \rmX :
+%          Y\strict{|\rmW|+1}\rmW \cup \{Z\}
+%     \end{aligned}
+%   \end{equation}
+% \end{lemma}
 
-\begin{lemma}
+\begin{lemma}[$k$-dependance implies association]
   \begin{equation}
     \label{eq:13}
     \begin{aligned}
-      &Y \dep{} X \mid \rmS \cup \rmX
-        % \wedge
-        % \forall X'\in\rmX :
-        \bigwedge_{X'\in\rmX}
-        Y \indep{} X \mid \rmS \cup \rmX
-      \setminus X'\\
-      &\implies \forall X'\in\rmX :
-        Y \dep{} X' \mid \rmS \cup X \cup \rmX \setminus X'
+      &\kdep{\verts}{Y,X}{\rmX}\\
+      % &Y \dep{} X \mid \rmS \cup \rmX
+      %   % \wedge
+      %   % \forall X'\in\rmX :
+      %   \bigwedge_{X'\in\rmX}
+      %   Y \indep{} X \mid \rmS \cup \rmX
+      %   \setminus X'\\
+&\implies \forall X'\in\rmX : \kassoc{\verts}{Y,X'}{X \cup \rmX \setminus X'}
+      % &\implies \forall X'\in\rmX :
+      %   Y \dep{} X' \mid \rmS \cup X \cup \rmX \setminus X'
     \end{aligned}
   \end{equation}
   by contraction
@@ -661,6 +663,10 @@ like stochastic \texttt{AND} operator.
   by contradiction.
 \end{proof}
 
+\begin{lemma}[Subset]
+  Let $\verts' \subseteq \verts$ and $X,Y \in \verts$
+\end{lemma}
+
 \begin{theorem}[Strict $k$-association filtering]
   
 \end{theorem}
@@ -669,22 +675,22 @@ like stochastic \texttt{AND} operator.
   needed for practical algorithm
 \end{definition}
 
-\begin{algorithm}
-  \caption{kOMB}
-  % \DontPrintSemicolon
-  \KwIn{$\db$, $\rmX$, $Y$, $\mb$, $\alpha$, $k$}
-  \KwOut{Output result}
-  $\verts' \gets \verts \setminus Y$\;
-  $\rmS \gets \emptyset$\tcp{CMB}
-  \While{$\exists \rmX \in [\verts']^{\leq k} :
-    Y\strict{|\rmX|}\rmX$}{
-    $\rmS \gets \rmS \cup \rmX$\;
-  }
-  \While{$\exists X \in \rmS : Y \indep{\pr} X \mid \rmS \setminus X$}{
-    $\rmS \gets \rmS \setminus X$\;
-  }
-  \Return{$\rmS$}\;
-\end{algorithm}
+% \begin{algorithm}
+%   \caption{kOMB}
+%   % \DontPrintSemicolon
+%   \KwIn{$\db$, $\rmX$, $Y$, $\mb$, $\alpha$, $k$}
+%   \KwOut{Output result}
+%   $\verts' \gets \verts \setminus Y$\;
+%   $\rmS \gets \emptyset$\tcp{CMB}
+%   \While{$\exists \rmX \in [\verts']^{\leq k} :
+%     Y\strict{|\rmX|}\rmX$}{
+%     $\rmS \gets \rmS \cup \rmX$\;
+%   }
+%   \While{$\exists X \in \rmS : Y \indep{\pr} X \mid \rmS \setminus X$}{
+%     $\rmS \gets \rmS \setminus X$\;
+%   }
+%   \Return{$\rmS$}\;
+% \end{algorithm}
 
 \begin{algorithm}
   \caption{kOMB (Pratical Implementation)}
@@ -694,7 +700,10 @@ like stochastic \texttt{AND} operator.
   \KwOut{Output result}
   $\verts' \gets \verts \setminus Y$\;
   $\rmS \gets \emptyset$\tcp*[r]{Candidate Markov Blanket}
-  \Repeat(\tcp*[f]{While $\exists \rmX' \subseteq \rmV' \setminus \rmS : Y \strictdep{P} \rmX' \mid \rmS$}){$\rmX' = \emptyset$}{
+  \Repeat
+  % (\tcp*[f]{While $\exists \rmX' \subseteq \rmV' \setminus \rmS : Y
+  %   \strictdep{P} \rmX' \mid \rmS$})
+  {$\rmX' = \emptyset$}{
     $\rmX' \gets $ find\_assoc($Y$, $\emptyset$, $\rmS$, $\verts'$)\;
     $\rmS \gets \rmS \cup \rmX'$
   }
