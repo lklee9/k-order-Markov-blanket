@@ -76,10 +76,10 @@ pub fn g2_stat_with_probs<'a>(
         }
     }
     let valid_ratio = (num_valid_cells as f64) / (num_cells as f64);
-    print!("\tvalid_ratio={}", valid_ratio);
-    if valid_ratio < 0.8 {
-        print!("\tWARNING: test might be invalid!!!");
-    }
+    // print!("\tvalid_ratio={}", valid_ratio);
+    // if valid_ratio < 0.8 {
+    //     print!("\tWARNING: test might be invalid!!!");
+    // }
     stat * 2.0
 }
 

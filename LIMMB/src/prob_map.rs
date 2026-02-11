@@ -55,6 +55,14 @@ impl<'a> Probability<'a> for ProbabilityMap<'a> {
             self.atts.iter().map(|a| vals[a]).collect();
         self.f(&comb)
     }
+    
+    fn clone(&self) -> Self {
+        Self {
+            dataset: self.dataset,
+            atts: self.atts.clone(),
+            comb_to_freq: self.comb_to_freq.clone(),
+        }
+    }
 }
 
 impl<'a> ProbabilityMap<'a> {
@@ -80,15 +88,6 @@ impl<'a> ProbabilityMap<'a> {
             comb_to_freq,
         };
     }
-
-    pub fn clone(&self) -> Self {
-        Self {
-            dataset: self.dataset,
-            atts: self.atts.clone(),
-            comb_to_freq: self.comb_to_freq.clone(),
-        }
-    }
-
 
     pub fn marginalize(&self, marg: &BTreeSet<usize>) -> Self {
         let mut comb_to_freq_m: HashMap<Vec<usize>, usize> =

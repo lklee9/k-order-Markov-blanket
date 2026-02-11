@@ -14,4 +14,5 @@ pub trait Probability<'a> {
     fn f_map(&self, vals: &HashMap<usize, usize>) -> usize;
     fn p(&self, comb: &Vec<usize>) -> f64;
     fn p_map(&self, vals: &HashMap<usize, usize>) -> f64;
+    fn clone(&self) -> Self;
 }

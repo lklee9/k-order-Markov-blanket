@@ -58,10 +58,34 @@ impl<'a> Probability<'a> for ProbabilityTIDs<'a> {
             self.atts.iter().map(|a| vals[a]).collect();
         self.f(&comb)
     }
-
+    fn clone(&self) -> Self {
+        Self {
+            dataset: self.dataset,
+            atts: self.atts.clone(),
+            comb_to_tid: self.comb_to_tid.clone(),
+        }
+    }
 }
 
 impl<'a> ProbabilityTIDs<'a> {
+    pub fn new_empty(
+        dataset: &'a DataSet,
+    ) -> Self {
+        let mut comb_to_tid: HashMap<Vec<usize>, BitSet> =
+            HashMap::new();
+        let n = dataset.data.len();
+        let mut tid: BitSet = BitSet::with_capacity(n);
+        for i in 0..n {
+            tid.insert(i);
+        }
+        comb_to_tid.insert(Vec::new(), tid);
+        return Self {
+            dataset,
+            atts: BTreeSet::new(),
+            comb_to_tid,
+        };
+    }
+    
     pub fn new_marg(
         dataset: &'a DataSet,
         vars: BTreeSet<usize>,
@@ -133,13 +157,4 @@ impl<'a> ProbabilityTIDs<'a> {
             comb_to_tid: new_comb_to_tid,
         }
     }
-
-    pub fn clone(&self) -> Self {
-        Self {
-            dataset: self.dataset,
-            atts: self.atts.clone(),
-            comb_to_tid: self.comb_to_tid.clone(),
-        }
-    }
-
 }

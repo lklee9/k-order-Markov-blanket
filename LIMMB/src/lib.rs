@@ -1,4 +1,6 @@
+use log::{info, trace};
 use std::collections::BTreeSet;
+use std::time::Instant;
 
 use crate::prob_tids::ProbabilityTIDs;
 use crate::probability::Probability;
@@ -13,6 +15,7 @@ use std::iter::once;
 mod ci_tests;
 mod dataset;
 mod g2test;
+mod homb;
 mod liam;
 mod mb;
 mod metadata;
@@ -61,10 +64,17 @@ fn run_nested_assoc_mine(
         HashMap::new();
     let dataset: DataSet = DataSet::new(data);
     let all_atts: BTreeSet<usize> = (0..dataset.natts).collect();
-    let atom_probs: Vec<ProbabilityTIDs> = (0..dataset.natts).map(|a| ProbabilityTIDs::new_marg(&dataset, BTreeSet::from([a]))).collect();
+    let atom_probs: Vec<ProbabilityTIDs> = (0..dataset.natts)
+        .map(|a| {
+            ProbabilityTIDs::new_marg(&dataset, BTreeSet::from([a]))
+        })
+        .collect();
     println!("Runnig Miner...");
     let mut num_ci: usize = 0;
-    let mut known_xs_deps: HashMap<BTreeSet<usize>, Vec<BTreeSet<usize>>> = HashMap::new();
+    let mut known_xs_deps: HashMap<
+        BTreeSet<usize>,
+        Vec<BTreeSet<usize>>,
+    > = HashMap::new();
     let mut atts: BTreeSet<usize> =
         all_atts.difference(&mb).cloned().collect();
     atts.remove(&att_target);
@@ -74,7 +84,7 @@ fn run_nested_assoc_mine(
         // num_ci += prune(&mut cmb, &prob, att_target, alpha, df_limit);
         it += 1;
         print!(
-            "\n{}: mb size: {} \t att rem: {} \t mb: [",
+            "{}: mb size: {} \t att rem: {} \t cur_mb: [",
             it,
             cmb.len(),
             atts.len()
@@ -83,6 +93,7 @@ fn run_nested_assoc_mine(
             print!("{},", a);
         }
         println!("]");
+        let start = Instant::now();
         let res = nested_assoc_mine(
             &cmb,
             &atom_probs,
@@ -96,16 +107,19 @@ fn run_nested_assoc_mine(
         match res {
             Some(r) => {
                 num_ci += r.num_ci_test;
+                print!("\nnew_mb: [");
+                r.mb.iter().for_each(|a| print!("{},", a));
+                println!("]\t time taken: {}s", start.elapsed().as_secs());
                 let mut pruned_res_mb = r.mb.clone();
-                num_ci += prune(
-                    &mut pruned_res_mb,
-                    &atom_probs,
-                    att_target,
-                    &mut known_xs_deps,
-                    alpha,
-                    max_sub_mb_size,
-                    use_gtest,
-                );
+                // num_ci += prune(
+                //     &mut pruned_res_mb,
+                //     &atom_probs,
+                //     att_target,
+                //     &mut known_xs_deps,
+                //     alpha,
+                //     max_sub_mb_size,
+                //     use_gtest,
+                // );
                 if cmb == pruned_res_mb {
                     converged = true;
                 }
@@ -113,24 +127,32 @@ fn run_nested_assoc_mine(
                     atts.remove(&y);
                 }
                 cmb = pruned_res_mb;
-                if r.mb != cmb {
-                    num_ci += prune(
-                        &mut cmb,
-                        &atom_probs,
-                        att_target,
-                        &mut known_xs_deps,
-                        alpha,
-                        max_sub_mb_size,
-                        use_gtest,
-                    );
-                }
+                // if r.mb != cmb {
+                //     num_ci += prune(
+                //         &mut cmb,
+                //         &atom_probs,
+                //         att_target,
+                //         &mut known_xs_deps,
+                //         alpha,
+                //         max_sub_mb_size,
+                //         use_gtest,
+                //     );
+                // }
             }
             None => {
                 converged = true;
             }
         }
     }
-    // num_ci += prune(&mut cmb, &prob, att_target, alpha, df_limit);
+    num_ci += prune(
+        &mut cmb,
+        &atom_probs,
+        att_target,
+        &mut known_xs_deps,
+        alpha,
+        max_sub_mb_size,
+        use_gtest,
+    );
     print!(
         "\nfinal: mb size: {} \t att rem: {}\t mb: [",
         cmb.len(),
@@ -139,8 +161,31 @@ fn run_nested_assoc_mine(
     for a in cmb.iter() {
         print!("{},", a);
     }
-    println!("]");
+    print!("]\n");
     Ok((cmb, num_ci))
+}
+
+#[pyfunction]
+fn run_komb(
+    data: Vec<Vec<usize>>,
+    att_target: usize,
+    mb: BTreeSet<usize>,
+    order: usize,
+    max_sep_size: usize,
+    alpha: f64,
+    use_gtest: bool,
+) -> PyResult<(BTreeSet<usize>, usize)> {
+    let dataset: DataSet = DataSet::new(data);
+    let mut method = homb::HOMB::new(
+        &dataset,
+        att_target,
+        mb,
+        alpha,
+        order,
+        max_sep_size,
+        use_gtest,
+    );
+    Ok(method.run())
 }
 
 #[pyfunction]
@@ -168,6 +213,7 @@ fn IAMB(
 fn LIMMB(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(learn_mbs, m)?)?;
     m.add_function(wrap_pyfunction!(run_nested_assoc_mine, m)?)?;
+    m.add_function(wrap_pyfunction!(run_komb, m)?)?;
     m.add_function(wrap_pyfunction!(IAMB, m)?)?;
     Ok(())
 }

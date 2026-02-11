@@ -1,7 +1,8 @@
 use std::collections::BTreeSet;
 
-use crate::g2test::{chi_square_p_val, g2_df, g2_stat_with_probs};
+use crate::g2test::{chi_square_p_val, g2_df, g2_stat_with_probs, g2_df_eff};
 use crate::prob_map::ProbabilityMap;
+use crate::prob_tids::ProbabilityTIDs;
 use crate::probability::Probability;
 use crate::sci::cond_sci_stat;
 
@@ -43,25 +44,81 @@ impl GTest {
         let mut tc: BTreeSet<usize> = cond.clone();
         tc.insert(t);
         let prob_tc: ProbabilityMap = prob.marginalize(&tc);
+        // print!("GTest: [");
+        // x.iter().for_each(|a| print!("{},", a));
+        // print!("], {} | [", t);
+        // cond.iter().for_each(|a| print!("{},", a));
+        // println!("]");
 
         let stat =
             g2_stat_with_probs(&prob_xtc, &prob_xc, &prob_tc, &prob_c);
-        let df = g2_df(prob.get_dataset(), t, x, cond);
-        let pval = chi_square_p_val(stat, df);
+        // let df = g2_df(prob.get_dataset(), t, x, cond);
+        let df = g2_df_eff(x, t, &prob_c);
+
+        let pval = if df == 0 {
+            1.0
+        } else {
+            chi_square_p_val(stat, df)
+        };
         Self {
             vars: x.clone(),
             samp_size: prob.get_dataset().sample_size,
             stat,
             df,
             pval,
-            badness: pval,
+            badness: -1.0 * stat,
+        }
+    }
+    
+    pub fn new_from_prob(
+        prob_cond: &ProbabilityTIDs,
+        prob_x: &ProbabilityTIDs,
+        prob_t: &ProbabilityTIDs,
+    ) -> Self {
+        // Get Probs
+        let prob_xc = prob_cond.merge(prob_x);
+        let prob_xtc = prob_xc.merge(prob_t);
+        let prob_tc = prob_cond.merge(prob_t);
+        // print!("GTest: [");
+        // x.iter().for_each(|a| print!("{},", a));
+        // print!("], {} | [", t);
+        // cond.iter().for_each(|a| print!("{},", a));
+        // println!("]");
+
+        let stat = g2_stat_with_probs(
+            &prob_xtc, &prob_xc, &prob_tc, prob_cond,
+        );
+        // let df = g2_df(
+        //     prob_cond.get_dataset(),
+        //     *prob_t.get_atts().first().unwrap(),
+        //     prob_x.get_atts(),
+        //     prob_cond.get_atts(),
+        // );
+        let df = g2_df_eff(
+            prob_x.get_atts(),
+            *prob_t.get_atts().first().unwrap(),
+            prob_cond,
+        );
+        let pval = if df == 0 {
+            1.0
+        } else {
+            chi_square_p_val(stat, df)
+        };
+        Self {
+            vars: prob_x.get_atts().clone(),
+            samp_size: prob_cond.get_dataset().sample_size,
+            stat,
+            df,
+            pval,
+            badness: -1.0 * stat,
         }
     }
 }
 
 impl CITest for GTest {
     fn is_too_weak(&self) -> bool {
-        return self.df * 5 > self.samp_size;
+        return false;
+        // return self.df * 5 > self.samp_size;
     }
 
     fn is_not_cond_indep(&self, alpha: f64) -> bool {
@@ -108,7 +165,7 @@ pub fn sci_min_sample_size(
         + 2.0
             * card_t as f64
             * (card_x as f64).powf(2.0 / 3.0)
-        * (card_cond as f64 + 1.0);
+            * (card_cond as f64 + 1.0);
     // print!("\tbounds: ({},{})", bound1, bound2);
     f64::min(bound1, bound2)
 }
@@ -154,9 +211,10 @@ impl SCI {
                 f64::NAN
             } else {
                 let s1 = cond_sci_stat(
-                    &prob_xtc, &prob_xc, &prob_tc, &prob_c);
+                    &prob_xtc, &prob_xc, &prob_tc, &prob_c,
+                );
                 let s2 = cond_sci_stat(
-                    &prob_xtc, &prob_tc, &prob_xc, &prob_c
+                    &prob_xtc, &prob_tc, &prob_xc, &prob_c,
                 );
                 f64::max(s1, s2)
             };
@@ -171,12 +229,66 @@ impl SCI {
             card_cond: prob_c.get_size(),
         }
     }
+
+    pub fn new_from_prob(
+        prob_cond: &ProbabilityTIDs,
+        prob_x: &ProbabilityTIDs,
+        prob_t: &ProbabilityTIDs,
+    ) -> Self {
+        // Get Probs
+        let prob_xc = prob_cond.merge(prob_x);
+        let prob_xtc = prob_xc.merge(prob_t);
+        let prob_tc = prob_cond.merge(prob_t);
+
+        // Calculate min sample size:
+        let db = prob_cond.get_dataset();
+        let mut card_x: usize = 1;
+        for v in prob_x.get_atts() {
+            card_x = card_x * db.nvals[*v];
+        }
+        let mut card_cond: usize = 1;
+        for v in prob_cond.get_atts() {
+            card_cond *= db.nvals[*v];
+        }
+        let t: usize = *prob_t.get_atts().first().unwrap();
+        let card_t: usize = prob_t.get_dataset().nvals[t];
+
+        let stat: f64 =
+            if sci_min_sample_size(card_x, card_t, card_cond)
+                > db.sample_size as f64
+            {
+                f64::NAN
+            } else {
+                let s1 = cond_sci_stat(
+                    &prob_xtc, &prob_xc, &prob_tc, prob_cond,
+                );
+                let s2 = cond_sci_stat(
+                    &prob_xtc, &prob_tc, &prob_xc, prob_cond,
+                );
+                f64::max(s1, s2)
+            };
+
+        Self {
+            vars: prob_x.atts.clone(),
+            samp_size: db.sample_size,
+            stat,
+            badness: -1.0 * stat,
+            card_x: card_x,
+            card_t: card_t,
+            card_cond: card_cond,
+        }
+    }
+
 }
 
 impl CITest for SCI {
     fn is_too_weak(&self) -> bool {
         // eps = delta = 0.05
-        return sci_min_sample_size(self.card_x, self.card_t, self.card_cond) > self.samp_size as f64
+        return sci_min_sample_size(
+            self.card_x,
+            self.card_t,
+            self.card_cond,
+        ) > self.samp_size as f64;
     }
 
     fn is_not_cond_indep(&self, _alpha: f64) -> bool {
