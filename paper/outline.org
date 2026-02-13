@@ -130,12 +130,14 @@
 - multiple test correction
 - other metrics
 * New
+- link k-assoc with cliques
+- we need to sort "to add" at each iter
 - a notation of k-assoc
   + that is compatible with previous notions of 2/3-assoc
 - for k-assoc we need to consider assoc between 2 vars
   + via some set of vars
 - how does limited samples affect faithfulness
-- 3-assoc requires conditioning on entire cmb to work
+- 2-assoc requires conditioning on entire cmb to work
   + also requires assumption 1
   + to prevent spouses from canceling each other
   + does cancellation result in higher order assocs?
@@ -148,12 +150,15 @@
 ** kOMB: An algorithm for high-order markov blanket discovery
 *** What would be nice in theory
 **** Algorithm
-1. find $\mathbf{X}\subset\mathbf{V}$ s.t.
-   $\mathbf{X}$ and $Y$ are strictly $k$-associated
+1. Sort \(A\) by ascending p-value
+2. 
+3. find $\mathbf{X}\subset\mathbf{V}$ s.t.
+   $\mathbf{X}$ and $Y$ are strictly \(k\)-associated
    - done by first finding $\mathbf{X}$ where its loosely
-     $k$-associated, i.e. combination of lower order 
-2.
+     \(k\)-associated, i.e. combination of lower order 
+4. BFS to find minimal subset of \(\mathbf{X}\) 
 **** Proof
+
 *** What we need to do with limited samples
 *** Statistical Test
 ** Pruning the Search Space of kOMB

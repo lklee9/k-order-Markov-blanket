@@ -78,7 +78,7 @@
 
 % \usepackage{algorithm}
 % \usepackage{algpseudocode}
-\usepackage[ruled,vlined]{algorithm2e}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
 \SetKwComment{Comment}{/*}{*/}
 \SetKwInput{Inv}{Invariant}
 \crefname{algocf}{alg.}{algs.}
@@ -518,9 +518,9 @@ computationally efficient.
   \end{equation}
   Here we say that $Y$ and $X$ are associated w.r.t. $\rmZ$. Of course
   under this definition there might be some strict subset
-  $\rmZ' \subset \rmZ$ where $\kdep{Y,X}{\rmZ'}$ still holds. Therefore
-  we say $Y$ and $X$ are $|\rmZ|$-order dependent w.r.t $\rmZ$ only if
-  this is not the case,
+  $\rmZ' \subset \rmZ$ where $\kdep{\verts}{Y,X}{\rmZ'}$ still
+  holds. Therefore we say $Y$ and $X$ are $|\rmZ|$-order dependent w.r.t
+  $\rmZ$ only if this is not the case,
   \begin{gather}
     \begin{aligned}
       &\kdep{\rmV}{Y,X}{\rmZ}\\
@@ -529,6 +529,8 @@ computationally efficient.
     \end{aligned}
   \end{gather}
 \end{definition}
+difference between assoc and dep
+
 prevents chains like
 $X_{1}\rightarrow Y \rightarrow X_{2}$ to be included in this definition.
 
@@ -539,19 +541,18 @@ like stochastic \texttt{AND} operator.
 \begin{definition}[$k$-Order Adjacency Faithfulness]
   Given the probabilistic graphical model $\model=(\gr, \pr)$ where
   $\gr = (\verts, \edges)$, then $\gr$ is $k$-adjacent faithful to $\pr$
-  if and only if $\forall (Y,X) \in \edges$ and
-  $\forall \rmS \subseteq \verts \setminus \{Y,X\}$,
-  \begin{equation}
+  if and only if $\forall (Y,X) \in \edges$,
+  \begin{gather}
     \label{eq:8}
-    \exists \rmZ \in \power{\leq k-1}(\mb(Y) \setminus X):
-    \kdep{\verts}{Y,X}{\rmZ}.
-  \end{equation}
+      \exists \rmZ \in \power{\leq k}(\mb(Y) \setminus X):
+      \kdep{\verts}{Y,X}{\rmZ}.
+  \end{gather}
   In other words, for any adjacent variables $(Y,X)$ in $\gr$, there
   must be a subset of the Markov blanket of $Y$ that $Y$ and $X$ are
   always conditionally dependent with respect to, regardless of any
   other variables they are conditioned on.
 \end{definition}
-
+rules out deterministic functions?
 
 
 \subsection{Theoretical Algorithm}
@@ -573,31 +574,6 @@ like stochastic \texttt{AND} operator.
 %   as a consequence of the weak union graphoid axiom.
 % \end{lemma}
 
-% \begin{lemma}[Finding $k$-associations]
-%   For distinct random variables $Y\in\rmV$ and
-%   $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$, the following holds
-%   for all $\rmS \subset \rmV \setminus \rmX \cup \{Y\}$
-%   \begin{equation}
-%     \label{eq:11}
-%     \rmX \dep{} Y \mid \rmS
-%     \implies \exists \rmZ \subseteq \rmX : Y\strict{|\rmZ|}\rmZ
-%   \end{equation}
-% \end{lemma}
-% \begin{proof}[Proof by induction]
-%   With subsets of $\rmX$ of size $1$, $[\rmX]^{1}=\{A\subseteq \rmX
-%   \mid |A| = 1\}$, we know that
-%   \begin{equation}
-%     \label{eq:12}
-%     Y \assoc{1} [\rmX]^{1} \iff Y \strict{1} [\rmX]^{1}.
-%   \end{equation}
-%   Therefore, any association found is a strict association.
-
-%   Now assume that $Y$ is not associated with any subsets in
-%   $[\rmX]^{k}\cup \ldots \cup [\rmX]^{1}$. Then we know that if $Y$ is
-%   associated with any subset in $[\rmX]^{k+1}$, it also implies a strict
-%   association. Therefore the existance of any association implies a
-%   strict association for some subset.
-% \end{proof}
 
 % \begin{lemma}[kOMB $k$-associations detection]
 %   For random variables $\rmX \subset \rmV$ and
@@ -614,22 +590,20 @@ like stochastic \texttt{AND} operator.
 %   \end{equation}
 % \end{lemma}
 
-\begin{lemma}[$k$-dependance implies association]
-  \begin{equation}
+\begin{lemma}[$k$-dependance implies $(k+1)$-inter-association]
+  \begin{gather}
     \label{eq:13}
+    \kdep{\verts}{Y,X}{\rmZ}
+    \implies 
+    \kinter{\verts}{Y,\rmZ \cup X}
+    \intertext{where}
     \begin{aligned}
-      &\kdep{\verts}{Y,X}{\rmX}\\
-      % &Y \dep{} X \mid \rmS \cup \rmX
-      %   % \wedge
-      %   % \forall X'\in\rmX :
-      %   \bigwedge_{X'\in\rmX}
-      %   Y \indep{} X \mid \rmS \cup \rmX
-      %   \setminus X'\\
-&\implies \forall X'\in\rmX : \kassoc{\verts}{Y,X'}{X \cup \rmX \setminus X'}
-      % &\implies \forall X'\in\rmX :
-      %   Y \dep{} X' \mid \rmS \cup X \cup \rmX \setminus X'
+      &\kinter{\verts}{Y,\rmZ \cup X}\\
+      &:=
+      \forall Z'\in\rmZ : \kassoc{\verts}{Y,Z'}{X \cup \rmZ
+      \setminus Z'}
     \end{aligned}
-  \end{equation}
+  \end{gather}
   by contraction
 \end{lemma}
 \begin{proof}
@@ -664,12 +638,13 @@ like stochastic \texttt{AND} operator.
 \end{proof}
 
 \begin{lemma}[Subset]
-  Let $\verts' \subseteq \verts$ and $X,Y \in \verts$
+  Let $\verts' \subseteq \verts$, $X,Y \in \verts$, and $\rmZ \subseteq
+  \verts \setminus (\verts' \cup \{X, Y\})$
+  \begin{equation}
+    \label{eq:22}
+    \kinter{\verts}{Y,\rmX} \implies \kinter{\verts'}{Y,\rmX}
+  \end{equation}
 \end{lemma}
-
-\begin{theorem}[Strict $k$-association filtering]
-  
-\end{theorem}
 
 \begin{definition}[Bounded Separator Assumption]
   needed for practical algorithm
@@ -692,8 +667,45 @@ like stochastic \texttt{AND} operator.
 %   \Return{$\rmS$}\;
 % \end{algorithm}
 
+\begin{lemma}[Finding $k$-dependance from association]
+  For distinct random variables $Y,X\in\rmV$ and
+  $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$, the following holds
+  for all $\rmS \subset \rmV \setminus \rmX \cup \{Y\}$
+  \begin{equation}
+    \label{eq:11}
+    \kassoc{\verts}{X,Y}{\rmX}
+    \implies \exists \rmZ \subseteq \rmX : \kdep{\verts}{X,Y}{\rmZ}
+  \end{equation}
+\end{lemma}
+\begin{proof}[Proof by induction]
+  With subsets of $\rmX$ of size $1$, $\rmZ\in\powereq{1}{\rmX}$, we
+  know by definition that if $X$ and $Y$ are associated w.r.t. $\rmZ$,
+  it immediately follows that $X$ and $Y$ are also $1$-dependant
+  w.r.t. $\rmZ$ and vice versa,
+  \begin{equation}
+    \label{eq:12}
+    \kassoc{\verts}{X,Y}{\rmZ}
+    \iff \kdep{\verts}{X,Y}{\rmZ}.
+  \end{equation}
+  Now assume that $Y$ is not associated with any subsets in
+  $\powerleq{k}{\rmX}$. Then we know that if $Y$ is associated with any
+  subset in $\powereq{k+1}{\rmX}$, it implies a $(k+1)$-dependance
+  between $X$ and $Y$. Therefore the existance of any association
+  implies a potentially lower order dependance for some subset.
+\end{proof}
+
+\begin{theorem}[Correctness of \Cref{alg:assoc-mine}]
+  
+\end{theorem}
+
+\begin{theorem}[Correctness of \Cref{alg:komb}]
+\end{theorem}
+\begin{proof}
+  During the grow-phase (lines 1 to 6) we find a subset of 
+\end{proof}
+
 \begin{algorithm}
-  \caption{kOMB (Pratical Implementation)}
+  \caption{kOMB (Pratical Implementation)}\label{alg:komb}
   % \DontPrintSemicolon
   \SetKwProg{Fn}{Function}{:}{}
   \KwIn{$\db$, $\rmX$, $Y$, $\mb$, $\alpha$, $k$, $l$}
@@ -715,7 +727,7 @@ like stochastic \texttt{AND} operator.
 
 
 \begin{algorithm}
-  \caption{Association Mining}
+  \caption{Association Mining}\label{alg:assoc-mine}
   % \DontPrintSemicolon
   \SetKwProg{Fn}{Function}{:}{}
   \Fn{make\_strict($Y$, $X$, $\rmX$, $\rmS$, $k$, $l$)}{
@@ -732,7 +744,7 @@ like stochastic \texttt{AND} operator.
   }
   \Fn{find\_assoc($Y$, $\rmX$, $\rmS$, $\rmV'$, $k$, $l$)}{
     \KwOut{$\rmX\subseteq\rmV'\setminus\rmS$
-      such that $Y \dep{} \rmX \mid \rmS$}
+      s.t. $\kinter{\rmS}{Y,\rmX}$}
     \If{$|\rmX| > k$}{
       \Return{$\emptyset$}\;
     }
@@ -766,7 +778,7 @@ like stochastic \texttt{AND} operator.
       $\rmX' \gets \rmZ \cup \rmX$\;
       $\rmS' \gets \rmS \setminus \rmZ$\;
       % $p \gets$ p-value of test $H_{0}: Y \indep{} X \mid \rmX'$\;
-      \If{$H_{0}: Y \dep{} X \mid \rmX'$}{
+      \If{$Y \dep{} X \mid \rmX'$}{
         \If{no\_seps($Y$, $X$, $\rmX'$, $\rmS'$, $l$, $\alpha$)}{
           \Return{True}\;
         }
