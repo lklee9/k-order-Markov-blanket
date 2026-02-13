@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use log::{info, trace};
 use num::traits::bounds::UpperBounded;
 use pyo3::call;
@@ -6,7 +7,7 @@ use std::collections::{BTreeSet, HashMap, HashSet, VecDeque};
 use std::iter::once;
 use std::usize::MAX;
 
-use crate::ci_tests::{sci_min_sample_size, CITest, GTest, SCI};
+use crate::ci_tests::{sci_min_sample_size, CIRes, GTest, SCI};
 use crate::dataset::{self, DataSet};
 use crate::g2test::{
     self, chi_square_p_val, g2, g2_df, g2_df_eff, g2_stat,
@@ -42,9 +43,9 @@ pub struct HOMB<'a> {
     cmb: VarSet,
     prob_cmb: ProbabilityTIDs<'a>,
     num_ci: usize,
-    known_seps: HashMap<usize, HashSet<VarSet>>,
+    known_seps: HashMap<usize, HashMap<VarSet, HashSet<VarSet>>>,
     known_not_deps: HashMap<usize, HashSet<VarSet>>,
-    known_badness: HashMap<usize, HashMap<VarSet, (bool, f64)>>,
+    known_ci: HashMap<usize, HashMap<VarSet, CIRes>>,
 }
 
 impl<'a> HOMB<'a> {
@@ -63,16 +64,20 @@ impl<'a> HOMB<'a> {
             })
             .collect();
         let cmb: VarSet = init_mb.clone();
-        let prob_cmb: ProbabilityTIDs = ProbabilityTIDs::new_empty(db);
+        let mut prob_cmb: ProbabilityTIDs =
+            ProbabilityTIDs::new_empty(db);
+        for a in init_mb.iter() {
+            prob_cmb = prob_cmb.merge(&prob_atoms[*a]);
+        }
         let num_ci: usize = 0;
-        let known_seps: HashMap<usize, HashSet<VarSet>> =
-            HashMap::new();
+        let known_seps: HashMap<
+            usize,
+            HashMap<VarSet, HashSet<VarSet>>,
+        > = HashMap::new();
         let known_not_deps: HashMap<usize, HashSet<VarSet>> =
             HashMap::new();
-        let known_badness: HashMap<
-            usize,
-            HashMap<VarSet, (bool, f64)>,
-        > = HashMap::new();
+        let known_ci: HashMap<usize, HashMap<VarSet, CIRes>> =
+            HashMap::new();
         return Self {
             db,
             att_t,
@@ -87,7 +92,7 @@ impl<'a> HOMB<'a> {
             num_ci,
             known_seps,
             known_not_deps,
-            known_badness,
+            known_ci,
         };
     }
 
@@ -111,23 +116,65 @@ impl<'a> HOMB<'a> {
         return too_weak;
     }
 
+    fn test_ci(
+        &mut self,
+        att_x: usize,
+        prob_cond: &ProbabilityTIDs,
+    ) -> CIRes {
+        let cond = prob_cond.atts.clone();
+        if let Some(res) = self.known_ci[&att_x].get(&cond) {
+            return res.clone();
+        }
+        self.num_ci += 1;
+        let tmp = GTest::new_from_prob(
+            prob_cond,
+            &self.prob_atoms[att_x],
+            &self.prob_atoms[self.att_t],
+            self.alpha,
+        );
+        let res = if self.use_gtest
+            && !tmp.too_weak
+            && prob_cond.atts.len() <= 3
+        {
+            print!(
+                "\tres_stat: {}, res_df: {}, res_p: {}",
+                tmp.stat, tmp.df, tmp.pval,
+            );
+            tmp
+        } else {
+            let tmp = SCI::new_from_prob(
+                prob_cond,
+                &self.prob_atoms[att_x],
+                &self.prob_atoms[self.att_t],
+            );
+            print!("\tres_stat: {}", tmp.stat);
+            tmp
+        };
+        self.known_ci
+            .get_mut(&att_x)
+            .unwrap()
+            .insert(prob_cond.atts.clone(), res.clone());
+        res
+    }
+
     /// Order given vars by G-Stat in ascending order
     fn order_vars(
-        &self,
+        &mut self,
         prob_cond: &ProbabilityTIDs,
         vars_to_add: &mut Vec<usize>,
     ) {
         let var_to_stat: HashMap<usize, f64> = vars_to_add
             .iter()
-            .map(|a| {
+            .map(|&a| {
                 (
-                    *a,
+                    a,
                     GTest::new_from_prob(
-                        prob_cond,
-                        &self.prob_atoms[*a],
+                        &prob_cond,
+                        &self.prob_atoms[a],
                         &self.prob_atoms[self.att_t],
+                        self.alpha,
                     )
-                    .get_badness(),
+                    .badness,
                 )
             })
             .collect();
@@ -137,22 +184,21 @@ impl<'a> HOMB<'a> {
     }
 
     fn order_mb(
-        &self,
+        &mut self,
         prob_cond: &ProbabilityTIDs,
         x: usize,
         mb_to_add: &mut Vec<usize>,
     ) {
         let mb_to_stat: HashMap<usize, f64> = mb_to_add
             .iter()
-            .map(|a| {
+            .map(|&a| {
                 (
-                    *a,
-                    GTest::new_from_prob(
-                        &prob_cond.merge(&self.prob_atoms[*a]),
-                        &self.prob_atoms[x],
-                        &self.prob_atoms[self.att_t],
+                    a,
+                    self.test_ci(
+                        x,
+                        &prob_cond.merge(&self.prob_atoms[a]),
                     )
-                    .get_badness(),
+                    .badness,
                 )
             })
             .collect();
@@ -165,15 +211,15 @@ impl<'a> HOMB<'a> {
         println!("Runnig HOMB...");
         self.known_seps = HashMap::new();
         self.known_not_deps = HashMap::new();
-        self.known_badness = HashMap::new();
+        self.known_ci = HashMap::new();
         self.num_ci = 0;
         self.cmb = self.init_mb.clone();
         let mut non_t: BTreeSet<usize> = (0..self.db.natts).collect();
         non_t.remove(&self.att_t);
         for a in non_t.iter() {
-            self.known_seps.insert(*a, HashSet::new());
+            self.known_seps.insert(*a, HashMap::new());
             self.known_not_deps.insert(*a, HashSet::new());
-            self.known_badness.insert(*a, HashMap::new());
+            self.known_ci.insert(*a, HashMap::new());
         }
         let mut prev_cmb: BTreeSet<usize> = self.cmb.clone();
         let mut iter: usize = 0;
@@ -187,7 +233,11 @@ impl<'a> HOMB<'a> {
             print!("]");
             if let Some(mut xs) = xs_group {
                 print!("\tTO ADD: [");
-                xs.iter().for_each(|a| print!("{},", a));
+                for a in xs.iter() {
+                    print!("{},", a);
+                    self.prob_cmb =
+                        self.prob_cmb.merge(&self.prob_atoms[*a])
+                }
                 println!("]");
                 self.cmb.append(&mut xs);
                 // self.prune();
@@ -251,10 +301,10 @@ impl<'a> HOMB<'a> {
     fn find_assoc(&mut self, xs_set: &VarSet) -> Option<VarSet> {
         // Sort atts by gstat in asc order
         let mut xs_vec: Vec<usize> = xs_set.iter().cloned().collect();
-        self.order_vars(
-            &ProbabilityTIDs::new_empty(self.db),
-            &mut xs_vec,
-        );
+        print!("Ordering vars based on cond prob with cond: [");
+        self.prob_cmb.atts.iter().for_each(|a| print!("{},", a));
+        println!("]");
+        self.order_vars(&self.prob_cmb.clone(), &mut xs_vec);
         // Start mining loop (DFS)
         let mut stack_to_add: Vec<Vec<usize>> =
             Vec::from(vec![xs_vec.clone()]);
@@ -282,7 +332,7 @@ impl<'a> HOMB<'a> {
                 print!("\tXs too large!");
                 continue;
             }
-            self.order_vars(&prob_cond, &mut to_add);
+            // self.order_vars(&prob_cond, &mut to_add);
             for i in 0..to_add.len() {
                 let x_cur = to_add[i];
                 let is_not_ci =
@@ -307,37 +357,6 @@ impl<'a> HOMB<'a> {
         return None;
     }
 
-    fn test_ci(
-        &mut self,
-        att_x: usize,
-        prob_cond: &ProbabilityTIDs,
-    ) -> Box<dyn CITest> {
-        self.num_ci += 1;
-        let tmp = GTest::new_from_prob(
-            prob_cond,
-            &self.prob_atoms[att_x],
-            &self.prob_atoms[self.att_t],
-        );
-        if self.use_gtest
-            && !tmp.is_too_weak()
-            && prob_cond.atts.len() <= 3
-        {
-            print!(
-                "\tres_stat: {}, res_df: {}, res_p: {}",
-                tmp.stat, tmp.df, tmp.pval,
-            );
-            Box::new(tmp)
-        } else {
-            let tmp = SCI::new_from_prob(
-                prob_cond,
-                &self.prob_atoms[att_x],
-                &self.prob_atoms[self.att_t],
-            );
-            print!("\tres_stat: {}", tmp.stat);
-            Box::new(tmp)
-        }
-    }
-
     fn not_ci(
         &mut self,
         att_x: usize,
@@ -356,30 +375,28 @@ impl<'a> HOMB<'a> {
             self.cmb.clone().difference(att_xs).cloned().collect();
         atts_to_add.remove(&att_x);
         let mut atts: Vec<usize> = atts_to_add.into_iter().collect();
-        self.order_mb(&prob_xs, att_x, &mut atts);
+        // self.order_mb(&prob_xs, att_x, &mut atts);
 
         let mut prob_max: ProbabilityTIDs = prob_xs.clone();
         for a in atts.iter() {
             prob_max = prob_max.merge(&self.prob_atoms[*a]);
         }
-        let max_g_test: GTest = GTest::new_from_prob(
+        let max_g_test: CIRes = GTest::new_from_prob(
             &prob_max,
             &self.prob_atoms[att_x],
             &self.prob_atoms[self.att_t],
+            self.alpha,
         );
-        // if prob_max.atts.len() <= eff_sub_mb_size + self.sep_size {
-        //     print!("\t END EARLY with max: [");
-        //     prob_max.atts.iter().for_each(|a| print!("{},", a));
-        //     print!("]");
-        //     print!(
-        //         "\t res_stat: {}, res_df: {}, res_p: {}",
-        //         max_g_test.stat, max_g_test.df, max_g_test.pval,
-        //     );
-        //     return (
-        //         max_g_test.is_not_cond_indep(self.alpha),
-        //         max_g_test.get_badness(),
-        //     );
-        // }
+        if prob_max.atts.len() <= eff_sub_mb_size + self.sep_size {
+            print!("\t END EARLY with max: [");
+            prob_max.atts.iter().for_each(|a| print!("{},", a));
+            print!("]");
+            print!(
+                "\t res_stat: {}, res_df: {}, res_p: {}",
+                max_g_test.stat, max_g_test.df, max_g_test.pval,
+            );
+            return (!max_g_test.is_ci, max_g_test.badness);
+        }
 
         let mut worse_badness: f64 = f64::NEG_INFINITY;
         let mut stack_to_add: Vec<Vec<usize>> = Vec::from(vec![atts]);
@@ -449,9 +466,8 @@ impl<'a> HOMB<'a> {
                     > self.alpha;
             if !skip {
                 // Lower bound on p-val is too low, need full check
-                let ci: Box<dyn CITest> =
-                    self.test_ci(att_x, &cond_prob);
-                if ci.is_not_cond_indep(self.alpha) {
+                let ci: CIRes = self.test_ci(att_x, &cond_prob);
+                if !ci.is_ci {
                     let (no_seps, badness) =
                         self.no_seps(att_x, &cur_deps, &cond_prob);
                     worse_badness = f64::max(worse_badness, badness);
@@ -497,6 +513,18 @@ impl<'a> HOMB<'a> {
         let mut atts_to_add: BTreeSet<usize> =
             self.cmb.difference(att_deps).cloned().collect();
         atts_to_add.remove(&att_x);
+        // Check if atts_to_add is subset of known seps
+        if !self.known_seps[&att_x].contains_key(&att_deps) {
+            self.known_seps
+                .get_mut(&att_x)
+                .unwrap()
+                .insert(att_deps.clone(), HashSet::new());
+        }
+        for s in self.known_seps[&att_x][&att_deps].iter() {
+            if s.is_subset(&atts_to_add) {
+                return (false, f64::INFINITY);
+            }
+        }
         // let eff_sub_size = att_deps.len() +
         //     usize::min(self.sep_size, atts_to_add.len());
         let eff_sub_size = usize::max(
@@ -506,8 +534,8 @@ impl<'a> HOMB<'a> {
         );
         let mut tmp_atts: Vec<usize> =
             atts_to_add.into_iter().collect();
-        self.order_mb(&prob_deps, att_x, &mut tmp_atts);
-        tmp_atts.reverse();
+        // self.order_mb(&prob_deps, att_x, &mut tmp_atts);
+        // tmp_atts.reverse();
         let mut stack_to_add: Vec<Vec<usize>> = vec![tmp_atts];
         let mut stack_cond: Vec<VarSet> = vec![att_deps.clone()];
         let mut stack_cond_prob: Vec<ProbabilityTIDs> =
@@ -517,6 +545,8 @@ impl<'a> HOMB<'a> {
         while !stack_to_add.is_empty() {
             let mut to_add = stack_to_add.pop().unwrap();
             let cur_cond = stack_cond.pop().unwrap();
+            let cur_sep: BTreeSet<usize> =
+                self.cmb.difference(&cur_cond).cloned().collect();
             let cond_prob = stack_cond_prob.pop().unwrap();
             if cur_cond.len() == eff_sub_size {
                 iter += 1;
@@ -526,32 +556,34 @@ impl<'a> HOMB<'a> {
                 to_add.iter().for_each(|v| print!("{},", v));
                 print!("]");
                 // Check if known before testing
-                if let Some(tmp) =
-                    self.known_badness[&att_x].get(&cur_cond)
+                if let Some(tmp) = self.known_ci[&att_x].get(&cur_cond)
                 {
                     print!("\n");
-                    if tmp.0 == false {
-                        return *tmp;
+                    if tmp.is_ci {
+                        self.known_seps
+                            .get_mut(&att_x)
+                            .unwrap()
+                            .get_mut(&att_deps)
+                            .unwrap()
+                            .insert(cur_sep);
+                        return (false, tmp.badness);
                     }
                     continue;
                 }
                 let ci = self.test_ci(att_x, &cond_prob);
-                worse_badness =
-                    f64::max(worse_badness, ci.get_badness());
-                if ci.is_too_weak() {
+                worse_badness = f64::max(worse_badness, ci.badness);
+                if ci.too_weak {
                     print!("\tTEST TOO WEAK!\n");
-                } else if !ci.is_not_cond_indep(self.alpha) {
+                } else if ci.is_ci {
                     print!("\tFOUND SEP!\n");
-                    self.known_badness.get_mut(&att_x).unwrap().insert(
-                        cur_cond.clone(),
-                        (false, worse_badness),
-                    );
+                    self.known_seps
+                        .get_mut(&att_x)
+                        .unwrap()
+                        .get_mut(&att_deps)
+                        .unwrap()
+                        .insert(cur_sep);
                     return (false, worse_badness);
                 } else {
-                    self.known_badness.get_mut(&att_x).unwrap().insert(
-                        cur_cond.clone(),
-                        (true, worse_badness),
-                    );
                     print!("\n");
                 }
             } else if cur_cond.len() < eff_sub_size {

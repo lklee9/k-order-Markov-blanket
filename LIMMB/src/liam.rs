@@ -9,7 +9,7 @@ use std::iter::once;
 use std::time::Instant;
 use std::usize::MAX;
 
-use crate::ci_tests::{sci_min_sample_size, CITest, GTest, SCI};
+use crate::ci_tests::{sci_min_sample_size, CIRes, GTest, SCI};
 use crate::dataset::{self, DataSet};
 use crate::g2test::{
     self, chi_square_p_val, g2, g2_df, g2_df_eff, g2_stat,
@@ -58,8 +58,9 @@ pub fn nested_assoc_mine(
                     att_t,
                     &BTreeSet::from([*a]),
                     mb,
+                    alpha,
                 )
-                .get_badness(),
+                .badness,
             )
         })
         .collect();
@@ -424,12 +425,13 @@ fn find_deps(
             num_ci += 1;
             let num_var = cur_mb.len() + att_xs.len() + 1;
             // let ci: Box<dyn CITest> = if use_gtest && num_var <= 5 {
-            let ci: Box<dyn CITest> = if use_gtest {
+            let ci: CIRes = if use_gtest {
                 let tmp = GTest::new(
                     &cur_prob.clone().into(),
                     att_t,
                     att_xs,
                     &cur_mb,
+                    alpha,
                 );
                 trace!(
                     "\tres_stat: {}, res_df: {}, res_p: {}",
@@ -437,7 +439,7 @@ fn find_deps(
                     tmp.df,
                     tmp.pval,
                 );
-                Box::new(tmp)
+                tmp
             } else {
                 let tmp = SCI::new(
                     &cur_prob.clone().into(),
@@ -446,12 +448,12 @@ fn find_deps(
                     &cur_mb,
                 );
                 trace!("\tres_stat: {}", tmp.stat);
-                Box::new(tmp)
+                tmp
             };
             // If CI Test is strong enough check result of test
-            if !ci.is_too_weak() && cur_mb.len() <= eff_max_sub_mb_size
+            if !ci.too_weak && cur_mb.len() <= eff_max_sub_mb_size
             {
-                if ci.is_not_cond_indep(alpha) && cur_mb != *init_mb {
+                if !ci.is_ci && cur_mb != *init_mb {
                     // This subset is gives depedency, return current mb
                     // trace!("\n\t\tFOUND DEPS: [");
                     // cur_mb.iter().for_each(|a| trace!("{},", a));
@@ -481,7 +483,7 @@ fn find_deps(
             } else {
                 trace!(
                     "\tTEST TOO WEAK! {} {}<={}",
-                    ci.is_too_weak(),
+                    ci.too_weak,
                     cur_mb.len(),
                     eff_max_sub_mb_size
                 );
@@ -595,14 +597,15 @@ pub fn inner_mb_mine(
             trace!("]");
             num_ci += 1;
             let total_vars = cur_mb.len() + att_xs.len() + 1;
-            let ci: Box<dyn CITest> = if use_gtest && total_vars <= 5 {
+            let ci: CIRes = if use_gtest && total_vars <= 5 {
                 let tmp = GTest::new(
                     &cur_prob.clone().into(),
                     att_t,
                     att_xs,
                     &cur_mb,
+                    alpha,
                 );
-                if tmp.is_too_weak() {
+                if tmp.too_weak {
                     let tmp2 = SCI::new(
                         &cur_prob.clone().into(),
                         att_t,
@@ -610,7 +613,7 @@ pub fn inner_mb_mine(
                         &cur_mb,
                     );
                     trace!("\tres_stat: {}", tmp2.stat);
-                    Box::new(tmp2)
+                    tmp2
                 } else {
                     trace!(
                         "\tres_stat: {}, res_df: {}, res_p: {}",
@@ -618,7 +621,7 @@ pub fn inner_mb_mine(
                         tmp.df,
                         tmp.pval,
                     );
-                    Box::new(tmp)
+                    tmp
                 }
             } else {
                 let tmp = SCI::new(
@@ -628,13 +631,13 @@ pub fn inner_mb_mine(
                     &cur_mb,
                 );
                 trace!("\tres_stat: {}", tmp.stat);
-                Box::new(tmp)
+                tmp
             };
             // If CI Test is strong enough check result of test
-            if !ci.is_too_weak() && cur_mb.len() <= eff_max_sub_mb_size
+            if !ci.too_weak && cur_mb.len() <= eff_max_sub_mb_size
             {
-                max_bad = f64::max(max_bad, ci.get_badness());
-                if !ci.is_not_cond_indep(alpha) {
+                max_bad = f64::max(max_bad, ci.badness);
+                if ci.is_ci {
                     trace!("\tFOUND SEP!!!\n");
                     // This subset shows xs is not in mb of t
                     // sep = sep.intersection(&cur_mb).cloned().collect();
@@ -658,12 +661,12 @@ pub fn inner_mb_mine(
                     xs: att_xs.clone(),
                     is_in_mb: false,
                     num_ci: num_ci,
-                    badness: ci.get_badness(),
+                    badness: ci.badness,
                 };
             } else {
                 trace!(
                     "\tTEST TOO WEAK! {} {}<={}\n",
-                    ci.is_too_weak(),
+                    ci.too_weak,
                     cur_mb.len(),
                     eff_max_sub_mb_size
                 );

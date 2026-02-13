@@ -1,29 +1,50 @@
 use std::collections::BTreeSet;
 
-use crate::g2test::{chi_square_p_val, g2_df, g2_stat_with_probs, g2_df_eff};
+use crate::g2test::{
+    chi_square_p_val, g2_df, g2_df_eff, g2_stat_with_probs,
+};
 use crate::prob_map::ProbabilityMap;
 use crate::prob_tids::ProbabilityTIDs;
 use crate::probability::Probability;
 use crate::sci::cond_sci_stat;
 
-pub trait CITest {
-    fn is_too_weak(&self) -> bool;
-    fn is_not_cond_indep(&self, alpha: f64) -> bool;
-    fn get_statistic(&self) -> f64;
-    fn get_mb_tested(&self) -> BTreeSet<usize>;
-    fn get_badness(&self) -> f64;
+// pub trait CITest {
+//     fn is_too_weak(&self) -> bool;
+//     fn is_not_cond_indep(&self, alpha: f64) -> bool;
+//     fn get_statistic(&self) -> f64;
+//     fn get_mb_tested(&self) -> BTreeSet<usize>;
+//     fn get_badness(&self) -> f64;
+// }
+
+pub struct CIRes {
+    pub too_weak: bool,
+    pub is_ci: bool,
+    pub stat: f64,
+    pub badness: f64,
+    pub df: usize,
+    pub pval: f64,
+    pub att_x: BTreeSet<usize>,
+    pub att_cond: BTreeSet<usize>,
+}
+
+impl CIRes {
+    pub fn clone(&self) -> Self {
+        Self {
+            too_weak: self.too_weak,
+            is_ci: self.is_ci,
+            stat: self.stat,
+            badness: self.badness,
+            df: self.df,
+            pval: self.pval,
+            att_x: self.att_x.clone(),
+            att_cond: self.att_cond.clone(),
+        }
+    }
 }
 
 // * G Test
 
-pub struct GTest {
-    pub vars: BTreeSet<usize>,
-    pub samp_size: usize,
-    pub stat: f64,
-    pub df: usize,
-    pub pval: f64,
-    pub badness: f64,
-}
+pub struct GTest;
 
 impl GTest {
     pub fn new(
@@ -31,7 +52,8 @@ impl GTest {
         t: usize,
         x: &BTreeSet<usize>,
         cond: &BTreeSet<usize>,
-    ) -> Self {
+        alpha: f64,
+    ) -> CIRes {
         // Get Probs
         let mut xtc: BTreeSet<usize> = cond.union(x).cloned().collect();
         xtc.insert(t);
@@ -60,21 +82,24 @@ impl GTest {
         } else {
             chi_square_p_val(stat, df)
         };
-        Self {
-            vars: x.clone(),
-            samp_size: prob.get_dataset().sample_size,
+        CIRes {
             stat,
-            df,
-            pval,
             badness: -1.0 * stat,
+            too_weak: (df * 5 > prob.get_dataset().sample_size),
+            is_ci: (pval > alpha),
+            df: df,
+            pval: pval,
+            att_x: x.clone(),
+            att_cond: cond.clone(),
         }
     }
-    
+
     pub fn new_from_prob(
         prob_cond: &ProbabilityTIDs,
         prob_x: &ProbabilityTIDs,
         prob_t: &ProbabilityTIDs,
-    ) -> Self {
+        alpha: f64,
+    ) -> CIRes {
         // Get Probs
         let prob_xc = prob_cond.merge(prob_x);
         let prob_xtc = prob_xc.merge(prob_t);
@@ -104,51 +129,22 @@ impl GTest {
         } else {
             chi_square_p_val(stat, df)
         };
-        Self {
-            vars: prob_x.get_atts().clone(),
-            samp_size: prob_cond.get_dataset().sample_size,
+        CIRes {
             stat,
-            df,
-            pval,
             badness: -1.0 * stat,
+            too_weak: (df * 5 > prob_x.get_dataset().sample_size),
+            is_ci: (pval > alpha),
+            df: df,
+            pval: pval,
+            att_x: prob_x.atts.clone(),
+            att_cond: prob_cond.atts.clone(),
         }
-    }
-}
-
-impl CITest for GTest {
-    fn is_too_weak(&self) -> bool {
-        return false;
-        // return self.df * 5 > self.samp_size;
-    }
-
-    fn is_not_cond_indep(&self, alpha: f64) -> bool {
-        return self.pval <= alpha;
-    }
-
-    fn get_mb_tested(&self) -> BTreeSet<usize> {
-        self.vars.clone()
-    }
-
-    fn get_statistic(&self) -> f64 {
-        self.stat
-    }
-
-    fn get_badness(&self) -> f64 {
-        self.badness
     }
 }
 
 // * SCI
 
-pub struct SCI {
-    pub vars: BTreeSet<usize>,
-    pub samp_size: usize,
-    pub stat: f64,
-    pub badness: f64,
-    card_x: usize,
-    card_t: usize,
-    card_cond: usize,
-}
+pub struct SCI;
 
 pub fn sci_min_sample_size(
     card_x: usize,
@@ -176,7 +172,7 @@ impl SCI {
         t: usize,
         x: &BTreeSet<usize>,
         cond: &BTreeSet<usize>,
-    ) -> Self {
+    ) -> CIRes {
         // Get Probs
         let mut xtc: BTreeSet<usize> = cond.union(x).cloned().collect();
         xtc.insert(t);
@@ -218,15 +214,17 @@ impl SCI {
                 );
                 f64::max(s1, s2)
             };
-
-        Self {
-            vars: x.clone(),
-            samp_size: prob.get_dataset().sample_size,
-            stat,
+        let samp_size = prob.dataset.sample_size;
+        CIRes {
+            stat: stat,
             badness: -1.0 * stat,
-            card_x: prob_x.get_size(),
-            card_t: prob.get_dataset().nvals[t],
-            card_cond: prob_c.get_size(),
+            too_weak: (sci_min_sample_size(card_x, card_t, card_cond)
+                > samp_size as f64),
+            is_ci: (stat < 0.0),
+            df: 0,
+            pval: -1.0,
+            att_x: prob_x.atts.clone(),
+            att_cond: cond.clone(),
         }
     }
 
@@ -234,7 +232,7 @@ impl SCI {
         prob_cond: &ProbabilityTIDs,
         prob_x: &ProbabilityTIDs,
         prob_t: &ProbabilityTIDs,
-    ) -> Self {
+    ) -> CIRes {
         // Get Probs
         let prob_xc = prob_cond.merge(prob_x);
         let prob_xtc = prob_xc.merge(prob_t);
@@ -265,45 +263,20 @@ impl SCI {
                 let s2 = cond_sci_stat(
                     &prob_xtc, &prob_tc, &prob_xc, prob_cond,
                 );
+                // println!("s1: {}, s2: {}", s1, s2);
                 f64::max(s1, s2)
             };
-
-        Self {
-            vars: prob_x.atts.clone(),
-            samp_size: db.sample_size,
-            stat,
+        let samp_size = prob_x.dataset.sample_size;
+        CIRes {
+            stat: stat,
             badness: -1.0 * stat,
-            card_x: card_x,
-            card_t: card_t,
-            card_cond: card_cond,
+            too_weak: (sci_min_sample_size(card_x, card_t, card_cond)
+                > samp_size as f64),
+            is_ci: (stat < 0.0),
+            df: 0,
+            pval: -1.0,
+            att_x: prob_x.atts.clone(),
+            att_cond: prob_cond.atts.clone(),
         }
-    }
-
-}
-
-impl CITest for SCI {
-    fn is_too_weak(&self) -> bool {
-        // eps = delta = 0.05
-        return sci_min_sample_size(
-            self.card_x,
-            self.card_t,
-            self.card_cond,
-        ) > self.samp_size as f64;
-    }
-
-    fn is_not_cond_indep(&self, _alpha: f64) -> bool {
-        return self.stat > 0.0;
-    }
-
-    fn get_mb_tested(&self) -> BTreeSet<usize> {
-        self.vars.clone()
-    }
-
-    fn get_statistic(&self) -> f64 {
-        self.stat
-    }
-
-    fn get_badness(&self) -> f64 {
-        self.badness
     }
 }
