@@ -590,7 +590,7 @@ rules out deterministic functions?
 %   \end{equation}
 % \end{lemma}
 
-\begin{lemma}[$k$-dependance implies $(k+1)$-inter-association]
+\begin{lemma}[$k$-dependance implies inter-association]
   \begin{gather}
     \label{eq:13}
     \kdep{\verts}{Y,X}{\rmZ}
@@ -642,9 +642,19 @@ rules out deterministic functions?
   \verts \setminus (\verts' \cup \{X, Y\})$
   \begin{equation}
     \label{eq:22}
-    \kinter{\verts}{Y,\rmX} \implies \kinter{\verts'}{Y,\rmX}
+    \kdep{\verts}{Y,X}{\rmZ} \implies \kdep{\verts'}{Y,X}{\rmZ}
   \end{equation}
 \end{lemma}
+\begin{proof}
+  Recall that by definition that
+  \begin{equation}
+    \label{eq:5}
+    \kdep{\verts}{Y,X}{\rmZ} \implies
+    \forall S \subset \verts \setminus \{Y,X\} :
+    Y \dep{\pr} X \mid \rmZ \cup \rmS
+  \end{equation}
+  We know from 
+\end{proof}
 
 \begin{definition}[Bounded Separator Assumption]
   needed for practical algorithm
@@ -735,7 +745,7 @@ rules out deterministic functions?
     % \KwOut{$\rmX'\subseteq\rmX$ s.t. $Y \dep{} X \mid \rmX' \cup \rmS$
     %   and $\forall X'\in\rmX' : Y \indep{} X \mid \rmS \cup \rmX'
     %   \setminus X'$}
-    \KwOut{$\rmX'\subseteq\rmX$ s.t. $\kdep{\rmS}{Y,X}{\rmX'}$}
+    \KwOut{$X\cup\rmX'$ s.t. $\rmX'\subseteq\rmX$ and $\kdep{\rmS}{Y,X}{\rmX'}$}
     \While{$\exists X' \in \rmX : \neg$not\_ci($Y$, $X$, $\rmX
       \setminus X'$, $\rmS$, $k$, $l$)}{
       remove $X'$ from $\rmX$\;
@@ -773,7 +783,8 @@ rules out deterministic functions?
   % \Inv{$\rmX \dep{} Y \mid \rmS$}
   \Fn{not\_ci($Y$, $X$, $\rmX$, $\rmS$, $k$, $l$, $\alpha$)}{
     \KwOut{is $Y \dep{} X \mid \rmX \cup \rmS$?}
-    \For{$\rmZ \in [\rmS]^{\leq k + 1 - |\rmX|}$}{
+    $k' \gets \max(k - |\rmX|, 1)$\;
+    \For{$\rmZ \in \powerleq{k'}{\rmS}$}{
       % +1 allows removing assmuption 1 from marx
       $\rmX' \gets \rmZ \cup \rmX$\;
       $\rmS' \gets \rmS \setminus \rmZ$\;
@@ -788,15 +799,17 @@ rules out deterministic functions?
   }
   \Fn{no\_seps($Y$, $X$, $\rmX'$, $\rmS'$, $l$, $\alpha$)}{
     \Inv{$X \dep{} Y \mid \rmX'$}
+    \KwOut{is $Y \dep{} X \mid \rmX' \cup \rmS'$?}
     % max\_p $\gets 1$\;
-    \For{$\rmS' \in [\rmS']^{\leq l}$}{
+    \For{$\rmZ \in \powerleq{l}{\rmS'}$}{
       % max\_p $\gets \min(\text{min\_p}, p)$\;
-      \If{$Y \indep{} X \mid \rmX' \cup \rmS'$}{
+      \If{$Y \indep{} X \mid \rmX' \cup \rmZ$}{
         \Return{False}\;
       }
     }
     \Return{True}\;
   }
+  
 \end{algorithm}
 
 
