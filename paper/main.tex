@@ -647,13 +647,30 @@ rules out deterministic functions?
 \end{lemma}
 \begin{proof}
   Recall that by definition that
-  \begin{equation}
+  \begin{align}
     \label{eq:5}
-    \kdep{\verts}{Y,X}{\rmZ} \implies
-    \forall S \subset \verts \setminus \{Y,X\} :
-    Y \dep{\pr} X \mid \rmZ \cup \rmS
+    \kdep{\verts}{Y,X}{\rmZ}\\
+    \implies
+      &\forall \rmZ' \subseteq \rmZ \:\:
+    \forall \rmS \subset \verts \setminus \{Y,X\} : \\
+      &Y \dep{\pr} X \mid \rmZ \cup \rmS
+        \wedge Y \indep{\pr} X \mid \rmZ' \cup \rmS
+  \end{align}
+  \begin{align*}
+    &\kassoc{\verts}{Y,X}{\rmZ}
+    = \forall \rmS \subseteq \verts \setminus \{Y,X\} :
+      Y \dep{\pr} X \mid \rmZ \cup \rmS\\
+    &\iff \forall \verts' \subseteq \verts \:\:
+      \forall \rmS \subset \verts' \setminus \{Y,X\} :
+      Y \dep{\pr} X \mid \rmZ \cup \rmS\\
+    &\iff \forall \verts' \subseteq \verts :
+      \kassoc{\verts'}{Y,X}{\rmZ}
+  \end{align*}
+  Therefore, for any subset $\verts'\subseteq\verts$
+  \begin{equation}
+    \label{eq:4}
+    \kassoc{\verts}{Y,X}{\rmZ} \implies \kassoc{\verts'}{Y,X}{\rmZ}
   \end{equation}
-  We know from 
 \end{proof}
 
 \begin{definition}[Bounded Separator Assumption]
