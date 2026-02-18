@@ -270,6 +270,36 @@ difficulty of xor
 - $\rvt$ target variable
 - $\rmX$ variables
 - $\mb$ markov blanket
+
+\begin{definition}[Global Markov Property]\label{def:global-markov}
+  \begin{equation}
+    \label{eq:5}
+    X \indep{\gr} Y \mid \rmZ \implies X \indep{\pr} Y\mid \rmZ
+  \end{equation}
+\end{definition}
+\begin{definition}[Faithfulness]
+  \begin{equation}
+    \label{eq:10}
+    X \indep{\pr} Y\mid \rmZ \implies X \indep{\gr} Y\mid \rmZ
+  \end{equation}
+\end{definition}
+
+\begin{definition}[Graphoid Axioms]
+  \begin{enumerate}
+  \item Symmetry:
+    $\rmX \indep{} \rmY \mid \rmZ \implies \rmY\indep{}\rmX\mid\rmZ$
+  \item Decomposition:
+    $\rmX \indep{} \rmY \cup \rmW \mid \rmZ \implies
+    \rmX\indep{}\rmY\mid\rmZ$
+  \item Weak Union:
+    $\rmX\indep{}\rmY\cup\rmW\mid\rmZ \implies \rmX\indep{}\rmY \mid
+    \rmW\cup\rmZ$
+  \item Contraction:
+    $(\rmX\indep{}\rmY \mid \rmW\cup\rmZ) \wedge
+    (\rmX\indep{}\rmW\mid\rmZ)\implies \rmX\indep{}\rmY\cup\rmW\mid\rmZ$
+  \end{enumerate}
+\end{definition}
+
 \subsection{Markov Blanket}
 todo
 - markov blanket
@@ -440,22 +470,6 @@ computationally efficient.
 %%% Method
 \section{kOMB}
 
-\begin{definition}[Graphoid Axioms]
-  t
-  \begin{enumerate}
-  \item Symmetry:
-    $\rmX \indep{} \rmY \mid \rmZ \implies \rmY\indep{}\rmX\mid\rmZ$
-  \item Decomposition:
-    $\rmX \indep{} \rmY \cup \rmW \mid \rmZ \implies
-    \rmX\indep{}\rmY\mid\rmZ$
-  \item Weak Union:
-    $\rmX\indep{}\rmY\cup\rmW\mid\rmZ \implies \rmX\indep{}\rmY \mid
-    \rmW\cup\rmZ$
-  \item Contraction:
-    $(\rmX\indep{}\rmY \mid \rmW\cup\rmZ) \wedge
-    (\rmX\indep{}\rmW\mid\rmZ)\implies \rmX\indep{}\rmY\cup\rmW\mid\rmZ$
-  \end{enumerate}
-\end{definition}
 
 \begin{lemma}[Inverse Weak Union]\label{lemma:inv-weak-union}
   Let $\rmV$ be a set of random variable and
@@ -516,8 +530,16 @@ computationally efficient.
     := \forall \rmS \subseteq \rmV \setminus \{Y,X\} :
     Y \dep{\pr} X \mid \rmZ \cup \rmS.
   \end{equation}
-  Here we say that $Y$ and $X$ are associated w.r.t. $\rmZ$. Of course
-  under this definition there might be some strict subset
+  Here we say that $Y$ and $X$ are associated w.r.t. $\rmZ$.
+  % Under this
+  % definition, it follows that 
+  % \begin{equation}
+  %   \label{eq:19}
+  %   \kassoc{\rmV}{Y,X}{\rmZ} \implies X \in \mb(Y)
+  % \end{equation}
+  % due to the absence of any probabilistic separators between $Y$ and
+  % $X$.
+  Of course under this definition there might be some strict subset
   $\rmZ' \subset \rmZ$ where $\kdep{\verts}{Y,X}{\rmZ'}$ still
   holds. Therefore we say $Y$ and $X$ are $|\rmZ|$-order dependent w.r.t
   $\rmZ$ only if this is not the case,
@@ -538,7 +560,7 @@ $Y\strict{k}\rmX$ results in DAGs with a collider structure, or a UG with
 a clique over all the variables. $Y\assoc{k}\rmX$ results in something
 like stochastic \texttt{AND} operator.
 
-\begin{definition}[$k$-Order Adjacency Faithfulness]
+\begin{definition}[$k$-Order Adjacency Faithfulness]\label{def:k-adj-faith}
   Given the probabilistic graphical model $\model=(\gr, \pr)$ where
   $\gr = (\verts, \edges)$, then $\gr$ is $k$-adjacent faithful to $\pr$
   if and only if $\forall (Y,X) \in \edges$,
@@ -553,6 +575,17 @@ like stochastic \texttt{AND} operator.
   other variables they are conditioned on.
 \end{definition}
 rules out deterministic functions?
+
+\begin{lemma}[Association implies Markov blanket]
+  Assume that $\gr$ is k-order adjacent faithful to $\pr$. Then for any
+  $\rmZ \in \powerleq{k}{\verts}$, we know that 
+  \begin{equation}
+    \label{eq:21}
+    \kassoc{\verts}{Y,X}{\rmZ} \implies X \in \mb(Y),
+  \end{equation}
+  or in other words, $Y$ and $X$ being associated w.r.t. $\rmZ$ implies
+  that $X$ belongs to the Markov blanket of $Y$ in $\gr$.
+\end{lemma}
 
 
 \subsection{Theoretical Algorithm}
@@ -598,10 +631,10 @@ rules out deterministic functions?
     \kinter{\verts}{Y,\rmZ \cup X}
     \intertext{where}
     \begin{aligned}
-      &\kinter{\verts}{Y,\rmZ \cup X}\\
-      &:=
-      \forall Z'\in\rmZ : \kassoc{\verts}{Y,Z'}{X \cup \rmZ
-      \setminus Z'}
+      \kinter{\verts}{Y,\rmX}
+      :=
+        \forall X\in\rmX :
+        \kassoc{\verts}{Y,X}{\rmX \setminus X}
     \end{aligned}
   \end{gather}
   by contraction
@@ -637,25 +670,15 @@ rules out deterministic functions?
   by contradiction.
 \end{proof}
 
-\begin{lemma}[Subset]
+\begin{lemma}[Subset]\label{lem:subset}
   Let $\verts' \subseteq \verts$, $X,Y \in \verts$, and $\rmZ \subseteq
   \verts \setminus (\verts' \cup \{X, Y\})$
   \begin{equation}
     \label{eq:22}
-    \kdep{\verts}{Y,X}{\rmZ} \implies \kdep{\verts'}{Y,X}{\rmZ}
+    \kdep{\verts}{Y,X}{\rmZ} \implies \kinter{\verts'}{Y,X\cup\rmZ}
   \end{equation}
 \end{lemma}
 \begin{proof}
-  Recall that by definition that
-  \begin{align}
-    \label{eq:5}
-    \kdep{\verts}{Y,X}{\rmZ}\\
-    \implies
-      &\forall \rmZ' \subseteq \rmZ \:\:
-    \forall \rmS \subset \verts \setminus \{Y,X\} : \\
-      &Y \dep{\pr} X \mid \rmZ \cup \rmS
-        \wedge Y \indep{\pr} X \mid \rmZ' \cup \rmS
-  \end{align}
   \begin{align*}
     &\kassoc{\verts}{Y,X}{\rmZ}
     = \forall \rmS \subseteq \verts \setminus \{Y,X\} :
@@ -671,10 +694,63 @@ rules out deterministic functions?
     \label{eq:4}
     \kassoc{\verts}{Y,X}{\rmZ} \implies \kassoc{\verts'}{Y,X}{\rmZ}
   \end{equation}
+  \begin{align*}
+    &\kassoc{\verts}{Y,X}{\rmZ}
+      \implies \forall Z \in \rmZ :
+      \kassoc{\verts}{Y,Z}{X\cup \rmZ \setminus Z}\\
+    &\iff \forall Z \in \rmZ \:\:
+      \forall \verts' \subseteq \verts :
+      \kassoc{\verts'}{Y,Z}{X\cup \rmZ \setminus Z}
+  \end{align*}
+  Therefore, for any subset $\verts'\subseteq\verts$
+  \begin{equation}
+    \label{eq:4}
+    \kassoc{\verts}{Y,X}{\rmZ} \implies
+    \forall Z \in \rmZ : \kassoc{\verts'}{Y,Z}{X \cup \rmZ \setminus Z'}
+  \end{equation}
+  Therefore
+  \begin{align*}
+    \kdep{\verts}{Y,X}{\rmZ}&\implies\kassoc{\verts}{Y,X}{\rmZ}\\
+    &\implies\kinter{\verts'}{Y,X\cup\rmZ}
+    % &\implies
+    % \kassoc{\verts'}{Y,X}{\rmZ}
+    % \wedge\\
+    % &\qquad
+    %   \forall Z \in \rmZ : \kassoc{\verts'}{Y,Z}{X \cup \rmZ \setminus
+    %   Z'}\\
+    % &=\kinter{\verts'}{Y,X\cup\rmZ}
+  \end{align*}
 \end{proof}
 
-\begin{definition}[Bounded Separator Assumption]
-  needed for practical algorithm
+needed for practical algorithm
+\begin{definition}[Bounded Separator Assumption]\label{def:bound-sep}
+  Let $\gr=(\verts,\edges)$, $l\in\mathbb{N}$, and assume $k$-order
+  adjacency faithfulness from \Cref{def:k-adj-faith},
+  \begin{align*}
+    &\adj{\gr}{Y,X}\\
+    &\iff
+    \:\exists \rmZ \in \powerleq{k}{\mb(Y) \setminus X}:
+      \ldep{\verts}{Y,X}{\rmZ}
+  \end{align*}
+  where
+  \begin{align}
+    &\begin{aligned}
+      &\lassoc{\verts}{Y,X}{\rmZ}\\
+      &:= \forall \rmS \in \powerleq{l}{\verts\setminus\{Y,X\}} :
+        Y \dep{\pr} X \mid \rmZ \cup \rmS\\
+    \end{aligned}\\
+    &\begin{aligned}
+      &\ldep{\verts}{Y,X}{\rmZ}\\
+      &:=
+      \lassoc{\verts}{Y,X}{\rmZ} \wedge
+      \forall \rmZ'\subset\rmZ :
+      \neg\lassoc{\verts}{Y,X}{\rmZ'}
+    \end{aligned}
+  \end{align}
+  and $\verts'=\verts\setminus\{Y,X\}$
+  
+  relation to global/local markov?
+  Therefore, 
 \end{definition}
 
 % \begin{algorithm}
@@ -688,7 +764,7 @@ rules out deterministic functions?
 %     Y\strict{|\rmX|}\rmX$}{
 %     $\rmS \gets \rmS \cup \rmX$\;
 %   }
-%   \While{$\exists X \in \rmS : Y \indep{\pr} X \mid \rmS \setminus X$}{
+%     \While{$\exists X \in \rmS : Y \indep{\pr} X \mid \rmS \setminus X$}{
 %     $\rmS \gets \rmS \setminus X$\;
 %   }
 %   \Return{$\rmS$}\;
@@ -721,9 +797,94 @@ rules out deterministic functions?
   implies a potentially lower order dependance for some subset.
 \end{proof}
 
+\begin{theorem}[Correctness of \Cref{alg:ci-test}]
+  
+\end{theorem}
+\begin{proof}
+  When called by \textit{find\_assoc}, the function \textit{not\_ci}
+  receives the subset $\rmX\in\powerleq{k}{\verts'\setminus\rmS}$ and
+  then further iterates over $\rmX'\in\powerleq{k'}{\rmS}$ where
+  $k'=\max(k-|\rmX|, 1)$. Therefore the effective search space for
+  $\rmZ := \rmX \cup \rmX'$ are the sets in $\powerleq{k+1}{\verts'}$.
+
+  If any of the sets $\rmZ \in \powerleq{k+1}{\verts'}$ are causes $Y$
+  and $X$ to be dependent, $Y \dep{\pr} X \mid \rmZ$, \textit{not\_ci}
+  calls \textit{no\_sep} to determine if there are any subsets in
+  $\rmS' \in \powerleq{l}{\rmS \setminus \rmZ}$ that causes $Y$ and $X$
+  to be independent, $Y \dep{\pr} X \mid \rmZ \cup \rmS'$.
+
+  Under the $l$-bounded separator assmuption in \Cref{def:bound-sep}, we
+  know that
+  \begin{align*}
+    &\adj{\gr}{Y,X}\\
+    &\iff
+    \exists \rmZ \in \powerleq{k}{\mb(Y) \setminus X}:
+      \ldep{\verts}{Y,X}{\rmZ}\\
+    &\implies
+    \exists \rmZ \in \powerleq{k}{\mb(Y) \setminus X}:
+      \lassoc{\verts'}{Y,X}{\rmZ}
+  \end{align*}
+  which is logically equivalent to its contrapositive
+  \begin{align*}
+    &\forall \rmZ \in \powerleq{k}{\mb(Y) \setminus X}:
+    \neg \lassoc{\verts'}{Y,X}{\rmZ}\\
+    &\iff \forall\rmZ \in \powerleq{k}{\mb(Y) \setminus X} \:\:
+      \exists \rmS \in \powerleq{l}{\verts'} :\\
+      &\qquad\qquad Y \indep{\pr} X \mid \rmZ \cup \rmS\\
+    &\implies \neg \adj{\gr}{Y,X}.
+  \end{align*}
+  Therefore, whenever \textit{no\_seps} finds a subset of the candidate
+  Markov blanket $\rmS'\subseteq\rmS$ that causes $Y \indep{\pr} X \mid
+  \rmZ \cup \rmS$, we know for certain that $Y$ and $X$ are not adjacent
+  in $\gr$ under both the bounded separator and $k$-order adjacency
+  faithfulness assumption.
+  
+  Therefore, since the function \textit{no\_seps} only returns
+  \texttt{True} when
+  $\forall \rmS' \in \powerleq{l}{\rmV\setminus\{X,Y\}} : X \dep{\gr} Y
+  \mid \rmS'$
+  
+  However, recall that we are mainly interested in determining if $Y
+  \dep{\pr} X \mid \rmZ \cup \verts'$. Therefore by negating the bounded
+  separator assumption we get
+  \begin{equation*}
+    (Y,X)\in\edges
+    \iff \forall \rmS' \in \powerleq{l}{\rmV\setminus\{X,Y\}} :
+    X \dep{\gr} Y \mid \rmS'
+  \end{equation*}
+\end{proof}
+
 \begin{theorem}[Correctness of \Cref{alg:assoc-mine}]
   
 \end{theorem}
+\begin{proof}
+  The function \textit{find\_assoc} in \Cref{alg:komb} is a recursive
+  function where for each recursive call of the function, it is passed a
+  subset of all the variables except $Y$ and $\rmS$ with length less
+  than or equal to $k$, $\rmX \in \powerleq{k}{\verts' \setminus \rmS}$.
+
+  During each function call, \textit{find\_assoc} iterates through each
+  varible $X$ that has not been included in $\rmX$ yet and determines if
+  there is a subset $\rmS'\subseteq \rmS$ of the candidate Markov blanket
+  $\rmS$ such that $|\rmX \cup \rmS'| \leq k + 1$ and
+  $Y \dep{\pr} X \mid \rmX \cup \rmS' \cup \rmS$. Therefore, the
+  effective search space for $\rmZ := \rmX \cup \rmS'$ is all subsets of
+  $\verts'$ with length less than or equal to $k+1$,
+  $\powerleq{k+1}{\verts'}$.
+
+  If $Y \dep{\pr} X \mid \rmZ \cup \rmS$, we know that
+  $\kassoc{\rmS}{Y,X}{\rmZ}$ is true and pass $\rmZ$ to the function
+  \textit{make\_strict} to find a subset $\rmZ'\subseteq\rmZ$ such that
+  $\kinter{\rmS}{Y, X \cup \rmZ'}$.
+
+  Since from \Cref{lem:subset} we know that
+  \begin{equation*}
+    \kdep{\verts}{Y,X}{\rmZ'} \implies \kinter{\rmS}{Y,X\cup\rmZ'},
+  \end{equation*}
+  therefore \textit{find\_assoc} will always return $X \cup \rmZ'$
+  whenever it encounters a combination of $X$ and $\rmZ'$ that are
+  truely $k$-dependent where $|\rmZ'|\leq k+1$.
+\end{proof}
 
 \begin{theorem}[Correctness of \Cref{alg:komb}]
 \end{theorem}
@@ -762,12 +923,12 @@ rules out deterministic functions?
     % \KwOut{$\rmX'\subseteq\rmX$ s.t. $Y \dep{} X \mid \rmX' \cup \rmS$
     %   and $\forall X'\in\rmX' : Y \indep{} X \mid \rmS \cup \rmX'
     %   \setminus X'$}
-    \KwOut{$X\cup\rmX'$ s.t. $\rmX'\subseteq\rmX$ and $\kdep{\rmS}{Y,X}{\rmX'}$}
-    \While{$\exists X' \in \rmX : \neg$not\_ci($Y$, $X$, $\rmX
+    \KwOut{$X\cup\rmX'$ s.t. $\rmX'\subseteq\rmX$ and $\kinter{\rmS}{Y,X\cup\rmX'}$}
+    \While{$\exists Z \in \rmX : \neg$not\_ci($Y$, $Z$, $X\cup\rmX
       \setminus X'$, $\rmS$, $k$, $l$)}{
-      remove $X'$ from $\rmX$\;
+      remove $Z$ from $\rmX$\;
     }
-    \Return{$\rmX'$}\;
+    \Return{$X\cup\rmX'$}\;
   }
   \Fn{find\_assoc($Y$, $\rmX$, $\rmS$, $\rmV'$, $k$, $l$)}{
     \KwOut{$\rmX\subseteq\rmV'\setminus\rmS$
@@ -775,7 +936,7 @@ rules out deterministic functions?
     \If{$|\rmX| > k$}{
       \Return{$\emptyset$}\;
     }
-    \For{$X \in \rmV'\setminus\rmS$}{
+    \For{$X \in \rmV'\setminus(\rmS \cup \rmX)$}{
       \If{not\_ci($Y$, $X$, $\rmX$, $\rmS$, $k$, $l$)}{
         \tcp{$Y \dep{} X \mid \rmX \cup \rmS$}
         \Return{make\_strict($Y$, $X$, $\rmX$, $\rmS$, $k$, $l$)}\;
@@ -792,7 +953,7 @@ rules out deterministic functions?
 \end{algorithm}
 
 \begin{algorithm}
-  \caption{Practical Conditional Independence Test}
+  \caption{Practical Conditional Independence Test}\label{alg:ci-test}
   % \DontPrintSemicolon
   \SetKwProg{Fn}{Function}{:}{}
   % \KwIn{$Y$, $X$, $\rmX$, $\rmS$, $k$, $l$, $\alpha$}
@@ -801,26 +962,25 @@ rules out deterministic functions?
   \Fn{not\_ci($Y$, $X$, $\rmX$, $\rmS$, $k$, $l$, $\alpha$)}{
     \KwOut{is $Y \dep{} X \mid \rmX \cup \rmS$?}
     $k' \gets \max(k - |\rmX|, 1)$\;
-    \For{$\rmZ \in \powerleq{k'}{\rmS}$}{
+    \For{$\rmX' \in \powerleq{k'}{\rmS}$}{
       % +1 allows removing assmuption 1 from marx
-      $\rmX' \gets \rmZ \cup \rmX$\;
-      $\rmS' \gets \rmS \setminus \rmZ$\;
+      $\rmZ \gets \rmX' \cup \rmX$\;
       % $p \gets$ p-value of test $H_{0}: Y \indep{} X \mid \rmX'$\;
-      \If{$Y \dep{} X \mid \rmX'$}{
-        \If{no\_seps($Y$, $X$, $\rmX'$, $\rmS'$, $l$, $\alpha$)}{
+      \If{$Y \dep{} X \mid \rmZ$}{
+        \If{no\_seps($Y$, $X$, $\rmZ$, $\rmS$, $l$, $\alpha$)}{
           \Return{True}\;
         }
       }
     }
     \Return{False}\;
   }
-  \Fn{no\_seps($Y$, $X$, $\rmX'$, $\rmS'$, $l$, $\alpha$)}{
-    \Inv{$X \dep{} Y \mid \rmX'$}
-    \KwOut{is $Y \dep{} X \mid \rmX' \cup \rmS'$?}
+  \Fn{no\_seps($Y$, $X$, $\rmZ$, $\rmS$, $l$, $\alpha$)}{
+    \Inv{$X \dep{} Y \mid \rmZ$}
+    \KwOut{is $Y \dep{} X \mid \rmZ \cup \rmS$?}
     % max\_p $\gets 1$\;
-    \For{$\rmZ \in \powerleq{l}{\rmS'}$}{
+    \For{$\rmS' \in \powerleq{l}{\rmS \setminus \rmZ}$}{
       % max\_p $\gets \min(\text{min\_p}, p)$\;
-      \If{$Y \indep{} X \mid \rmX' \cup \rmZ$}{
+      \If{$Y \indep{} X \mid \rmZ \cup \rmS'$}{
         \Return{False}\;
       }
     }
