@@ -3,9 +3,9 @@
 % also before submission to see how the non-anonymous paper would look like 
                         
 %% There is a class option to choose the math font
-% \documentclass[mathfont=ptmx]{uai2026} % ptmx math instead of Computer
+%\documentclass[mathfont=ptmx]{uai2026} % ptmx math instead of Computer
                                          % Modern (has noticeable issues)
-% \documentclass[mathfont=newtx]{uai2026} % newtx fonts (improves upon
+%\documentclass[mathfont=newtx]{uai2026} % newtx fonts (improves upon
                                           % ptmx; less tested, no support)
 % NOTE: Only keep *one* line above as appropriate, as it will be replaced
 %       automatically for papers to be published. Do not make any other
@@ -68,7 +68,9 @@
 % Todonotes is useful during development; simply uncomment the next line
 %    and comment out the line below the next line to turn off comments
 %\usepackage[disable,textsize=tiny]{todonotes}
-\usepackage[textsize=tiny]{todonotes}
+% \usepackage[textsize=tiny]{todonotes}
+\usepackage{xcolor}
+\newcommand{\todo}[1]{\colorbox{yellow}{#1}}
 
 \usepackage{tikz}
 \usetikzlibrary{positioning,graphs}
@@ -85,18 +87,28 @@
 \Crefname{algocf}{Algorithm}{Algorithms}
 \usepackage{float} %figure inside minipage
 \usepackage{wrapfig}
+\usepackage{braket}
 
 \usepackage{romannum}
 
 \newcommand{\cmark}{\ding{51}}%
 \newcommand{\xmark}{\ding{55}}%
 
+\usepackage[acronym]{glossaries}
+\usepackage{glossaries-extra}
+\setkeys{glslink}{hyper=false}
 
+\newacronym{dag}{DAG}{Directed acyclic graph}
+\newacronym{ug}{UG}{Undirected graph}
+
+\hypersetup{hidelinks}
 
 \input{math\_commands}
 
+
+
 \title{High-Order Markov Blanket Discovery\\
-  via a Weak k-Order Faithfulness Assumption}
+  via a k-Order Relaxation of the Faithfulness Assumption}
 
 % The standard author block has changed for UAI 2026 to provide
 % more space for long author lists and allow for complex affiliations
@@ -163,7 +175,7 @@ originally discussed in the context of learning Bayesian
 networks~\citep{margaritis1999,tsamardinos2003}
 
 However has been later discussed and used in feature
-selection~\cite{wang2020,tsamardinos2003a} and causal
+selection~\citep{wang2020,tsamardinos2003a} and causal
 discovery~\citep{hu2024,ling2021}.
 %%%% Why is MB Discovery hard
 A naive approach to MB discovery would just involve enumerating over all
@@ -264,27 +276,105 @@ difficulty of xor
 - pointing out gap in existing approaches
 - method to prune subset lattice during exhaustive search based on g-test
 
-%%% Related Work
-\section{Background}
-- notation
-- $\rvt$ target variable
-- $\rmX$ variables
-- $\mb$ markov blanket
+%%% background
+\section{Probabilistic Graphical Models and Independencies}
+Consider the set of $n$ variables $\verts=\{V_{1},\ldots,V_{n}\}$ with
+no other hidden or latent variables in our setting. The conditional
+independencies between these variables---$\rmY \indep{} \rmX \mid \rmZ$
+for disjoint variables sets $\rmY,\rmX,\rmZ\subseteq\verts$---can be
+represented by either a \acrfull{dag} or an \acrfull{ug}.
+% , which we denote as
+% $\overrightarrow{\gr}=(\verts,\overrightarrow{\edges})$ and
+% $\overline{\gr}=(\verts,\overline{\edges})$ respectively. Here
+% $\overrightarrow{\edges}$ represents the set of directed edges between
+% variables $\verts$ in a \acrshort{dag} while $\overline{\edges}$
+% represents the undirected edges in a \acrshort{ug}.
+That said, we will denote both graphs with the tuple
+$\gr=(\verts,\edges)$ since we are agnostic on the type of graph used
+for representing these graphical conditional independencies
+$\indeps{\gr}$.
+% we are only interested in the Markov blanket of a variable
+% $Y\in\verts$, and are agnostic to the type of graph the Markov blanket
+% arises from. As such---for the most part---we denote both types of
+% graphs with the tuple $\gr=(\verts,\edges)$, where $\edges$ are the
+% directed or undirected edges between the variables in $\verts$.
 
-\begin{definition}[Global Markov Property]\label{def:global-markov}
+\paragraph{\acrfullpl{dag}} For \glspl{dag}~\citep{pearl1988}, $\edges$ consists of ordered pairs
+$(V_{i},V_{j})\in\edges$ that represent the directed edges between
+variables $V_{i}\rightarrow V_{j}$. The graphical conditional
+independencies in a \gls{dag} are then characterised by the notion of
+\emph{d-separation}~\citep{pearl1988,geiger1989}. Specifically, the
+distinct variables $Y,X\in\verts$ are \emph{d-seperated} by
+$\rmS\subseteq\subverts$ if all paths between $X$ and $Y$... \todo{to complete}
+
+The vertices $Y,X\in\verts$ are
+separated by $\rmS\subseteq\subverts$ in the \gls{dag} $\gr$ when 
+
+\paragraph{\acrfullpl{ug}} On the other hand, for \glspl{ug}~\citep{lauritzen1996},
+
+Regardless of the type of graph $\gr$ is, for disjoint subsets
+$\rmX,\rmY,\rmS\subseteq\verts$, we will denote that $\rmX$ and $\rmY$
+are separated in $\gr$ as,
+\begin{equation}
+  \label{eq:g-sep}
+  \rmX \indep{\gr} \rmY \mid \rmS.
+\end{equation}
+Furthermore, we denote the set of conditional independencies encoded by
+the graph $\gr$---i.e. the independence model of $\gr$---as,
+\begin{equation}
+  \label{eq:g-indeps}
+  \braket{\rmX,\rmY\mid\rmS} \in \indeps{\gr}
+  \iff \rmX \indep{\gr} \rmY \mid \rmS,
+\end{equation}
+where $\braket{\rmX,\rmY\mid\rmS}$ is known as an independence
+statement~\citep{sadeghi2017}.
+
+In addition to the graphical structure $\gr$, we also consier a joint
+distribution $\pr$ over $\verts$ that might encode its own set of
+conditional independencies between the variables in $\verts$,
+\begin{equation}
+  \label{eq:4}
+  \braket{\rmX,\rmY\mid\rmS} \in \indeps{\pr}
+  \iff \rmX \indep{\pr} \rmY \mid \rmS,
+\end{equation}
+where $\rmX \indep{\pr} \rmY \mid \rmS$ denotes $\rmX$ and
+$\rmY$ are probabilistically conditionally independent given $\rmS$.
+
+Our base assumption throughout this paper is that any
+conditional independencies encoded by the graph $\gr$ implies the same
+conditional independency in $\pr$---more formally known as the Global
+Markov property.
+
+\begin{assumption}[Global Markov Property]\label{def:global-markov}
+  Assume we have a probabilistic graphical model $\model=(\gr,\pr)$.
+  Then we say that the joint distribution $\pr$ is \emph{Markov} to the
+  graph $\gr$ when for all disjoint subsets
+  $\rmX,\rmY,\rmS\subseteq\verts$~\citep{hammersley1971,lauritzen2018}, 
   \begin{equation}
     \label{eq:5}
-    X \indep{\gr} Y \mid \rmZ \implies X \indep{\pr} Y\mid \rmZ
+    \begin{aligned}
+      &(\rmX \indep{\gr} \rmY \mid \rmS \implies
+        \rmX \indep{\pr} \rmY\mid \rmS)\\
+      &\iff
+        \indeps{\gr} \subseteq \indeps{\pr}.
+    \end{aligned}
   \end{equation}
-\end{definition}
-\begin{definition}[Faithfulness]
-  \begin{equation}
-    \label{eq:10}
-    X \indep{\pr} Y\mid \rmZ \implies X \indep{\gr} Y\mid \rmZ
-  \end{equation}
-\end{definition}
+  where
+  $\braket{\rmX,\rmY\mid\rmS} \in \indeps{\pr} \iff \rmX \indep{\pr}
+  \rmY \mid \rmS$. When this property holds, $\gr$ is an independency
+  map, or I-map, of $\pr$.
+\end{assumption}
 
-\begin{definition}[Graphoid Axioms]
+Despite their differences, the independence models of $\gr$ and $\pr$
+are both known to obey a set of axioms called the (semi-)graphoid
+axioms~\citep{pearl1989}. These axioms are particully useful when
+attempting to prove various theorems relating to probabilistic graphical
+models.
+
+\begin{definition}[Graphoid Axioms]\label{def:graphoid}
+  For disjoint subsets $\rmX,\rmY,\rmZ,\rmW\subseteq\verts$, an
+  independence model $\indeps{\cdot}$ is called a semi-graphoid if it
+  obeys the following properties~\citep{dawid1979,pearl1987}:
   \begin{enumerate}
   \item Symmetry:
     $\rmX \indep{} \rmY \mid \rmZ \implies \rmY\indep{}\rmX\mid\rmZ$
@@ -298,193 +388,86 @@ difficulty of xor
     $(\rmX\indep{}\rmY \mid \rmW\cup\rmZ) \wedge
     (\rmX\indep{}\rmW\mid\rmZ)\implies \rmX\indep{}\rmY\cup\rmW\mid\rmZ$
   \end{enumerate}
+  The model is called a graphoid if it obeys the folliwng additional
+  property~\citep{pearl1985}:
+  \begin{enumerate}[resume]
+  \item Intersection:
+    $(\rmX \indep{} \rmY \mid \rmZ \cup \rmW) \wedge
+    (\rmX \indep{} \rmW \mid \rmZ \cup \rmY)
+    \implies \rmX \indep{} \rmY \cup \rmW \mid
+    \rmZ$
+  \end{enumerate}
+  All graph induced independence models $\indeps{\gr}$ are guranteed to
+  obey all the graphoid axioms~\citep{lauritzen2018}. On the other hand,
+  probabilistic independence models $\indeps{\pr}$ are only guranteed to
+  obey the semi-graphoid axioms. However if the joint distribution is
+  strictly positive $\pr>0$, then $\indeps{\pr}$ is guranteed to be a
+  graphoid as well~\citep{pearl1988,pearl1989}.
 \end{definition}
 
-\subsection{Markov Blanket}
-todo
-- markov blanket
-- conditiona indep
-
-\subsection{G-Test}
-The G-test is a statistical test that seeks to reject the hypothesis
-that a set of observed discrete data follows some assumed
-distribution. A common use for the G-test is to test if the dimensions
-in some multidimensional data are independent. Conducting this test
-first involves computing the G-statistic,
-\begin{equation}
-  \label{eq:g-stat}
-  G = 2 \sum_{i} O_{i}\cdot \ln\Biggl(\frac{O_{i}}{E_{i}}\Biggr),
-\end{equation}
-where $O_{i}\geq 0$ are the observed counts in the cells and $E_{i} > 0$
-are the expected counts under the distribution assumed in the null
-hypothesis.
-
-In this paper, we are specifically interested in using the G-test to
-test the null hypothesis that some subset $\rmS$ of the variables
-$\rmS\subset\rmX \setminus (\{\rvt\} \cup \mb)$ is conditionally
-independent to the variable $\rvt$ given the a candidate Markov blanket
-$\mb$,
-\begin{equation*}
-  H_{0}(\rmS): \rmS \indep \rvt \mid \mb.
-\end{equation*}
-The G-statistic for testing this hypothesis is
-then~\citep{tsamardinos2006}
-\begin{align*}
-  G(\rmS)
-  &= 2 \sum_{\rvx_{\rvs},\rvx_{t},\rvx_{\rvc}}
-    O(\rvx_{\rvs},\rvx_{t},\rvx_{\rvc})\cdot
-    \ln\Biggl(
-    \frac{P(\rvx_{\rvs},\rvx_{t}\mid\rvx_{\rvc}) P(\rvx_{\rvc})}
-    {P(\rvx_{\rvs}\mid\rvx_{\rvc})P(\rvx_{t}\mid\rvx_{\rvc})
-    P(\rvx_{\rvc})}\Biggr)\\
-  &= 2 \sum_{\rvx_{\rvs},\rvx_{t},\rvx_{\rvc}}
-    O(\rvx_{\rvs},\rvx_{t},\rvx_{\rvc})\cdot
-    \ln\Biggl(
-    \frac{O(\rvx_{\rvs},\rvx_{t},\rvx_{\rvc}) O(\rvx_{\rvc})}
-    {O(\rvx_{\rvs},\rvx_{\rvc})O(\rvx_{t},\rvx_{\rvc})}\Biggr).
-\end{align*}
-Under the null hypothesis, the distribution of this statistic $G(\rmS)$
-is then approximately $\chi^{2}(\df(\rmS))$ distributed
-where~\citep{tsamardinos2006}
-\begin{align*}
-  \df(\rmS) &= (|\rvt|-1) \cdot
-              \Biggl(\prod_{\rvs\in\rmS}|\rvs| - 1\Biggr) \cdot
-              \Biggl(\prod_{\rvc\in\mb}|\rvc|\Biggr)
-\end{align*}
-is the degrees of freedomn in the statistical test. A useful yet not so well-known property of
-the $\chi^{2}$ distribution that we will use later to prove
-\Cref{thm:prune} is the following fact:
-
-\begin{lemma}[CDF of $\chi^{2}$ is monotonic with degrees of freedom]
-  \label{thm:chi2-ineq}
+As mentioned in \Cref{sec:intro}, we are interested in learning the
+graphical Markov blanket of some target variable $Y\in\verts$.
+\begin{definition}[Markov Blanket and Boundary] \label{def:mb}
+  For a single variable $Y\in\verts$, the Markov blanket of $Y$ in $\gr$
+  is any subset $\rmM \subseteq \rmV\setminus Y$\footnote{For
+    convenience we allow set operations between variables sets and
+    single variables to implicitly mean the operation between the
+    variable set and the atomic set containing the single variable---for
+    example $\rmV \setminus Y \coloneq \rmV \setminus \{Y\}$.}
+  such that every other variable in $\verts \setminus (Y \cup \rmS)$ is
+  graphically separated from $Y$ by $\rmS$,
   \begin{equation}
-    \label{eq:chi2-ineq}
-    F(\rvx; k) \geq F(\rvx; k+l) 
+    \label{eq:def-mb}
+    Y \indep{\gr} \verts \setminus (Y \cup \rmM) \mid \rmM.
   \end{equation}
-  where $l \geq 0$.
-\end{lemma}
-\begin{proof}
-  See~\citet[Theorem 1]{ghosh1973}
-\end{proof}
+  The Markov boundary of the variable $Y$---henceforth denoted as
+  $\mbs{\gr}(Y)$---is then defined as the mininal Markov blanket of
+  $Y$~\citep{pearl1988}.
 
-On the other hand, it is well known that the G-statistic is propotional to the
-Kullback-Leibler divergence between the empirical distribution over the
-observed data $\db$ and the expected empirical distribution under the
-null hypothesis,
-\begin{align*}
-  G
-  &= 2 \sum_{i} O_{i}\cdot \ln\Biggl(\frac{O_{i}}{E_{i}}\Biggr)
-    = 2 \sum_{i} \rvp_{i}n\cdot
-    \ln\Biggl(\frac{\rvp_{i}n}{\rvq_{i}n}\Biggr)
-    =2n\sum_{i} \rvp_{i}\cdot
-    \ln\Biggl(\frac{\rvp_{i}}{\rvq_{i}}\Biggr)
-    =2nD_{\kl}(\rvp \| \rvq).
-\end{align*}
-This relationship allows us to use existing results for the
-Kullback-Leibler (KL) divergence on the G-statistic. Specifically we
-will use the \emph{Information Monotonicity} of the KL divergence to
-help with proving \Cref{thm:prune} later on.
+  An equivalent definition for the Markov blanket and boundary of $Y$ in
+  $\pr$ can be made by just substituting the graph separation term in
+  \Cref{eq:def-mb} for conditional independence in $\pr$.
+\end{definition}
+Therefore, from \Cref{def:mb}, it is more accurate to say that we wish
+to learn the Markov boundary of $Y$ and not just a Markov blanket of
+it. However, since colloqually the term Markov blanket is commonly used
+to implicitly refer to the Markov boundary, we shall use the term Markov
+blanket in such a fashion as well.
 
-\begin{lemma}[Information Monotonicity]
-  \label{thm:dpi}
-  For $\rmX\supseteq\rmY$ 
+However, it is important to note that only graphs with an independence
+model $\indeps{\gr}$ that satisfies the symmetry, decomoposition,
+intersection, and weak union graphoid axioms in \Cref{def:graphoid} are
+guranteed to have a unique Markov boundary $\mbs{\gr}(Y)$. Throughout
+this paper we will assume that this is true. That said, there has been
+some previous work done on addressing the case when the Markov boundary
+is not unique~\citep{statnikov2013}.
+
+-methods to learn MB
+-common assumption is Faithfulness.
+\begin{definition}[Faithfulness]\label{def:faith}
+  Given a probabilistic graphical model $\model=(\gr, \pr)$, the graph
+  $\gr$ is \emph{faithful} to the joint distribution $\pr$ if for all
+  disjoint subsets $\rmX,\rmY,\rmS\subseteq\verts$~\citep{spirtes2001},
   \begin{equation}
-    \label{eq:dpi}
-    D_{\kl}(\pr_{\rmX}\|\qr_{\rmX}) \geq
-    D_{\kl}(\pr_{\rmY}\|\qr_{\rmY}) 
+    \label{eq:16}
+    \rmX \indep{\pr} \rmY \mid \rmS
+    \implies \rmX \indep{\gr} \rmY \mid \rmS
   \end{equation}
-\end{lemma}
-\begin{proof}
-  See \citet[Appendix]{amari2009}.
-\end{proof}
+  which is also the inverse of the global Markov property in
+  \Cref{def:global-markov}.
+\end{definition}
 
 
-\subsection{Iterative Association Markov Blanket (IAMB)}
-One of the first approaches to MB discovery that sclaes up well to
-thousands of variables is Iterative Association Markov Blanket
-(IAMB)~\citep{tsamardinos2003}. Prior to IAMB, the main other algorithm
-for MB discovery that scales similarly was the Grow-Shrink (GS)
-algorithm by \citet{margaritis1999}. Both approaches consist of two phases 
-where in the first phase they iteratively test and add variables
-into a candidate MB that shows some dependency to the target variable
-$\rvt$. However, in GS they only considered the pairwise relationship
-between each variable $\rvx$ and the target $\rvt$, which can make
-spouses of $\rvt$ hard to recover~\citep{tsamardinos2003}. On the other
-hand IAMB considers the relationship between $\rvt$ and each $\rvx$
-given the candidate MB that is being grown iteratively during Phase
-\Romannum{1} of the algorithm as illustrated in \Cref{alg:forward}. The
-second phase of both approaches---as illustrated in
-\Cref{alg:backward}---removes any variable in the candidate MB that do
-not belong in the MB of $\rvt$ by iteratively testing for the
-conditional independence of each variable with $\rvt$ given the
-remaining candidate MB that is iteratively pruned during this phase.
-
-% % \begin{minipage}[t]{0.48\linewidth}
-% \begin{algorithm}[H]
-%   \caption{Forward Selection (\texttt{forward})}\label{alg:forward}
-%   \DontPrintSemicolon
-%   \KwIn{$\db$, $\rmX$, $t$, $\alpha$}
-%   \KwOut{Candidate Markov Blanket $\mb$}
-%   $\rmC \gets \rmX$\;
-%   $\mb \gets \{\}$\;
-%   \While{True}{
-%     $\rmR \gets \{\rvx \mid \rvx \in \rmC,
-%     \rvx \not\indep t \mid \mb\}$\;
-%     \If{$\rvx$ is empty} {
-%       \Return{$\mb$}\;
-%     }
-%     $\rvr \gets \rvx\in\rmR$ with the largest $G_{\rvx}$\;
-%     Remove $\rvr$ from $\rmC$\;
-%     Insert $\rvr$ into $\mb$\;
-%   }
-% \end{algorithm}
-% % \end{minipage}
-% % \hfill
-% % \begin{minipage}[t]{0.48\linewidth}
-% \begin{algorithm}[H]
-%   \caption{Prune Candidate MB (\texttt{backward})}\label{alg:backward}
-%   \DontPrintSemicolon
-%   \KwIn{$\db$, $\mb$, $t$, $\alpha$}
-%   \KwOut{Output result}
-%   \For{each $\rvx\in\mb$}{
-%     $\mb' \gets \mb \setminus \{\rvx\}$\;
-%     \If{$\rvx \indep t \mid \mb'$}{
-%       $\mb \gets \mb'$\;
-%     }
-%     \Return{$\mb$}\;
-%   }
-% \end{algorithm}
-% % \end{minipage}
-
-By utilising a heuristic for constructing the candidate MB during the
-first phase, these and other similar approaches to MB discovery are
-capable of scaling well to datasets with 1000s of variables. However, as
-we have shown in \Cref{sec:intro}, the main trade-off with a heuristic
-approach is the inability to capture certain relationships between
-$\rvt$ and variables in its MB. Therefore, in the next section we will
-revisit and propose exhaustive approach that is capable capturing these
-relationships between variables in exchange for being less
-computationally efficient.
 
 
-%%% Method
-\section{kOMB}
-
-
-\begin{lemma}[Inverse Weak Union]\label{lemma:inv-weak-union}
-  Let $\rmV$ be a set of random variable and
-  $\rmX, \rmY, \rmZ \subset \rmV$ be disjoint subsets of $\rmV$.  Also
-  assume without loss of generality that $|\rmX\cup\rmZ|\leq k$.  Then,
-  if $\forall \rmS \subseteq \rmZ \setminus (\rmX \cup \rmY \cup \rmZ)$
-  \begin{equation}
-    \label{eq:2}
-    \rmX \dep{} \rmY \mid \rmS \cup \rmZ
-    \implies \bigl(\rmX \cup \rmZ\bigr) \dep{} \rmY \mid \rmS\\
-  \end{equation}
-  which is just the contrapositive of the weak union graphoid axiom.
-\end{lemma}
-
-
+%%% Faithfulness
+\section{Faithfulness Violations and Existing Relaxations}
+Probably the most well-known
+%%% k-oder
+\section{The k-Order Faithfulness Relaxation}
+In this section we will introduce our generalisation of the faithfulness
+assumption in \Cref{def:faith} for finding conditional dependancies that
+require 
 
 \begin{definition}[Power Sets of Limited Size]
   Let $\rmX$ be a set of elements and $k\leq |\rmX|$ be some natural
@@ -504,20 +487,6 @@ computationally efficient.
   than or equal to $k$.
 \end{definition}
 
-\begin{definition}[Adjacency Faithfulness~\cite{ramsey2006}]
-  If $X,Y\in\verts$ are adjacent in $\gr$, i.e. $X \dep{\gr} Y$, then
-  they are also probabilistically dependant given all
-  $\rmS\subseteq\verts\setminus\{X,Y\}$.
-  \begin{equation}
-    \label{eq:16}
-    X \dep{\gr} Y \iff \forall \rmS\subseteq\verts\setminus\{X,Y\}
-    X \dep{\pr} Y \mid \rmS.
-  \end{equation}
-  Or in other words, adjacent variables in $\gr$ are always
-  probabilistically dependent regardless of what they are conditioned
-  on.
-\end{definition}
-
 \begin{definition}[$k$-Order Dependence]
   For a set of random variables $\rmV$, let $Y,X\in\rmV$ and
   $\rmZ=\{Z_{1},Z_{2},\ldots,Z_{k}\}\subset\rmV$ be distinct random
@@ -526,8 +495,8 @@ computationally efficient.
   conditionally independent given $\rmZ \cup \rmS$ as
   \begin{equation}
     \label{eq:20}
-    \kassoc{\rmV}{Y,X}{\rmZ}
-    := \forall \rmS \subseteq \rmV \setminus \{Y,X\} :
+    \kassoc{\rmV}{Y,X}{\rmS}
+    := \exists \rmZ \subseteq \rmV \setminus \{Y,X\} :
     Y \dep{\pr} X \mid \rmZ \cup \rmS.
   \end{equation}
   Here we say that $Y$ and $X$ are associated w.r.t. $\rmZ$.
@@ -557,38 +526,115 @@ prevents chains like
 $X_{1}\rightarrow Y \rightarrow X_{2}$ to be included in this definition.
 
 $Y\strict{k}\rmX$ results in DAGs with a collider structure, or a UG with
-a clique over all the variables. $Y\assoc{k}\rmX$ results in something
+a clique over all the variables.
+assoc
+results in something
 like stochastic \texttt{AND} operator.
+\begin{lemma}[Finding $k$-dependance from association]
+  \label{lem:k-dep-to-assoc}
+  For distinct random variables $Y,X\in\rmV$ and
+  $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$, the following holds
+  for all $\rmS \subset \rmV \setminus \rmX \cup \{Y\}$
+  \begin{equation}
+    \label{eq:11}
+    \kassoc{k}{Y,X}{\rmS}
+    \implies \exists k' \in [k] : \kdep{k'}{Y,X}{\rmS}
+  \end{equation}
+  where $[k]\coloneq\{i\in\mathbb{Z} : 0 \leq i \leq k\}$.
+\end{lemma}
+\begin{proof}[Proof by induction]
+  With subsets of $\rmX$ of size $1$, $\rmZ\in\powereq{1}{\rmX}$, we
+  know by definition that if $X$ and $Y$ are associated w.r.t. $\rmZ$,
+  it immediately follows that $X$ and $Y$ are also $1$-dependant
+  w.r.t. $\rmZ$ and vice versa,
+  \begin{equation}
+    \label{eq:12}
+    \kassoc{\verts}{X,Y}{\rmZ}
+    \iff \kdep{\verts}{X,Y}{\rmZ}.
+  \end{equation}
+  Now assume that $Y$ is not associated with any subsets in
+  $\powerleq{k}{\rmX}$. Then we know that if $Y$ is associated with any
+  subset in $\powereq{k+1}{\rmX}$, it implies a $(k+1)$-dependance
+  between $X$ and $Y$. Therefore the existance of any association
+  implies a potentially lower order dependance for some subset.
+\end{proof}
 
-\begin{definition}[$k$-Order Adjacency Faithfulness]\label{def:k-adj-faith}
+\begin{definition}[$k$-Order Faithfulness]\label{def:k-faith}
   Given the probabilistic graphical model $\model=(\gr, \pr)$ where
-  $\gr = (\verts, \edges)$, then $\gr$ is $k$-adjacent faithful to $\pr$
-  if and only if $\forall (Y,X) \in \edges$,
+  $\gr = (\verts, \edges)$, then $\gr$ is $k$-order faithful to $\pr$ if
+  and only if $\forall \rmS \subseteq \verts\setminus\{Y,X\}$ whenever
   \begin{gather}
-    \label{eq:8}
-      \exists \rmZ \in \power{\leq k}(\mb(Y) \setminus X):
-      \kdep{\verts}{Y,X}{\rmZ}.
+    \label{eq:k-faith-indep}
+    \begin{aligned}
+      &\forall \rmZ \in \power{\leq k}(\verts\setminus\{Y,X\})\:\:
+        \exists \rmS' \subseteq \rmS :
+      Y \indep{\pr} X \mid \rmZ \cup \rmS'\\
+      &\implies
+      Y \indep{\gr} X \mid \rmS,
+    \end{aligned}
   \end{gather}
-  In other words, for any adjacent variables $(Y,X)$ in $\gr$, there
-  must be a subset of the Markov blanket of $Y$ that $Y$ and $X$ are
-  always conditionally dependent with respect to, regardless of any
-  other variables they are conditioned on.
+  More useful however is its contrapositive which states
+  that $\forall \rmS \subseteq \verts\setminus\{Y,X\}$:
+  \begin{gather}
+    \label{eq:k-faith-1}
+    \begin{aligned}
+      &Y \dep{\gr} X \mid \rmS\\
+      &\implies
+      \exists \rmZ \in \power{\leq k}(\verts\setminus\{Y,X\}) :
+      %   \forall \rmS' \subseteq \rmS :
+      %   Y \dep{\pr} X \mid \rmZ \cup \rmS.
+        \kassoc{\rmS}{Y,X}{\rmZ},
+    \end{aligned}
+    \intertext{where}
+    \begin{aligned}
+      \kassoc{\rmS}{Y,X}{\rmZ} \coloneq
+      \forall \rmS' \subseteq \rmS : Y \dep{\pr} X \mid \rmZ \cup \rmS.
+    \end{aligned}
+  \end{gather}
+  However, the definition in \Cref{eq:k-faith-1} allows $k$ to be larger
+  than it needs to be---i.e. $k$ is not strict. Therefore, we say that
+  the graph $\gr$ is \emph{strictly} $k$-order faithful to the
+  distribution $\pr$ if $\forall \rmS \subseteq \verts\setminus\{Y,X\}$:
+  \begin{gather}
+    \label{eq:10}
+    \begin{aligned}
+      &Y \dep{\gr} X \mid \rmS\\
+      &\implies
+      \exists \rmZ \in \powereq{k}{\verts\setminus\{Y,X\}} :
+      \kdep{\rmS}{Y,X}{\rmZ}
+    \end{aligned}
+    \intertext{where}
+    \begin{aligned}
+      &\kdep{\rmS}{Y,X}{\rmZ}\\
+      &\coloneq
+        \kassoc{\rmS}{Y,X}{\rmZ}
+        \wedge
+        (\forall \rmZ' \subset \rmZ :
+                \neg\kassoc{\rmS}{Y,X}{\rmZ'}).
+    \end{aligned}
+  \end{gather}
+  This implication follows directly from \Cref{lem:k-dep-to-assoc}.
+% \begin{gather}
+%     \begin{aligned}
+%       &\forall \rmS \subseteq \subverts{YX} :
+%       Y \dep{\gr} X \mid \rmS\\
+%       &\implies
+%       \exists \rmZ \in \power{\leq k}(\subverts{YX})\:\:
+%       \forall \rmS \subseteq \subverts{YX} :
+%       Y \dep{\pr} X \mid \rmZ \cup \rmS\\
+%       % &\implies 
+%       % \exists \rmZ \in \power{\leq k}(\subverts{YX}):
+%       % \kassoc{\verts}{Y,X}{\rmZ}\\
+%       % &\implies
+%       % \exists \rmZ \in \power{\leq k}(\subverts{YX}):
+%       % \kdep{\verts}{Y,X}{\rmZ}
+%     \end{aligned}
+%   \end{gather}
 \end{definition}
 rules out deterministic functions?
 
-\begin{lemma}[Association implies Markov blanket]
-  Assume that $\gr$ is k-order adjacent faithful to $\pr$. Then for any
-  $\rmZ \in \powerleq{k}{\verts}$, we know that 
-  \begin{equation}
-    \label{eq:21}
-    \kassoc{\verts}{Y,X}{\rmZ} \implies X \in \mb(Y),
-  \end{equation}
-  or in other words, $Y$ and $X$ being associated w.r.t. $\rmZ$ implies
-  that $X$ belongs to the Markov blanket of $Y$ in $\gr$.
-\end{lemma}
-
-
-\subsection{Theoretical Algorithm}
+%%% Algorithm
+\section{kOMB: k-order Markov Blanket}
 % \begin{lemma}[Ruling out $k$-associations]
 %   For distinct random variables $Y\in\rmV$ and
 %   $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$, the following holds
@@ -623,95 +669,113 @@ rules out deterministic functions?
 %   \end{equation}
 % \end{lemma}
 
-\begin{lemma}[$k$-dependance implies inter-association]
+\begin{lemma}[$k$-dependance implies inter-association]\label{lem:k-dep-inter}
   \begin{gather}
     \label{eq:13}
-    \kdep{\verts}{Y,X}{\rmZ}
+    \kdep{\rmS}{Y,X}{\rmZ}
     \implies 
-    \kinter{\verts}{Y,\rmZ \cup X}
+    \kinter{\rmS}{Y,\rmZ \cup X}
     \intertext{where}
     \begin{aligned}
-      \kinter{\verts}{Y,\rmX}
-      :=
-        \forall X\in\rmX :
-        \kassoc{\verts}{Y,X}{\rmX \setminus X}
+      \kinter{\rmS}{Y,\rmZ} := \forall Z\in\rmZ :
+      \kassoc{\rmS}{Y,Z}{\rmZ\setminus Z}
     \end{aligned}
   \end{gather}
   by contraction
 \end{lemma}
 \begin{proof}
-  Assume that for some $X'\in\rmX$
+  First assume that $\kdep{\rmS}{Y,X}{\rmZ}$ which implies,
+  \begin{gather}
+    \begin{aligned}
+      &\kdep{\rmS}{Y,X}{\rmZ}\\
+      &\implies
+      \forall \rmZ' \subset \rmZ \:\: \exists \rmS' \subseteq \rmS :
+      Y \indep{\pr} X \mid \rmZ' \cup \rmS'
+    \end{aligned}
+    .\label{eq:k-dep-inter-eq2}
+  \end{gather}
+  Furthermore, assume that
   \begin{equation}
-    \label{eq:6}
-    Y \indep{} X' \mid \rmS \cup X \cup \rmX \setminus X'
+    \label{eq:k-dep-inter-eq1}
+    \exists Z \in \rmZ \:\: \exists \rmS' \subseteq \rmS:
+    Y \indep{\pr} Z \mid X \cup \rmS' \cup \rmZ \setminus Z.
   \end{equation}
-  By the contraction graphoid axiom we know that
+  By the contraction and weak union graphoid axioms we know that for
+  some $\rmS'\subseteq\rmS$,
   \begin{equation}
     \label{eq:9}
     \begin{aligned}
-      &(Y \indep{} X' \mid \rmS \cup X \cup \rmX \setminus X')
-        \wedge (Y \indep{} X \mid \rmS \cup \rmX \setminus X')\\
-      &\implies Y \indep{} \{X', X\} \mid \rmS \cup \rmX \setminus X'
+      &(Y \indep{\pr} Z \mid X \cup \rmS' \cup \rmZ \setminus Z)
+        \wedge (Y \indep{\pr} X \mid \rmS' \cup \rmZ \setminus Z)\\
+      &\implies Y \indep{\pr} \{X, Z\} \mid \rmS' \cup \rmZ \setminus Z\\
+      &\implies Y \indep{\pr} X \mid \rmS' \cup \rmZ
     \end{aligned}
   \end{equation}
-  However this contracdicts what we know from \Cref{lemma:inv-weak-union}
-  that is 
+  However we know by definition that  
+  \begin{gather}
+    \label{eq:k-dep-inter-eq3}
+    \kdep{\rmS}{Y,X}{\rmZ} \implies
+    \forall \rmS' \subseteq \rmS : Y \dep{\pr} X \mid \rmS' \cup \rmZ,
+  \end{gather}
+  which causes a contradiction. Therefore, taking the negation of the
+  conjunction our assumptions we get
+  \begin{align*}
+    &\neg \bigl(
+    \kdep{\rmS}{Y,X}{\rmZ} \wedge\\
+    &\qquad\exists Z \in \rmZ \:\: \exists \rmS' \subseteq \rmS: 
+    Y \indep{\pr} Z \mid X \cup \rmS \cup \rmZ \setminus Z
+    \bigr)\\
+    &=\neg\kdep{\rmS}{Y,X}{\rmZ} \vee\\
+    &\qquad\forall Z \in \rmZ \:\: \forall \rmS' \subseteq \rmS: 
+    Y \dep{\pr} Z \mid X \cup \rmS \cup \rmZ \setminus Z\\
+    &=\kdep{\rmS}{Y,X}{\rmZ} \implies
+    \forall Z \in \rmZ :
+      \kassoc{\rmS}{Y,Z}{X\cup\rmZ\setminus Z}.
+  \end{align*}
+  Which in addition to the implication we know to be true in
+  \Cref{eq:k-dep-inter-eq3} results in
   \begin{equation}
-    \label{eq:14}
-    Y\dep{}X\mid \rmS \cup \rmX
-    \implies Y \dep{} \{X,X'\} \mid \rmS \cup \rmX \setminus X'
+    \label{eq:29}
+    \kdep{\rmS}{Y,X}{\rmZ} \implies \kinter{\rmS}{Y, \rmZ \cup X},
   \end{equation}
-  Therefore, our initial assumption is not possible and that for all
-  $X'\in\rmX$
-  \begin{equation}
-    \label{eq:15}
-    Y \dep{} X' \mid \rmS \cup X \cup \rmX \setminus X'
-  \end{equation}
-  by contradiction.
+  concluding our proof.
 \end{proof}
 
-\begin{lemma}[Subset]\label{lem:subset}
+\begin{lemma}[MB Subset]\label{lem:subset}
   Let $\verts' \subseteq \verts$, $X,Y \in \verts$, and $\rmZ \subseteq
   \verts \setminus (\verts' \cup \{X, Y\})$
-  \begin{equation}
+  \begin{gather}
     \label{eq:22}
-    \kdep{\verts}{Y,X}{\rmZ} \implies \kinter{\verts'}{Y,X\cup\rmZ}
-  \end{equation}
+    \begin{aligned}
+      \kdep{\rmS}{Y,X}{\rmZ}
+      \implies \kinter{\rmS'}{Y,X\cup\rmZ}
+    \end{aligned}
+  \end{gather}
 \end{lemma}
 \begin{proof}
+  For some $\rmS'\subseteq\rmS$
   \begin{align*}
-    &\kassoc{\verts}{Y,X}{\rmZ}
-    = \forall \rmS \subseteq \verts \setminus \{Y,X\} :
-      Y \dep{\pr} X \mid \rmZ \cup \rmS\\
-    &\iff \forall \verts' \subseteq \verts \:\:
-      \forall \rmS \subset \verts' \setminus \{Y,X\} :
-      Y \dep{\pr} X \mid \rmZ \cup \rmS\\
-    &\iff \forall \verts' \subseteq \verts :
-      \kassoc{\verts'}{Y,X}{\rmZ}
+    \kassoc{\rmS}{Y,X}{\rmZ}
+    \iff &\forall \rmS^{*} \subseteq \rmS :
+           Y \dep{\pr} X \mid \rmZ \cup \rmS^{*}\\
+    \implies
+         &\forall \rmS^{*} \subseteq \rmS' :
+           Y \dep{\pr} X \mid \rmZ \cup \rmS^{*}\\
+    \iff &\kassoc{\rmS'}{Y,X}{\rmZ}
   \end{align*}
-  Therefore, for any subset $\verts'\subseteq\verts$
-  \begin{equation}
-    \label{eq:4}
-    \kassoc{\verts}{Y,X}{\rmZ} \implies \kassoc{\verts'}{Y,X}{\rmZ}
-  \end{equation}
+  Using the results from \Cref{lem:k-dep-inter} and let $\rmW = X \cup
+  \rmZ$, 
   \begin{align*}
-    &\kassoc{\verts}{Y,X}{\rmZ}
-      \implies \forall Z \in \rmZ :
-      \kassoc{\verts}{Y,Z}{X\cup \rmZ \setminus Z}\\
-    &\iff \forall Z \in \rmZ \:\:
-      \forall \verts' \subseteq \verts :
-      \kassoc{\verts'}{Y,Z}{X\cup \rmZ \setminus Z}
+    \kdep{\rmS}{Y,X}{\rmZ}
+    \implies &\forall Z \in\rmZ :
+               \kassoc{\rmS}{Y,Z}{X\cup\rmZ\setminus Z}\\
+    \implies &\forall Z \in\rmZ :
+               \kassoc{\rmS'}{Y,Z}{X\cup\rmZ\setminus Z}
   \end{align*}
-  Therefore, for any subset $\verts'\subseteq\verts$
-  \begin{equation}
-    \label{eq:4}
-    \kassoc{\verts}{Y,X}{\rmZ} \implies
-    \forall Z \in \rmZ : \kassoc{\verts'}{Y,Z}{X \cup \rmZ \setminus Z'}
-  \end{equation}
   Therefore
   \begin{align*}
-    \kdep{\verts}{Y,X}{\rmZ}&\implies\kassoc{\verts}{Y,X}{\rmZ}\\
-    &\implies\kinter{\verts'}{Y,X\cup\rmZ}
+    \kdep{\rmS}{Y,X}{\rmZ}
+    \implies\kinter{\rmS'}{Y,X\cup\rmZ}
     % &\implies
     % \kassoc{\verts'}{Y,X}{\rmZ}
     % \wedge\\
@@ -725,30 +789,30 @@ rules out deterministic functions?
 needed for practical algorithm
 \begin{definition}[Bounded Separator Assumption]\label{def:bound-sep}
   Let $\gr=(\verts,\edges)$, $l\in\mathbb{N}$, and assume $k$-order
-  adjacency faithfulness from \Cref{def:k-adj-faith},
-  \begin{align*}
-    &\adj{\gr}{Y,X}\\
-    &\iff
-    \:\exists \rmZ \in \powerleq{k}{\mb(Y) \setminus X}:
-      \ldep{\verts}{Y,X}{\rmZ}
-  \end{align*}
-  where
-  \begin{align}
-    &\begin{aligned}
-      &\lassoc{\verts}{Y,X}{\rmZ}\\
-      &:= \forall \rmS \in \powerleq{l}{\verts\setminus\{Y,X\}} :
-        Y \dep{\pr} X \mid \rmZ \cup \rmS\\
-    \end{aligned}\\
-    &\begin{aligned}
-      &\ldep{\verts}{Y,X}{\rmZ}\\
-      &:=
-      \lassoc{\verts}{Y,X}{\rmZ} \wedge
-      \forall \rmZ'\subset\rmZ :
-      \neg\lassoc{\verts}{Y,X}{\rmZ'}
+  adjacency faithfulness from \Cref{def:k-faith},
+  $\forall\rmS \subseteq \subverts$
+  \begin{gather*}
+    \begin{aligned}
+      & \forall \rmZ \in \power{\leq k}(\verts\setminus\{Y,X\})\:\:
+        \exists \rmS' \in \powerleq{l}{\rmS}:
+        Y \indep{\pr} X \mid \rmZ \cup \rmS'\\
+      &\implies
+      Y \indep{\gr} X \mid \rmS,
     \end{aligned}
-  \end{align}
-  and $\verts'=\verts\setminus\{Y,X\}$
-  
+  \end{gather*}
+  note that reversing the quantifiers here would not work, especially if $l=1$.
+\begin{gather*}
+  \begin{aligned}
+    Y \dep{\gr} X \mid \rmS 
+    &\implies
+      \exists \rmZ \in \power{\leq k}(\verts\setminus\{Y,X\})\:\:
+      \forall \rmS' \in \powerleq{l}{\rmS}: \\
+    &\qquad\qquad Y \dep{\pr} X \mid \rmZ \cup \rmS'\\
+    &\implies \exists \rmZ \in \powereq{k}{\verts\setminus\{Y,X\}}\:\:
+      \forall \rmS' \in \powerleq{l}{\rmS}:\\
+    &\qquad\qquad\kdep{\rmS'}{Y,X}{\rmZ}
+  \end{aligned}
+  \end{gather*}
   relation to global/local markov?
   Therefore, 
 \end{definition}
@@ -770,128 +834,6 @@ needed for practical algorithm
 %   \Return{$\rmS$}\;
 % \end{algorithm}
 
-\begin{lemma}[Finding $k$-dependance from association]
-  For distinct random variables $Y,X\in\rmV$ and
-  $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$, the following holds
-  for all $\rmS \subset \rmV \setminus \rmX \cup \{Y\}$
-  \begin{equation}
-    \label{eq:11}
-    \kassoc{\verts}{X,Y}{\rmX}
-    \implies \exists \rmZ \subseteq \rmX : \kdep{\verts}{X,Y}{\rmZ}
-  \end{equation}
-\end{lemma}
-\begin{proof}[Proof by induction]
-  With subsets of $\rmX$ of size $1$, $\rmZ\in\powereq{1}{\rmX}$, we
-  know by definition that if $X$ and $Y$ are associated w.r.t. $\rmZ$,
-  it immediately follows that $X$ and $Y$ are also $1$-dependant
-  w.r.t. $\rmZ$ and vice versa,
-  \begin{equation}
-    \label{eq:12}
-    \kassoc{\verts}{X,Y}{\rmZ}
-    \iff \kdep{\verts}{X,Y}{\rmZ}.
-  \end{equation}
-  Now assume that $Y$ is not associated with any subsets in
-  $\powerleq{k}{\rmX}$. Then we know that if $Y$ is associated with any
-  subset in $\powereq{k+1}{\rmX}$, it implies a $(k+1)$-dependance
-  between $X$ and $Y$. Therefore the existance of any association
-  implies a potentially lower order dependance for some subset.
-\end{proof}
-
-\begin{theorem}[Correctness of \Cref{alg:ci-test}]
-  
-\end{theorem}
-\begin{proof}
-  When called by \textit{find\_assoc}, the function \textit{not\_ci}
-  receives the subset $\rmX\in\powerleq{k}{\verts'\setminus\rmS}$ and
-  then further iterates over $\rmX'\in\powerleq{k'}{\rmS}$ where
-  $k'=\max(k-|\rmX|, 1)$. Therefore the effective search space for
-  $\rmZ := \rmX \cup \rmX'$ are the sets in $\powerleq{k+1}{\verts'}$.
-
-  If any of the sets $\rmZ \in \powerleq{k+1}{\verts'}$ are causes $Y$
-  and $X$ to be dependent, $Y \dep{\pr} X \mid \rmZ$, \textit{not\_ci}
-  calls \textit{no\_sep} to determine if there are any subsets in
-  $\rmS' \in \powerleq{l}{\rmS \setminus \rmZ}$ that causes $Y$ and $X$
-  to be independent, $Y \dep{\pr} X \mid \rmZ \cup \rmS'$.
-
-  Under the $l$-bounded separator assmuption in \Cref{def:bound-sep}, we
-  know that
-  \begin{align*}
-    &\adj{\gr}{Y,X}\\
-    &\iff
-    \exists \rmZ \in \powerleq{k}{\mb(Y) \setminus X}:
-      \ldep{\verts}{Y,X}{\rmZ}\\
-    &\implies
-    \exists \rmZ \in \powerleq{k}{\mb(Y) \setminus X}:
-      \lassoc{\verts'}{Y,X}{\rmZ}
-  \end{align*}
-  which is logically equivalent to its contrapositive
-  \begin{align*}
-    &\forall \rmZ \in \powerleq{k}{\mb(Y) \setminus X}:
-    \neg \lassoc{\verts'}{Y,X}{\rmZ}\\
-    &\iff \forall\rmZ \in \powerleq{k}{\mb(Y) \setminus X} \:\:
-      \exists \rmS \in \powerleq{l}{\verts'} :\\
-      &\qquad\qquad Y \indep{\pr} X \mid \rmZ \cup \rmS\\
-    &\implies \neg \adj{\gr}{Y,X}.
-  \end{align*}
-  Therefore, whenever \textit{no\_seps} finds a subset of the candidate
-  Markov blanket $\rmS'\subseteq\rmS$ that causes $Y \indep{\pr} X \mid
-  \rmZ \cup \rmS$, we know for certain that $Y$ and $X$ are not adjacent
-  in $\gr$ under both the bounded separator and $k$-order adjacency
-  faithfulness assumption.
-  
-  Therefore, since the function \textit{no\_seps} only returns
-  \texttt{True} when
-  $\forall \rmS' \in \powerleq{l}{\rmV\setminus\{X,Y\}} : X \dep{\gr} Y
-  \mid \rmS'$
-  
-  However, recall that we are mainly interested in determining if $Y
-  \dep{\pr} X \mid \rmZ \cup \verts'$. Therefore by negating the bounded
-  separator assumption we get
-  \begin{equation*}
-    (Y,X)\in\edges
-    \iff \forall \rmS' \in \powerleq{l}{\rmV\setminus\{X,Y\}} :
-    X \dep{\gr} Y \mid \rmS'
-  \end{equation*}
-\end{proof}
-
-\begin{theorem}[Correctness of \Cref{alg:assoc-mine}]
-  
-\end{theorem}
-\begin{proof}
-  The function \textit{find\_assoc} in \Cref{alg:komb} is a recursive
-  function where for each recursive call of the function, it is passed a
-  subset of all the variables except $Y$ and $\rmS$ with length less
-  than or equal to $k$, $\rmX \in \powerleq{k}{\verts' \setminus \rmS}$.
-
-  During each function call, \textit{find\_assoc} iterates through each
-  varible $X$ that has not been included in $\rmX$ yet and determines if
-  there is a subset $\rmS'\subseteq \rmS$ of the candidate Markov blanket
-  $\rmS$ such that $|\rmX \cup \rmS'| \leq k + 1$ and
-  $Y \dep{\pr} X \mid \rmX \cup \rmS' \cup \rmS$. Therefore, the
-  effective search space for $\rmZ := \rmX \cup \rmS'$ is all subsets of
-  $\verts'$ with length less than or equal to $k+1$,
-  $\powerleq{k+1}{\verts'}$.
-
-  If $Y \dep{\pr} X \mid \rmZ \cup \rmS$, we know that
-  $\kassoc{\rmS}{Y,X}{\rmZ}$ is true and pass $\rmZ$ to the function
-  \textit{make\_strict} to find a subset $\rmZ'\subseteq\rmZ$ such that
-  $\kinter{\rmS}{Y, X \cup \rmZ'}$.
-
-  Since from \Cref{lem:subset} we know that
-  \begin{equation*}
-    \kdep{\verts}{Y,X}{\rmZ'} \implies \kinter{\rmS}{Y,X\cup\rmZ'},
-  \end{equation*}
-  therefore \textit{find\_assoc} will always return $X \cup \rmZ'$
-  whenever it encounters a combination of $X$ and $\rmZ'$ that are
-  truely $k$-dependent where $|\rmZ'|\leq k+1$.
-\end{proof}
-
-\begin{theorem}[Correctness of \Cref{alg:komb}]
-\end{theorem}
-\begin{proof}
-  During the grow-phase (lines 1 to 6) we find a subset of 
-\end{proof}
-
 \begin{algorithm}
   \caption{kOMB (Pratical Implementation)}\label{alg:komb}
   % \DontPrintSemicolon
@@ -904,7 +846,7 @@ needed for practical algorithm
   % (\tcp*[f]{While $\exists \rmX' \subseteq \rmV' \setminus \rmS : Y
   %   \strictdep{P} \rmX' \mid \rmS$})
   {$\rmX' = \emptyset$}{
-    $\rmX' \gets $ find\_assoc($Y$, $\emptyset$, $\rmS$, $\verts'$)\;
+    $\rmX' \gets $ find\_dep($Y$, $\emptyset$, $\rmS$, $\verts'$)\;
     $\rmS \gets \rmS \cup \rmX'$
   }
   \While{$\exists X \in \rmS : Y \indep{\pr} X \mid \rmS \setminus X$}{
@@ -918,35 +860,43 @@ needed for practical algorithm
   \caption{Association Mining}\label{alg:assoc-mine}
   % \DontPrintSemicolon
   \SetKwProg{Fn}{Function}{:}{}
-  \Fn{make\_strict($Y$, $X$, $\rmX$, $\rmS$, $k$, $l$)}{
+  \Fn{make\_strict($Y$, $X$, $\rmZ$, $\rmS$, $k$, $l$)}{
     \Inv{$Y \dep{} X \mid \rmX \cup \rmS$}
     % \KwOut{$\rmX'\subseteq\rmX$ s.t. $Y \dep{} X \mid \rmX' \cup \rmS$
     %   and $\forall X'\in\rmX' : Y \indep{} X \mid \rmS \cup \rmX'
     %   \setminus X'$}
-    \KwOut{$X\cup\rmX'$ s.t. $\rmX'\subseteq\rmX$ and $\kinter{\rmS}{Y,X\cup\rmX'}$}
-    \While{$\exists Z \in \rmX : \neg$not\_ci($Y$, $Z$, $X\cup\rmX
-      \setminus X'$, $\rmS$, $k$, $l$)}{
-      remove $Z$ from $\rmX$\;
+    \KwOut{$X\cup\rmX'$ s.t. $\rmX'\subseteq\rmX$ and
+      $\kinter{\rmS}{Y,X\cup\rmX'}$}
+    \For{$Z \in \rmZ$}{
+      \If{$\neg$ no\_seps($Y$, $Z$, $X\cup\rmZ
+        \setminus Z$, $\rmS$, $k$, $l$)}{
+        remove $Z$ from $\rmZ$\;
+      }
     }
-    \Return{$X\cup\rmX'$}\;
+    \Return{$X\cup\rmZ$}\;
   }
-  \Fn{find\_assoc($Y$, $\rmX$, $\rmS$, $\rmV'$, $k$, $l$)}{
+  \Fn{find\_inter\_dep($Y$, $\rmX$, $\rmS$, $\rmV'$, $k$, $l$)}{
     \KwOut{$\rmX\subseteq\rmV'\setminus\rmS$
       s.t. $\kinter{\rmS}{Y,\rmX}$}
     \If{$|\rmX| > k$}{
       \Return{$\emptyset$}\;
     }
-    \For{$X \in \rmV'\setminus(\rmS \cup \rmX)$}{
-      \If{not\_ci($Y$, $X$, $\rmX$, $\rmS$, $k$, $l$)}{
-        \tcp{$Y \dep{} X \mid \rmX \cup \rmS$}
-        \Return{make\_strict($Y$, $X$, $\rmX$, $\rmS$, $k$, $l$)}\;
+    \For{$X \in \rmV\setminus(\rmS \cup \rmX)$}{
+      $\rmZ\gets$\textit{find\_cond}
+      ($Y$, $X$, $\rmX$, $\rmS$, $k$, $l$)\;
+      \If{$\rmZ \neq \emptyset$}{
+        \tcp{$\forall \rmS'\in\powerleq{l}{\rmS} :
+          Y \dep{} X \mid \rmZ \cup \rmS'$}
+        \Return{make\_strict($Y$, $X$, $\rmZ$, $\rmS$, $k$, $l$)}\;
       }
-      $\rmV'\gets \rmV' \setminus X$\;
-      $\rmX' \gets $ find\_assoc(
-      $Y$, $\rmX\cup X$, $\rmS$, $\rmV'$, $k$, $l$)\;
-      \If{$\rmX' \neq \emptyset$}{
-        \Return{$\rmX'$}\;
-      }
+    }
+    \For{$X\in\rmV'\setminus(\rmS\cup\rmX)$}{
+        $\rmV'\gets \rmV' \setminus X$\;
+        $\rmX' \gets $ find\_inter\_dep(
+        $Y$, $\rmX\cup X$, $\rmS$, $\rmV'$, $k$, $l$)\;
+        \If{$\rmX' \neq \emptyset$}{
+          \Return{$\rmX'$}\;
+        }        
     }
     \Return{$\emptyset$}\;
   }
@@ -959,20 +909,21 @@ needed for practical algorithm
   % \KwIn{$Y$, $X$, $\rmX$, $\rmS$, $k$, $l$, $\alpha$}
   % \KwOut{is $Y \dep{} X \mid \rmX \cup \rmS$?}
   % \Inv{$\rmX \dep{} Y \mid \rmS$}
-  \Fn{not\_ci($Y$, $X$, $\rmX$, $\rmS$, $k$, $l$, $\alpha$)}{
-    \KwOut{is $Y \dep{} X \mid \rmX \cup \rmS$?}
-    $k' \gets \max(k - |\rmX|, 1)$\;
+  \Fn{find\_cond($Y$, $X$, $\rmX$, $\rmS$, $k$, $l$, $\alpha$)}{
+    % \KwOut{is $Y \dep{\pr} X \mid \rmX \cup \rmS$}
+    \KwOut{$\exists \rmX' \in \powerleq{k-|\rmX|}{\rmS} : Y \dep{\pr} X
+      \mid \rmX \cup \rmX' \cup \rmS$}
     \For{$\rmX' \in \powerleq{k'}{\rmS}$}{
       % +1 allows removing assmuption 1 from marx
       $\rmZ \gets \rmX' \cup \rmX$\;
       % $p \gets$ p-value of test $H_{0}: Y \indep{} X \mid \rmX'$\;
       \If{$Y \dep{} X \mid \rmZ$}{
         \If{no\_seps($Y$, $X$, $\rmZ$, $\rmS$, $l$, $\alpha$)}{
-          \Return{True}\;
+          \Return{$\rmZ$}\;
         }
       }
     }
-    \Return{False}\;
+    \Return{$\emptyset$}\;
   }
   \Fn{no\_seps($Y$, $X$, $\rmZ$, $\rmS$, $l$, $\alpha$)}{
     \Inv{$X \dep{} Y \mid \rmZ$}
@@ -990,229 +941,370 @@ needed for practical algorithm
 \end{algorithm}
 
 
-
-
-\section{Lattice Incremental Association Mining for Markov Blankets
-  (LIAM-MB)}
-
-% \begin{figure}
-%   \centering
-%   \begin{subfigure}{0.275\linewidth}
-%     \centering
-%     \input{./fig/lattice.tex}
-%     \caption{Subset Lattice}
-%     \label{fig:lattice}    
-%   \end{subfigure}
-%   \hspace{5em}
-%   \begin{subfigure}{0.325\linewidth}
-%     \centering
-%     \input{./fig/enum-tree.tex}
-%     \caption{Enumeration tree}
-%     \label{fig:tree}    
-%   \end{subfigure}
-%   \caption{Comparison between lattice and tree}
-%   \label{fig:comparison}
-% \end{figure}  
-% \begin{figure}  
-%   \begin{subfigure}{0.325\linewidth}
-%     \centering
-%     \input{./fig/enum-tree-one.tex}
-%     % \caption{$\cdf(G_{a};\df(a)) \leq \alpha$\\therefore $a$ should
-%     % be in $\mb$}
-%     \caption{\centering\\
-%       $\cdf(G_{a};\df(a)) \leq \alpha$\\ $\implies a \not\indep t
-%       \mid \mb$}
-%     \label{fig:tree}    
-%   \end{subfigure}
-%   \hfill
-%   \begin{subfigure}{0.325\linewidth}
-%     \centering
-%     \input{./fig/enum-tree-two.tex}
-%     \caption{\centering\\
-%       $\cdf(G_{\{a,b\}};\df(\{a,b\})) > \alpha$\\
-%       $\implies \{a,b\} \indep t \mid \mb$ not rejected}
-%     \label{fig:tree}    
-%   \end{subfigure}
-%   \hfill
-%   \begin{subfigure}{0.325\linewidth}
-%     \centering
-%     \input{./fig/enum-tree-three.tex}
-%     \caption{\centering\\
-%       Prune nodes that have $\geq$ degrees of freedom than
-%       $\df(\{a,b\})$.
-%     }
-%     \label{fig:tree}    
-%   \end{subfigure}
-%   \caption{Comparison between lattice and tree}
-%   \label{fig:comparison}
-% \end{figure}
-
-\begin{proposition}[Maximum Testable Degrees of Freedom given a Dataset]
-  The  over all the variables of 
-\end{proposition}
-
-As we have discussed, our approach builds upon the two-phase approach of
-IAMB. Specifically, we want to find the variables that should be in the
-MB of $t$ that Phase \romannum{1} of IAMB did not find before the last
-pruning step.  Therefore, after the first phase IAMB, our approach will
-conduct a theorectically exhaustive search over all possible subsets
-$S \in \mathcal{P}(\rmX \setminus (\mb \cup \{t\}))$. For each subest
-$S$, our approach will test the null hypothesis
-$H_{0}(S): S \indep t \mid \mb$. The rejection of $H_{0}(S)$ implies
-that $S$---or at least a subset of $S$---belongs in the MB of $t$.  The
-total number of subsets in
-$\mathcal{P}(\rmX \setminus (\mb \cup \{t\}))$ is exponential in the
-size of $\rmR \coloneqq \rmX \setminus (\mb \cup \{t\})$. Therefore, by
-carrying out Phase \Romannum{1} of IAMB first, we can increase the size
-of $\mb$ and decrease the search space of the exhaustive search.
-
-% \begin{wrapfigure}{l}{0.5\linewidth}
-%   \begin{minipage}[t]{\linewidth}
-% \begin{algorithm}[H]
-%   \caption{Lattice Mining (\texttt{lattice})}
-%   % \DontPrintSemicolon
-%   \KwIn{$\db$, $\rmX$, $t$, $\mb$, $\alpha$}
-%   \KwOut{Output result}
-%   $\rmS \gets [\emptyset]$\;
-%   $\rmA \gets [\rmX]$\;
-%   $\df_{\max} \gets \infty$\; 
-%   \For{each $\rvx\in\mb$}{
-%     $S \gets \pop(\rmS)$\;
-%     $A \gets \pop(\rmA)$\;
-%     $\df_{\cur} \gets \df(\rvs)$\;
-%     \If{$|S| > 0$}{
-%       \If{$S \not\indep t \mid \mb$}{
-%         \Return{$S$}\;
-%       }
-%       \If{$1 - \cdf(G_{S\cup A}; \df(S)) > \alpha$}{
-%         $\df_{\max} \gets \df_{\cur}$\;
-%         \Comment{Pruning of supersets according to
-%           \Cref{thm:prune-superset}.}
-%         continue\; 
-%       }
-%     }
-%     \Comment{Don't explore subsets that exceed the current maximum degrees
-%       of freedom via \Cref{thm:prune}.}
-%     $A' \gets \{a \mid a\in A, \df(S \cup \{a\}) < \df_{\max}\}$\;
-%     \For{$i \in [1, |A'|]$}{
-%       $a \gets A'_{i}$\;
-%       push $S \cup \{a\}$ on to $\rmS$\;
-%       push $A'[1,\ldots,i-1]$ on to $\rmA$\;
-%     }
-%     \Return{$\emptyset$};
-%   }
-% \end{algorithm}
-% \begin{algorithm}[H]
-%   \caption{LIAM-MB}
-%   % \DontPrintSemicolon
-%   \KwIn{$\db$, $\rmX$, $t$, $\alpha$}
-%   \KwOut{Output result}
-%   $\mb \gets \texttt{forward}(\db, \rmX, t, \alpha)$\;
-%   \While{$|\rmX| > 0$}{
-%     $S \gets \texttt{lattice}(\db, \rmX, t, \mb, \alpha)$\;
-%     \If{$S==\emptyset$}{
-%       break\;
-%     }
-%     \For{$a \in S$}{
-%       Remove $a$ from $\rmX$\;
-%       Insert $a$ into $\mb$\;
-%     }
-%   }
-%   $\mb \gets \texttt{backward}(\db, \mb, t, \alpha)$\;
-%   \Return{$\mb$}\;
-% \end{algorithm}
-% \end{minipage}  
-% \end{wrapfigure}
-
-Since the search space is the powerset $\mathcal{P}(\rmR)$, it can be
-naturally represented as a subset lattice---see \Cref{fig:lattice} for
-an example over three variables. When traversing the subset lattice in a
-depth-first order, the resulting search order can be represented as an
-enumeration tree as seen in \Cref{fig:tree}.
-
-\begin{definition}[Enumeration Tree]
-  An enumeration tree $\tree$ has nodes for each subset in the powerset
-  $V(\tree)=\mathcal{P}(\rmR)$. Let $A(S)$ for some $S\in V(\tree)$ be
-  the variables in its descendants not in $S$. Let $S_{i}$ be the $i$-th
-  node visited during a depth-wise traversal of the corresponding
-  lattice. Then by definition:
+\begin{theorem}[Correctness of \Cref{alg:ci-test}]
   \begin{equation}
-    \label{eq:set-enum}
-    S_{i}\cup A(S_{i}) \supseteq S_{j}\cup A(S_{j})
+    \label{eq:25}
+    \exists \rmX' \in \powerleq{k}{\rmS} \:\:
+    \forall \rmS' \in \powerleq{l}{\rmS \setminus \rmX'} :
+    Y \dep{\pr} X \mid \rmX \cup \rmX' \cup \rmS'
   \end{equation}
-  where $j > i$.
-\end{definition}
+\end{theorem}
+% \begin{proof}
+%   When called by \textit{find\_assoc}, the function \textit{not\_ci}
+%   receives the subset $\rmX\in\powerleq{k}{\verts'\setminus\rmS}$ and
+%   then further iterates over $\rmX'\in\powerleq{k'}{\rmS}$ where
+%   $k'=\max(k-|\rmX|, 1)$. Therefore the effective search space for
+%   $\rmZ := \rmX \cup \rmX'$ are the sets in $\powerleq{k+1}{\verts'}$.
 
-The property in \Cref{eq:set-enum} will allow us to prune chunks of the
-search space based on properties of $S_{i}$. Specifically we desire a
-way to determine at subset $S_{i}$ which proceeding subsets
-$j>i : S_{j}$ will not be capable of rejecting the conditional
-independence test.
+%   If any of the subsets $\rmZ \in \powerleq{k+1}{\verts'}$ causes $Y$
+%   and $X$ to be dependent, $Y \dep{\pr} X \mid \rmZ$, \textit{not\_ci}
+%   calls \textit{no\_sep} to determine if there are any subsets in
+%   $\rmS' \in \powerleq{l}{\rmS \setminus \rmZ}$ that causes $Y$ and $X$
+%   to be independent, $Y \indep{\pr} X \mid \rmZ \cup \rmS'$.
 
-\begin{theorem}[Pruning based on maximum degrees of freedom]
-  \label{thm:prune}
-  At some node in the enumeration tree $(S_{i}, A_{i})$, if
+%   Under the $l$-bounded separator assmuption in \Cref{def:bound-sep}, we
+%   know that for some subset $\verts' \subseteq \verts\setminus\{Y,X\}$
+%   \begin{align*}
+%     \forall \rmS \subseteq \verts
+%     &\setminus\{Y,X\} : Y \dep{\gr} X \mid \rmS\\
+%     \iff
+%      &\exists \rmZ \in \powerleq{k}{\verts\setminus\{Y,X\}} :
+%       \ldep{\verts}{Y,X}{\rmZ}\\
+%     \implies
+%      &\exists \rmZ \in \powerleq{k}{\verts\setminus\{Y,X\}} :
+%       \lassoc{\verts'}{Y,X}{\rmZ},
+%   \end{align*}
+%   which is logically equivalent to its contrapositive
+%   \begin{align*}
+%      &\forall\rmZ \in \powerleq{k}{\verts\setminus\{Y,X\}} \:
+%       \exists \rmS' \in \powerleq{l}{\verts'} :
+%        Y \indep{\pr} X \mid \rmZ \cup \rmS'\\
+%      &\implies 
+%        \exists \rmS^{*} \subseteq \verts
+%        \setminus\{Y,X\} : Y \indep{\gr} X \mid \rmS^{*}\\
+%      &\iff Y \indep{\gr} X \mid \verts \setminus \{Y,X\}
+%        .
+%   \end{align*}
+%   Therefore, since in \Cref{alg:ci-test} $\rmS \subseteq \verts$,
+%   whenever \textit{no\_seps} finds a subset of the candidate Markov
+%   blanket $\rmS'\subseteq\rmS\setminus\rmZ$ that causes
+%   $Y \indep{\pr} X \mid \rmZ \cup \rmS'$, we know for certain that $Y$
+%   and $X$ are separated in the graph $\gr$---but the same
+%   cannot be said in the reverse direction. That is to say
+%   \textit{no\_seps} might not always find a separator
+%   $\rmS'\subseteq\rmS$ even if $Y$ and $X$ are separated in $\gr$.
+
+%   As a result, the function \textit{not\_ci} will only return false
+%   postivies---i.e. it never indicates that $X$ and $Y$ are conditionally
+%   independent when 
+% \end{proof}
+
+\begin{theorem}[Correctness of \Cref{alg:assoc-mine}]
+  Given $Y$, \Cref{alg:assoc-mine}  returns
+  $\rmZ=X\cup\rmX\cup\rmX'$ if
+    \begin{equation*}
+    \exists \rmZ \in \powerleq{k+1}{\verts\setminus Y)}
+    : \linter{\rmS}{Y,\rmZ}.
+  \end{equation*}
+  where $(X\cup\rmX) \subseteq \verts \setminus (Y \cup \rmS)$ and
+  $\rmX' \subseteq \rmS$.
+\end{theorem}
+\begin{proof}
+  % The function \textit{find\_inter\_dep} in \Cref{alg:komb} is a
+  % recursive function where for each recursive call of the function, it
+  % is passed a subset of all the variables except $Y$ and $\rmS$ with
+  % length less than or equal to $k$,
+  % $\rmX \in \powerleq{k}{\verts' \setminus \rmS}$.
+
+  During each function call, \textit{find\_inter\_dep} iterates through
+  each varible $X$ that has not been included in $\rmX$
+  yet---$X\in\verts\setminus(Y \cup \rmX \cup \rmS)$---and calls
+  \textit{find\_cond} to find a set
+  $\rmX' \in \powerleq{k-|\rmX|}{\rmS}$ such that
+  \begin{equation*}
+    \forall \rmS' \in \powerleq{l}{\rmS \setminus \rmX'} :
+    Y\dep{\pr}X  \mid \rmX \cup \rmX' \cup \rmS'.
+  \end{equation*}
+  When such a subset $\rmX'$ is found, \textit{find\_cond} returns
+  $\rmZ=X\cup\rmX'\cup\rmX$ and $\rmZ$ is then passed on to the function
+  \textit{make\_strict} to remove any superfluous variables resulting in
+  the set $\rmZ'\subseteq\rmZ$ such that 
+  \begin{align*}
+    &\forall Z \in \rmZ'\:\:
+    \forall \rmS' \in \powerleq{l}{\rmS\setminus\rmZ}:
+    Y \dep{\pr} Z \mid \rmZ \cup \rmS' \setminus Z\\
+    &\implies \forall Z \in \rmZ' :
+      \lassoc{\rmS}{Y,Z}{\rmZ\setminus Z}\\
+    &\implies \linter{\rmS}{Y,X\cup\rmX\cup\rmX'}.
+  \end{align*}
+  Furthermore, since \textit{find\_inter\_dep} explores the
+  enumeration tree of the set $\verts \setminus (Y \cup \rmS)$ up
+  subsets of length $k+1$, we know that every subset
+  $(X\cup\rmX)\in\powerleq{k+1}{\verts \setminus (Y \cup \rmS)}$ will be
+  explored---barring any early returns. In combination with
+  \textit{find\_cond} exploring the subsets $\rmX' \in
+  \powerleq{k-|\rmX|}{\rmS}$, \textit{find\_inter\_dep} returns
+  $\rmZ=X\cup\rmX\cup\rmX'$ if
+  \begin{equation*}
+    \exists \rmZ \in \powerleq{k+1}{\verts\setminus Y)}
+    : \linter{\rmS}{Y,\rmZ}.
+  \end{equation*}
+  % Finally not that we don't explore every possible
+  % $\powerleq{k}{\subverts\setminus\rmS}$ for each $X\in\verts$. But
+  % this is fine... somehow
+\end{proof}
+
+\begin{theorem}[Correctness of Grow Phase in \Cref{alg:komb}]
   \begin{equation}
-    \label{eq:df-max-reject}
-    1 - F(G_{S_{i}\cup A_{i}}; \df(S_{i})) > \alpha
-  \end{equation}
-  then for every subsequent node in the enumeration tree $S_{j}, j > i$
-  \begin{equation}
-    \label{eq:df-max-reject}
-    \df(S_{j}) \geq \df(S_{i}) \implies
-    1 - F(G_{S_{j}\cup A_{i}}; \df(S_{j})) > \alpha
+    \label{eq:27}
+  \mbs{\gr}(Y) \subseteq \rmS 
   \end{equation}
 \end{theorem}
 \begin{proof}
-  First recall from the definition of enumeration trees that
+  At each iteration of the grow phase, we obtain
   \begin{equation*}
-    S_{i} \cup A(S_{i}) \supseteq S_{j} \cup A(S_{j})
+    \rmZ : \kinter{\rmS}{Y,X\cup\rmZ}
   \end{equation*}
-  for all $i \geq j$. Therefore, by using \Cref{thm:chi2-ineq,thm:dpi}
-  with the assumption that $\df(S_{j}) \geq \df(S_{i})$,
-  we can establish the following inequality:
-  \begin{gather*}
-    F(G_{S_{i}\cup A(S_{i})}; \df(S_{i}))
-    \underset{\text{\Cref{thm:dpi}}}{\geq}
-    F(G_{S_{j}\cup A(S_{j})}; \df(S_{i}))
-    \underset{\text{\Cref{thm:chi2-ineq}}}{\geq}
-    F(G_{S_{j}\cup A(S_{j})}; \df(S_{j}))\\
-    \implies 1 - F(G_{S_{i}\cup A(S_{i})}; \df(S_{i}))
-    \leq 1 - F(G_{S_{j}\cup A(S_{j})}; \df(S_{j}))
-  \end{gather*}
-  Therefore the following holds
-  \begin{align*}
-    \alpha < 1 - \cdf(G_{S_{i}\cup A(S_{i})}; \df(S_{i}))
-    \implies 
-    \alpha <  1 - \cdf(G_{S_{j}\cup A(S_{j})}; \df(S_{j}))
-  \end{align*}
-  whenever $\df(S_{j}) \geq \df(S_{i})$.
+  since for some $\rmS\subseteq \subverts$
+  \begin{align}
+    &Y \dep{\gr} X \mid \verts \iff X \in \mbs{\gr}(Y)\\
+    &\implies \exists \rmZ \in \powereq{k}{\subverts}:
+      \kdep{\verts}{Y,X}{\rmZ}\\
+    &\implies \exists \rmZ \in \powereq{k}{\subverts}:
+      \kinter{\rmS}{Y,X\cup\rmZ}\\
+    &\implies (X\cup\rmZ) \subseteq \rmS
+  \end{align}
+  where the penultimate implication follows from \Cref{lem:subset} and
+  the last implication follows from line 5 of \Cref{alg:komb} where
+  \method adds the subset $X\cup\rmZ$---found by the algorithm such
+  that $\kinter{\rmS}{Y,X\cup\rmZ}$---into $\rmS$.
 \end{proof}
-\begin{corollary}[Pruning Supersets]
-  \label{thm:prune-superset}
-  At some node in the enumeration tree $S_{i}$, if
-  \begin{equation}
-    \label{eq:max-reject}
-    1 - F(G_{S_{i}\cup A(S_{i})}; \df(S_{i})) > \alpha
-  \end{equation}
-  where $\alpha$ is some prescribed significance level, then it follows
-  directly from \Cref{thm:prune} that
-  \begin{equation}
-    \label{eq:max-pruned}
-    \forall S' \supseteq S : 1 - \cdf(G_{S'}; \df(S')) > \alpha
-  \end{equation}
-  since $S' \supseteq S \implies \df(S') \geq \df(S)$.
-  % therefore, when \Cref{eq:max-reject} is true, no superset of $S$ can
-  % have their conditional independence hypothesis be
-  % rejected. Consequently, we cannont definitively accept the hypothesis
-  % that any superset of $S$ is in the MB of $t$.
-\end{corollary}
 
-This implies that at $S_{i}$, we can prune entire branch.
+%%%% Complexity
+\subsection{Complexity of \method}
 
-- conjecture same result as IAMB
-- Complexity?
-- 
+
+% \section{Lattice Incremental Association Mining for Markov Blankets
+%   (LIAM-MB)}
+
+% % \begin{figure}
+% %   \centering
+% %   \begin{subfigure}{0.275\linewidth}
+% %     \centering
+% %     \input{./fig/lattice.tex}
+% %     \caption{Subset Lattice}
+% %     \label{fig:lattice}    
+% %   \end{subfigure}
+% %   \hspace{5em}
+% %   \begin{subfigure}{0.325\linewidth}
+% %     \centering
+% %     \input{./fig/enum-tree.tex}
+% %     \caption{Enumeration tree}
+% %     \label{fig:tree}    
+% %   \end{subfigure}
+% %   \caption{Comparison between lattice and tree}
+% %   \label{fig:comparison}
+% % \end{figure}  
+% % \begin{figure}  
+% %   \begin{subfigure}{0.325\linewidth}
+% %     \centering
+% %     \input{./fig/enum-tree-one.tex}
+% %     % \caption{$\cdf(G_{a};\df(a)) \leq \alpha$\\therefore $a$ should
+% %     % be in $\mb$}
+% %     \caption{\centering\\
+% %       $\cdf(G_{a};\df(a)) \leq \alpha$\\ $\implies a \not\indep t
+% %       \mid \mb$}
+% %     \label{fig:tree}    
+% %   \end{subfigure}
+% %   \hfill
+% %   \begin{subfigure}{0.325\linewidth}
+% %     \centering
+% %     \input{./fig/enum-tree-two.tex}
+% %     \caption{\centering\\
+% %       $\cdf(G_{\{a,b\}};\df(\{a,b\})) > \alpha$\\
+% %       $\implies \{a,b\} \indep t \mid \mb$ not rejected}
+% %     \label{fig:tree}    
+% %   \end{subfigure}
+% %   \hfill
+% %   \begin{subfigure}{0.325\linewidth}
+% %     \centering
+% %     \input{./fig/enum-tree-three.tex}
+% %     \caption{\centering\\
+% %       Prune nodes that have $\geq$ degrees of freedom than
+% %       $\df(\{a,b\})$.
+% %     }
+% %     \label{fig:tree}    
+% %   \end{subfigure}
+% %   \caption{Comparison between lattice and tree}
+% %   \label{fig:comparison}
+% % \end{figure}
+
+% \begin{proposition}[Maximum Testable Degrees of Freedom given a Dataset]
+%   The  over all the variables of 
+% \end{proposition}
+
+% As we have discussed, our approach builds upon the two-phase approach of
+% IAMB. Specifically, we want to find the variables that should be in the
+% MB of $t$ that Phase \romannum{1} of IAMB did not find before the last
+% pruning step.  Therefore, after the first phase IAMB, our approach will
+% conduct a theorectically exhaustive search over all possible subsets
+% $S \in \mathcal{P}(\rmX \setminus (\mb \cup \{t\}))$. For each subest
+% $S$, our approach will test the null hypothesis
+% $H_{0}(S): S \indep t \mid \mb$. The rejection of $H_{0}(S)$ implies
+% that $S$---or at least a subset of $S$---belongs in the MB of $t$.  The
+% total number of subsets in
+% $\mathcal{P}(\rmX \setminus (\mb \cup \{t\}))$ is exponential in the
+% size of $\rmR \coloneqq \rmX \setminus (\mb \cup \{t\})$. Therefore, by
+% carrying out Phase \Romannum{1} of IAMB first, we can increase the size
+% of $\mb$ and decrease the search space of the exhaustive search.
+
+% % \begin{wrapfigure}{l}{0.5\linewidth}
+% %   \begin{minipage}[t]{\linewidth}
+% % \begin{algorithm}[H]
+% %   \caption{Lattice Mining (\texttt{lattice})}
+% %   % \DontPrintSemicolon
+% %   \KwIn{$\db$, $\rmX$, $t$, $\mb$, $\alpha$}
+% %   \KwOut{Output result}
+% %   $\rmS \gets [\emptyset]$\;
+% %   $\rmA \gets [\rmX]$\;
+% %   $\df_{\max} \gets \infty$\; 
+% %   \For{each $\rvx\in\mb$}{
+% %     $S \gets \pop(\rmS)$\;
+% %     $A \gets \pop(\rmA)$\;
+% %     $\df_{\cur} \gets \df(\rvs)$\;
+% %     \If{$|S| > 0$}{
+% %       \If{$S \not\indep t \mid \mb$}{
+% %         \Return{$S$}\;
+% %       }
+% %       \If{$1 - \cdf(G_{S\cup A}; \df(S)) > \alpha$}{
+% %         $\df_{\max} \gets \df_{\cur}$\;
+% %         \Comment{Pruning of supersets according to
+% %           \Cref{thm:prune-superset}.}
+% %         continue\; 
+% %       }
+% %     }
+% %     \Comment{Don't explore subsets that exceed the current maximum degrees
+% %       of freedom via \Cref{thm:prune}.}
+% %     $A' \gets \{a \mid a\in A, \df(S \cup \{a\}) < \df_{\max}\}$\;
+% %     \For{$i \in [1, |A'|]$}{
+% %       $a \gets A'_{i}$\;
+% %       push $S \cup \{a\}$ on to $\rmS$\;
+% %       push $A'[1,\ldots,i-1]$ on to $\rmA$\;
+% %     }
+% %     \Return{$\emptyset$};
+% %   }
+% % \end{algorithm}
+% % \begin{algorithm}[H]
+% %   \caption{LIAM-MB}
+% %   % \DontPrintSemicolon
+% %   \KwIn{$\db$, $\rmX$, $t$, $\alpha$}
+% %   \KwOut{Output result}
+% %   $\mb \gets \texttt{forward}(\db, \rmX, t, \alpha)$\;
+% %   \While{$|\rmX| > 0$}{
+% %     $S \gets \texttt{lattice}(\db, \rmX, t, \mb, \alpha)$\;
+% %     \If{$S==\emptyset$}{
+% %       break\;
+% %     }
+% %     \For{$a \in S$}{
+% %       Remove $a$ from $\rmX$\;
+% %       Insert $a$ into $\mb$\;
+% %     }
+% %   }
+% %   $\mb \gets \texttt{backward}(\db, \mb, t, \alpha)$\;
+% %   \Return{$\mb$}\;
+% % \end{algorithm}
+% % \end{minipage}  
+% % \end{wrapfigure}
+
+% Since the search space is the powerset $\mathcal{P}(\rmR)$, it can be
+% naturally represented as a subset lattice---see \Cref{fig:lattice} for
+% an example over three variables. When traversing the subset lattice in a
+% depth-first order, the resulting search order can be represented as an
+% enumeration tree as seen in \Cref{fig:tree}.
+
+% \begin{definition}[Enumeration Tree]
+%   An enumeration tree $\tree$ has nodes for each subset in the powerset
+%   $V(\tree)=\mathcal{P}(\rmR)$. Let $A(S)$ for some $S\in V(\tree)$ be
+%   the variables in its descendants not in $S$. Let $S_{i}$ be the $i$-th
+%   node visited during a depth-wise traversal of the corresponding
+%   lattice. Then by definition:
+%   \begin{equation}
+%     \label{eq:set-enum}
+%     S_{i}\cup A(S_{i}) \supseteq S_{j}\cup A(S_{j})
+%   \end{equation}
+%   where $j > i$.
+% \end{definition}
+
+% The property in \Cref{eq:set-enum} will allow us to prune chunks of the
+% search space based on properties of $S_{i}$. Specifically we desire a
+% way to determine at subset $S_{i}$ which proceeding subsets
+% $j>i : S_{j}$ will not be capable of rejecting the conditional
+% independence test.
+
+% \begin{theorem}[Pruning based on maximum degrees of freedom]
+%   \label{thm:prune}
+%   At some node in the enumeration tree $(S_{i}, A_{i})$, if
+%   \begin{equation}
+%     \label{eq:df-max-reject}
+%     1 - F(G_{S_{i}\cup A_{i}}; \df(S_{i})) > \alpha
+%   \end{equation}
+%   then for every subsequent node in the enumeration tree $S_{j}, j > i$
+%   \begin{equation}
+%     \label{eq:df-max-reject}
+%     \df(S_{j}) \geq \df(S_{i}) \implies
+%     1 - F(G_{S_{j}\cup A_{i}}; \df(S_{j})) > \alpha
+%   \end{equation}
+% \end{theorem}
+% \begin{proof}
+%   First recall from the definition of enumeration trees that
+%   \begin{equation*}
+%     S_{i} \cup A(S_{i}) \supseteq S_{j} \cup A(S_{j})
+%   \end{equation*}
+%   for all $i \geq j$. Therefore, by using \Cref{thm:chi2-ineq,thm:dpi}
+%   with the assumption that $\df(S_{j}) \geq \df(S_{i})$,
+%   we can establish the following inequality:
+%   \begin{gather*}
+%     F(G_{S_{i}\cup A(S_{i})}; \df(S_{i}))
+%     \underset{\text{\Cref{thm:dpi}}}{\geq}
+%     F(G_{S_{j}\cup A(S_{j})}; \df(S_{i}))
+%     \underset{\text{\Cref{thm:chi2-ineq}}}{\geq}
+%     F(G_{S_{j}\cup A(S_{j})}; \df(S_{j}))\\
+%     \implies 1 - F(G_{S_{i}\cup A(S_{i})}; \df(S_{i}))
+%     \leq 1 - F(G_{S_{j}\cup A(S_{j})}; \df(S_{j}))
+%   \end{gather*}
+%   Therefore the following holds
+%   \begin{align*}
+%     \alpha < 1 - \cdf(G_{S_{i}\cup A(S_{i})}; \df(S_{i}))
+%     \implies 
+%     \alpha <  1 - \cdf(G_{S_{j}\cup A(S_{j})}; \df(S_{j}))
+%   \end{align*}
+%   whenever $\df(S_{j}) \geq \df(S_{i})$.
+% \end{proof}
+% \begin{corollary}[Pruning Supersets]
+%   \label{thm:prune-superset}
+%   At some node in the enumeration tree $S_{i}$, if
+%   \begin{equation}
+%     \label{eq:max-reject}
+%     1 - F(G_{S_{i}\cup A(S_{i})}; \df(S_{i})) > \alpha
+%   \end{equation}
+%   where $\alpha$ is some prescribed significance level, then it follows
+%   directly from \Cref{thm:prune} that
+%   \begin{equation}
+%     \label{eq:max-pruned}
+%     \forall S' \supseteq S : 1 - \cdf(G_{S'}; \df(S')) > \alpha
+%   \end{equation}
+%   since $S' \supseteq S \implies \df(S') \geq \df(S)$.
+%   % therefore, when \Cref{eq:max-reject} is true, no superset of $S$ can
+%   % have their conditional independence hypothesis be
+%   % rejected. Consequently, we cannont definitively accept the hypothesis
+%   % that any superset of $S$ is in the MB of $t$.
+% \end{corollary}
+
+% This implies that at $S_{i}$, we can prune entire branch.
+
+% - conjecture same result as IAMB
+% - Complexity?
+% - 
 
 %%% Experiments
 \section{Experiments}\label{sec:exp}
@@ -1310,6 +1402,54 @@ We then construct a Bayesian network for each
 \appendix
 \section{Appendix}
 You may include other additional sections here.
+\subsection{G-Test}
+The G-test is a statistical test that seeks to reject the hypothesis
+that a set of observed discrete data follows some assumed
+distribution. A common use for the G-test is to test if the dimensions
+in some multidimensional data are independent. Conducting this test
+first involves computing the G-statistic,
+\begin{equation}
+  \label{eq:g-stat}
+  G = 2 \sum_{i} O_{i}\cdot \ln\Biggl(\frac{O_{i}}{E_{i}}\Biggr),
+\end{equation}
+where $O_{i}\geq 0$ are the observed counts in the cells and $E_{i} > 0$
+are the expected counts under the distribution assumed in the null
+hypothesis.
+
+In this paper, we are specifically interested in using the G-test to
+test the null hypothesis that some subset $\rmS$ of the variables
+$\rmS\subset\rmX \setminus (\{\rvt\} \cup \mb)$ is conditionally
+independent to the variable $\rvt$ given the a candidate Markov blanket
+$\mb$,
+\begin{equation*}
+  H_{0}(\rmS): \rmS \indep \rvt \mid \mb.
+\end{equation*}
+The G-statistic for testing this hypothesis is
+then~\citep{tsamardinos2006}
+\begin{align*}
+  G(\rmS)
+  &= 2 \sum_{\rvx_{\rvs},\rvx_{t},\rvx_{\rvc}}
+    O(\rvx_{\rvs},\rvx_{t},\rvx_{\rvc})\cdot
+    \ln\Biggl(
+    \frac{P(\rvx_{\rvs},\rvx_{t}\mid\rvx_{\rvc}) P(\rvx_{\rvc})}
+    {P(\rvx_{\rvs}\mid\rvx_{\rvc})P(\rvx_{t}\mid\rvx_{\rvc})
+    P(\rvx_{\rvc})}\Biggr)\\
+  &= 2 \sum_{\rvx_{\rvs},\rvx_{t},\rvx_{\rvc}}
+    O(\rvx_{\rvs},\rvx_{t},\rvx_{\rvc})\cdot
+    \ln\Biggl(
+    \frac{O(\rvx_{\rvs},\rvx_{t},\rvx_{\rvc}) O(\rvx_{\rvc})}
+    {O(\rvx_{\rvs},\rvx_{\rvc})O(\rvx_{t},\rvx_{\rvc})}\Biggr).
+\end{align*}
+Under the null hypothesis, the distribution of this statistic $G(\rmS)$
+is then approximately $\chi^{2}(\df(\rmS))$ distributed
+where~\citep{tsamardinos2006}
+\begin{align*}
+  \df(\rmS) &= (|\rvt|-1) \cdot
+              \Biggl(\prod_{\rvs\in\rmS}|\rvs| - 1\Biggr) \cdot
+              \Biggl(\prod_{\rvc\in\mb}|\rvc|\Biggr)
+\end{align*}
+is the degrees of freedomn in the statistical test. 
+
 
 
 \end{document}

@@ -53,6 +53,22 @@
   abstract = {Forward-backward selection is one of the most basic and commonly-used feature selection algorithms available. It is also general and conceptually applicable to many different types of data. In this paper, we propose a heuristic that significantly improves its running time, while preserving predictive performance. The idea is to temporarily discard the variables that are conditionally independent with the outcome given the selected variable set. Depending on how those variables are reconsidered and reintroduced, this heuristic gives rise to a family of algorithms with increasingly stronger theoretical guarantees. In distributions that can be faithfully represented by Bayesian networks or maximal ancestral graphs, members of this algorithmic family are able to correctly identify the Markov blanket in the sample limit. In experiments we show that the proposed heuristic increases computational efficiency by about 1-2 orders of magnitude, while selecting fewer or the same number of variables and retaining predictive performance. Furthermore, we show that the proposed algorithm and feature selection with LASSO perform similarly when restricted to select the same number of variables, making the proposed algorithm an attractive alternative for problems where no (efficient) algorithm for LASSO exists.}
 }
 
+@article{dawid1979,
+  title = {Conditional independence in statistical theory},
+  author = {Dawid, A. Philip},
+  year = 1979,
+  journal = {Journal of the Royal Statistical Society. Series B (Methodological)},
+  volume = {41},
+  number = {1},
+  eprint = {2984718},
+  eprinttype = {jstor},
+  pages = {1--31},
+  publisher = {[Royal Statistical Society, Wiley]},
+  issn = {0035-9246},
+  urldate = {2022-06-27},
+  abstract = {Some simple heuristic properties of conditional independence are shown to form a conceptual framework for much of the theory of statistical inference. This framework is illustrated by an examination of the role of conditional independence in several diverse areas of the field of statistics. Topics covered include sufficiency and ancillarity, parameter identification, causal inference, prediction sufficiency, data selection mechanisms, invariant statistical models and a subjectivist approach to model-building.}
+}
+
 @article{dong2025a,
   title = {{{DCILP}}: {{A Distributed Approach}} for {{Large-Scale Causal Structure Learning}}},
   shorttitle = {{{DCILP}}},
@@ -69,6 +85,22 @@
   abstract = {Causal learning tackles the computationally demanding task of estimating causal graphs. This paper introduces a new divide-and-conquer approach for causal graph learning, called DCILP. In the divide phase, the Markov blanket MB(Xi) of each variable Xi is identified, and causal learning subproblems associated with each MB(Xi) are independently addressed in parallel. This approach benefits from a more favorable ratio between the number of data samples and the number of variables considered. In counterpart, it can be adversely affected by the presence of hidden confounders, as variables external to MB(Xi) might influence those within it. The reconciliation of the local causal graphs generated during the divide phase is a challenging combinatorial optimization problem, especially in large-scale applications. The main novelty of DCILP is an original formulation of this reconciliation as an integer linear programming (ILP) problem, which can be delegated and efficiently handled by an ILP solver. Through experiments on medium to large scale graphs, and comparisons with state-of-the-art methods, DCILP demonstrates significant improvements in terms of computational complexity, while preserving the learning accuracy on real-world problem and suffering at most a slight loss of accuracy on synthetic problems.},
   copyright = {Copyright (c) 2025 Association for the Advancement of Artificial Intelligence},
   langid = {english}
+}
+
+@article{forster2018,
+  title = {The {{Frugal Inference}} of {{Causal Relations}}},
+  author = {Forster, Malcolm and Raskutti, Garvesh and Stern, Reuben and Weinberger, Naftali},
+  year = 2018,
+  journal = {The British Journal for the Philosophy of Science},
+  volume = {69},
+  number = {3},
+  eprint = {26494814},
+  eprinttype = {jstor},
+  pages = {821--848},
+  publisher = {[The University of Chicago Press, The British Society for the Philosophy of Science]},
+  issn = {0007-0882},
+  urldate = {2026-02-22},
+  abstract = {Recent approaches to causal modelling rely upon the causal Markov condition, which specifies which probability distributions are compatible with a directed acyclic graph (DAG). Further principles are required in order to choose among the large number of DAGs compatible with a given probability distribution. Here we present a principle that we call frugality. This principle tells one to choose the DAG with the fewest causal arrows. We argue that frugality has several desirable properties compared to the other principles that have been suggested, including the well-known causal faithfulness condition.}
 }
 
 @inproceedings{fu2008a,
@@ -115,6 +147,18 @@
   abstract = {In a Bayesian network (BN), a target node is independent of all other nodes given its Markov blanket (MB), and finding the MB has many applications, including feature selection and BN structure learning. We propose a new MB discovery algorithm, simultaneous MB (STMB), to improve the efficiency of the existing topology-based MB discovery algorithms. The proposed method removes the necessity of enforcing the symmetry constraint that is prevalent in existing algorithms, by exploiting the coexisting property between spouses and descendants of the target node. Since STMB mainly reduces the number of independence tests needed to complete the MB set after finding the parents-and-children set, it is applicable to all previous topology-based methods. STMB is both sound and complete. Experiments show that STMB has a comparable accuracy but much better efficiency than state-of-the-art methods. An application on benchmark feature selection datasets further demonstrates the excellent performance of STMB.}
 }
 
+@inproceedings{geiger1989,
+  title = {d-separation: from theorems to algorithms},
+  shorttitle = {d-separation},
+  booktitle = {{{UAI}} '89: {{Proceedings}} of the {{Fifth Annual Conference}} on {{Uncertainty}} in {{Artificial Intelligence}}, {{Windsor}}, {{Ontario}}, {{Canada}}, {{August}} 18-20, 1989},
+  author = {Geiger, Dan and Verma, Thomas and Pearl, Judea},
+  editor = {Henrion, Max and Shachter, Ross D. and Kanal, Laveen N. and Lemmer, John F.},
+  year = 1989,
+  pages = {139--148},
+  publisher = {North-Holland},
+  urldate = {2022-06-22}
+}
+
 @article{ghosh1973,
   title = {Some {{Monotonicity Theorems}} for {$\chi$}2, {{F}} and {{T Distributions}} with {{Applications}}},
   author = {Ghosh, B. K.},
@@ -128,6 +172,16 @@
   doi = {10.1111/j.2517-6161.1973.tb00976.x},
   urldate = {2025-09-23},
   abstract = {The probability that a non-central {$\chi$}2, F or t variable exceeds c is a function of c, the degrees of freedom and the non-centrality parameter. The behaviour of these probabilities as functions of the degrees of freedom is investigated when c and the non-centrality parameters are fixed. It is also shown that, when c refers to the 100{$\alpha\%$} point of the corresponding central distribution, the probabilities are monotone in the degrees of freedom. Some allied results and possible applications are discussed.}
+}
+
+@article{hammersley1971,
+  title = {Markov fields on finite graphs and lattices},
+  author = {Hammersley, John Michael and Clifford, Peter},
+  year = 1971,
+  journal = {Unpublished manuscript},
+  urldate = {2022-07-05},
+  abstract = {Semantic Scholar extracted view of \&quot;Markov fields on finite graphs and lattices\&quot; by J. Hammersley et al.},
+  langid = {english}
 }
 
 @inproceedings{hochsprung2023,
@@ -153,6 +207,44 @@
   abstract = {The method of causal feature selection for constructing predictive models, which utilizes the causal relationships between predictor variables and class variables, has garnered significant attention in recent years. However, almost all existing causal feature selection algorithms use conditional independence (CI) tests to learn the Markov Blanket (MB), leading to algorithmic complexity that grows exponentially with the feature space and encountering errors in CI tests that affect model performance. In this paper, we analyze the unique role of neighborhood mutual information in causal relationships and propose a causal feature selection algorithm based on maximizing neighborhood mutual information (MNMI-CFS). Specifically, the MNMI-CFS method analyzes the relationships between features in three stages, selecting the features with the greatest causal impact on the target variable, thereby improving the performance of the predictive model. We validate the effectiveness of this method by comparing it with six advanced causal feature selection algorithms and demonstrate its performance advantages on five benchmark Bayesian networks and five real datasets.},
   isbn = {9798400718182},
   langid = {english}
+}
+
+@book{koller2009,
+  title = {Probabilistic graphical models: principles and techniques - adaptive computation and machine learning},
+  shorttitle = {Probabilistic graphical models},
+  author = {Koller, Daphne and Friedman, Nir},
+  year = 2009,
+  publisher = {The MIT Press},
+  abstract = {Most tasks require a person or an automated system to reasonto reach conclusions based on available information. The framework of probabilistic graphical models, presented in this book, provides a general approach for this task. The approach is model-based, allowing interpretable models to be constructed and then manipulated by reasoning algorithms. These models can also be learned automatically from data, allowing the approach to be used in cases where manually constructing a model is difficult or even impossible. Because uncertainty is an inescapable aspect of most real-world applications, the book focuses on probabilistic models, which make the uncertainty explicit and provide models that are more faithful to reality. Probabilistic Graphical Models discusses a variety of models, spanning Bayesian networks, undirected Markov networks, discrete and continuous models, and extensions to deal with dynamical systems and relational data. For each class of models, the text describes the three fundamental cornerstones: representation, inference, and learning, presenting both basic concepts and advanced techniques. Finally, the book considers the use of the proposed framework for causal reasoning and decision making under uncertainty. The main text in each chapter provides the detailed technical development of the key ideas. Most chapters also include boxes with additional material: skill boxes, which describe techniques; case study boxes, which discuss empirical cases related to the approach described in the text, including applications in computer vision, robotics, natural language understanding, and computational biology; and concept boxes, which present significant concepts drawn from the material in the chapter. Instructors (and readers) can group chapters in various combinations, from core topics to more technically advanced material, to suit their particular needs. Adaptive Computation and Machine Learning series},
+  isbn = {978-0-262-01319-2}
+}
+
+@book{lauritzen1996,
+  title = {Graphical models},
+  author = {Lauritzen, Steffen L.},
+  year = 1996,
+  series = {Oxford statistical science series},
+  number = {17},
+  publisher = {Clarendon Press ; Oxford University Press},
+  address = {Oxford : New York},
+  isbn = {978-0-19-852219-5},
+  lccn = {QA279 .L35 1996}
+}
+
+@article{lauritzen2018,
+  title = {Unifying {{Markov Properties}} for {{Graphical Models}}},
+  author = {Lauritzen, Steffen and Sadeghi, Kayvan},
+  year = 2018,
+  journal = {The Annals of Statistics},
+  volume = {46},
+  number = {5},
+  eprint = {26542863},
+  eprinttype = {jstor},
+  pages = {2251--2278},
+  publisher = {Institute of Mathematical Statistics},
+  issn = {0090-5364},
+  urldate = {2026-02-23},
+  abstract = {Several types of graphs with different conditional independence interpretations---also known as Markov properties---have been proposed and used in graphical models. In this paper, we unify these Markov properties by introducing a class of graphs with four types of edges---lines, arrows, arcs and dotted lines---and a single separation criterion. We show that independence structures defined by this class specialize to each of the previously defined cases, when suitable subclasses of graphs are considered. In addition, we define a pairwise Markov property for the subclass of chain mixed graphs, which includes chain graphs with the LWF interpretation, as well as summary graphs (and consequently ancestral graphs).We prove the equivalence of this pairwise Markov property to the global Markov property for compositional graphoid independence models.}
 }
 
 @article{li2021,
@@ -284,6 +376,61 @@
   abstract = {Learning a Bayesian network structure from data is an NP-hard problem and thus exact algorithms are feasible only for small data sets. Therefore, network structures for larger networks are usually learned with various heuristics. Another approach to scaling up the structure learning is local learning. In local learning, the modeler has one or more target variables that are of special interest; he wants to learn the structure near the target variables and is not interested in the rest of the variables. In this paper, we present a score-based local learning algorithm called SLL. We conjecture that our algorithm is theoretically sound in the sense that it is optimal in the limit of large sample size. Empirical results suggest that SLL is competitive when compared to the constraint-based HITON algorithm. We also study the prospects of constructing the network structure for the whole node set based on local results by presenting two algorithms and comparing them to several heuristics.}
 }
 
+@techreport{pearl1985,
+  type = {Technical {{Report}}},
+  title = {{{GRAPHOIDS}}: a graph-based logic for reasoning about relevance relations},
+  author = {Pearl, Judea and Paz, Azaria},
+  year = 1985,
+  number = {CSD-850038},
+  pages = {28},
+  institution = {UCLA Computer Science Department},
+  abstract = {We consider 3-place relations I(x, z, y) where, x, y, and z are three non-intersecting sets of elements (e.g., propositions), and I(x, z, y) stands for the statement: ``Know ing z renders x irrelevant to y.'' We give sufficient conditions on I for the existence of a (minimal) graph G such that I(x, z, y) can be validated by testing whether z separates x from y in G. These conditions define a GRAPHOID. The theory of graphoids uncovers the axiomatic basis of information relevance (e.g., probabilis tic dependencies) and ties it to vertex-separation conditions in graphs. The defin ing axioms can also be viewed as inference rules for deducing which propositions are relevant to each other, given a certain state of knowledge},
+  annotation = {pdf from chapter 13 of: Probabilistic and Causal Inference: The Works of Judea Pearl}
+}
+
+@inproceedings{pearl1987,
+  title = {The {{Logic}} of {{Representing Dependencies}} by {{Directed Graphs}}},
+  booktitle = {{{AAAI Conference}} on {{Artificial Intelligence}}},
+  author = {Pearl, J. and Verma, Thomas},
+  year = 1987,
+  month = jul,
+  urldate = {2026-02-23},
+  abstract = {Data-dependencies of the type "x can tell us more about y given that we already know z" can be represented in various formalisms: Probabilistic Dependencies, Embedded-Multi-Valued Dependencies, Undirected Graphs and Directed-Acyclic Graphs (DAGs). This paper provides an axiomatic basis, called a semigraphoid, which captures the structure common to all four types of dependencies and explores the expressive power of DAGs in representing various types of data dependencies. It is shown that DAGs can represent a richer set of dependencies than undirected graphs, that DAGs completely represent the closure of their specification bases, and that they offer an effective computational device for testing membership in that closure as well as inferring new dependencies from given inputs. These properties might explain the prevailing use of DAGs in causal reasoning and semantic nets.}
+}
+
+@book{pearl1988,
+  title = {Probabilistic reasoning in intelligent systems: networks of plausible inference},
+  shorttitle = {Probabilistic reasoning in intelligent systems},
+  author = {Pearl, Judea},
+  year = 1988,
+  publisher = {Morgan Kaufmann Publishers Inc.},
+  address = {San Francisco, CA, USA},
+  abstract = {From the Publisher: Probabilistic Reasoning in Intelligent Systems is a complete andaccessible account of the theoretical foundations and computational methods that underlie plausible reasoning under uncertainty. The author provides a coherent explication of probability as a language for reasoning with partial belief and offers a unifying perspective on other AI approaches to uncertainty, such as the Dempster-Shafer formalism, truth maintenance systems, and nonmonotonic logic. The author distinguishes syntactic and semantic approaches to uncertaintyand offers techniques, based on belief networks, that provide a mechanism for making semantics-based systems operational. Specifically, network-propagation techniques serve as a mechanism for combining the theoretical coherence of probability theory with modern demands of reasoning-systems technology: modular declarative inputs, conceptually meaningful inferences, and parallel distributed computation. Application areas include diagnosis, forecasting, image interpretation, multi-sensor fusion, decision support systems, plan recognition, planning, speech recognitionin short, almost every task requiring that conclusions be drawn from uncertain clues and incomplete information. Probabilistic Reasoning in Intelligent Systems will be of special interest to scholars and researchers in AI, decision theory, statistics, logic, philosophy, cognitive psychology, and the management sciences. Professionals in the areas of knowledge-based systems, operations research, engineering, and statistics will find theoretical and computational tools of immediate practical use. The book can also be used as an excellent text for graduate-level courses in AI, operations research, or applied probability.},
+  isbn = {978-1-55860-479-7}
+}
+
+@article{pearl1989,
+  title = {Conditional independence and its representations},
+  author = {Pearl, Judea and Geiger, Dan and Verma, Thomas},
+  year = 1989,
+  journal = {Kybernetika},
+  volume = {25},
+  number = {7},
+  pages = {33--44},
+  urldate = {2022-06-22}
+}
+
+@book{pearl2000,
+  title = {Causality: models, reasoning, and inference},
+  shorttitle = {Causality},
+  author = {Pearl, Judea},
+  year = 2000,
+  publisher = {Cambridge University Press},
+  address = {Cambridge, U.K. ; New York},
+  isbn = {978-0-521-89560-6 978-0-521-77362-1},
+  lccn = {BD541 .P43 2000}
+}
+
 @article{pena2007,
   title = {Towards scalable and data efficient learning of {{Markov}} boundaries},
   author = {Pe{\~n}a, Jose M. and Nilsson, Roland and Bj{\"o}rkegren, Johan and Tegn{\'e}r, Jesper},
@@ -315,6 +462,35 @@
   isbn = {978-0-9749039-2-7}
 }
 
+@article{raskutti2018,
+  title = {Learning directed acyclic graph models based on sparsest permutations},
+  author = {Raskutti, Garvesh and Uhler, Caroline},
+  year = 2018,
+  journal = {Stat},
+  volume = {7},
+  number = {1},
+  pages = {e183},
+  issn = {2049-1573},
+  doi = {10.1002/sta4.183},
+  urldate = {2026-02-22},
+  abstract = {We consider the problem of learning a Bayesian network or directed acyclic graph model from observational data. A number of constraint-based, score-based and hybrid algorithms have been developed for this purpose. Statistical consistency guarantees of these algorithms rely on the faithfulness assumption, which has been shown to be restrictive especially for graphs with cycles in the skeleton. We here propose the sparsest permutation (SP) algorithm, showing that learning Bayesian networks is possible under strictly weaker assumptions than faithfulness. This comes at a computational price, thereby indicating a statistical-computational trade-off for causal inference algorithms. In the Gaussian noiseless setting, we prove that the SP algorithm boils down to finding the permutation of the variables with the sparsest Cholesky decomposition of the inverse covariance matrix, which is equivalent to {$\ell$}0-penalized maximum likelihood estimation. We end with a simulation study showing that in line with the proven stronger consistency guarantees, and the SP algorithm compares favourably to standard causal inference algorithms in terms of accuracy for a given sample size. Copyright \copyright{} 2018 John Wiley \& Sons, Ltd.},
+  copyright = {Copyright \copyright{} 2018 John Wiley \& Sons, Ltd.},
+  langid = {english}
+}
+
+@article{sadeghi2017,
+  title = {Faithfulness of {{Probability Distributions}} and {{Graphs}}},
+  author = {Sadeghi, Kayvan},
+  year = 2017,
+  journal = {Journal of Machine Learning Research},
+  volume = {18},
+  number = {148},
+  pages = {1--29},
+  issn = {1533-7928},
+  urldate = {2026-02-09},
+  abstract = {A main question in graphical models and causal inference is whether, given a probability distribution  P P  (which is usually an underlying distribution of data), there is a graph (or graphs) to which  P P  is faithful. The main goal of this paper is to provide a theoretical answer to this problem. We work with general independence models, which contain probabilistic independence models as a special case. We exploit a generalization of ordering, called preordering, of the nodes of (mixed) graphs. This allows us to provide sufficient conditions for a given independence model to be Markov to a graph with the minimum possible number of edges, and more importantly, necessary and sufficient conditions for a given probability distribution to be faithful to a graph. We present our results for the general case of mixed graphs, but specialize the definitions and results to the better-known subclasses of undirected (concentration) and bidirected (covariance) graphs as well as directed acyclic graphs.}
+}
+
 @article{schluter2014,
   title = {A survey on independence-based {{Markov}} networks learning},
   author = {Schl{\"u}ter, Federico},
@@ -329,6 +505,65 @@
   urldate = {2025-08-27},
   abstract = {The problem of learning the Markov network structure from data has become increasingly important in machine learning, and in many other application fields. Markov networks are probabilistic graphical models, a widely used formalism for handling probability distributions in intelligent systems. This document focuses on a technology called independence-based learning, which allows for the learning of the independence structure of Markov networks from data in an efficient and sound manner, whenever the dataset is sufficiently large, and data is a representative sample of the target distribution. In the analysis of such technology, this work surveys the current state-of-the-art algorithms, discussing its limitations, and posing a series of open problems where future work may produce some advances in the area, in terms of quality and efficiency.},
   langid = {english}
+}
+
+@article{soh2019,
+  title = {Learning {{Unfaithful}} \${{K}}\$-separable {{Gaussian Graphical Models}}},
+  author = {Soh, De Wen and Tatikonda, Sekhar},
+  year = 2019,
+  journal = {Journal of Machine Learning Research},
+  volume = {20},
+  number = {109},
+  pages = {1--30},
+  issn = {1533-7928},
+  urldate = {2026-02-22},
+  abstract = {The global Markov property for Gaussian graphical models ensures graph separation implies conditional independence. Specifically if a node set  S S  graph separates nodes  u u  and  v v  then  X u Xu  is conditionally independent of  X v Xv  given  X S XS . The opposite direction need not be true, that is,  X u {$\perp$} X v {$\mid$} X S Xu{$\perp$}Xv{$\mid$}XS  need not imply  S S  is a node separator of  u u  and  v v . When it does, the relation  X u {$\perp$} X v {$\mid$} X S Xu{$\perp$}Xv{$\mid$}XS  is called faithful. In this paper we provide a characterization of faithful relations and then provide an algorithm to test faithfulness based only on knowledge of other conditional relations of the form  X i {$\perp$} X j {$\mid$} X S Xi{$\perp$}Xj{$\mid$}XS . We study two classes of separable Gaussian graphical models, namely, weakly  K K -separable and strongly  K K -separable Gaussian graphical models. Using the above test for faithfulness, we introduce algorithms to learn the topologies of weakly  K K -separable and strongly  K K -separable Gaussian graphical models with  \textohm (Klogp) \textohm (Klog⁡p)  sample complexity. For strongly  K K -separable Gaussian graphical models, we additionally provide a method with error bounds for learning the off-diagonal precision matrix entries.}
+}
+
+@book{spirtes2001,
+  title = {Causation, {{Prediction}}, and {{Search}}},
+  author = {Spirtes, Peter and Glymour, Clark and Scheines, Richard},
+  year = 2001,
+  month = jan,
+  edition = {2nd},
+  publisher = {The MIT Press},
+  doi = {10.7551/mitpress/1754.001.0001},
+  urldate = {2026-02-22},
+  abstract = {The authors address the assumptions and methods that allow us to turn observations into causal knowledge, and use even incomplete causal knowledge in plann},
+  isbn = {978-0-262-28415-8},
+  langid = {english}
+}
+
+@article{spirtes2014,
+  title = {A {{Uniformly Consistent Estimator}} of {{Causal Effects}} under the \$k\$-{{Triangle-Faithfulness Assumption}}},
+  author = {Spirtes, Peter and Zhang, Jiji},
+  year = 2014,
+  month = nov,
+  journal = {Statistical Science},
+  volume = {29},
+  number = {4},
+  pages = {662--678},
+  publisher = {Institute of Mathematical Statistics},
+  issn = {0883-4237, 2168-8745},
+  doi = {10.1214/13-STS429},
+  urldate = {2026-02-22},
+  abstract = {Spirtes, Glymour and Scheines [Causation, Prediction, and Search (1993) Springer] described a pointwise consistent estimator of the Markov equivalence class of any causal structure that can be represented by a directed acyclic graph for any parametric family with a uniformly consistent test of conditional independence, under the Causal Markov and Causal Faithfulness assumptions. Robins et al. [Biometrika 90 (2003) 491--515], however, proved that there are no uniformly consistent estimators of Markov equivalence classes of causal structures under those assumptions. Subsequently, Kalisch and B\"uhlmann [J. Mach. Learn. Res. 8 (2007) 613--636] described a uniformly consistent estimator of the Markov equivalence class of a linear Gaussian causal structure under the Causal Markov and Strong Causal Faithfulness assumptions. However, the Strong Faithfulness assumption may be false with high probability in many domains. We describe a uniformly consistent estimator of both the Markov equivalence class of a linear Gaussian causal structure and the identifiable structural coefficients in the Markov equivalence class under the Causal Markov assumption and the considerably weaker k-Triangle-Faithfulness assumption.},
+  langid = {english}
+}
+
+@article{statnikov2013,
+  title = {Algorithms for {{Discovery}} of {{Multiple Markov Boundaries}}},
+  author = {Statnikov, Alexander and Lytkin, Nikita I. and Lemeire, Jan and Aliferis, Constantin F.},
+  year = 2013,
+  month = feb,
+  journal = {Journal of machine learning research: JMLR},
+  volume = {14},
+  pages = {499--566},
+  issn = {1532-4435},
+  abstract = {Algorithms for Markov boundary discovery from data constitute an important recent development in machine learning, primarily because they offer a principled solution to the variable/feature selection problem and give insight on local causal structure. Over the last decade many sound algorithms have been proposed to identify a single Markov boundary of the response variable. Even though faithful distributions and, more broadly, distributions that satisfy the intersection property always have a single Markov boundary, other distributions/data sets may have multiple Markov boundaries of the response variable. The latter distributions/data sets are common in practical data-analytic applications, and there are several reasons why it is important to induce multiple Markov boundaries from such data. However, there are currently no sound and efficient algorithms that can accomplish this task. This paper describes a family of algorithms TIE* that can discover all Markov boundaries in a distribution. The broad applicability as well as efficiency of the new algorithmic family is demonstrated in an extensive benchmarking study that involved comparison with 26 state-of-the-art algorithms/variants in 15 data sets from a diversity of application domains.},
+  langid = {english},
+  pmcid = {PMC4184048},
+  pmid = {25285052}
 }
 
 @inproceedings{steck2002,

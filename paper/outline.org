@@ -141,12 +141,28 @@
   + also requires assumption 1
   + to prevent spouses from canceling each other
   + does cancellation result in higher order assocs?
+** Abstract
+- experiments show that >1 order faithfulness already perform better in small well known benchmarks
 ** Intro
+- crucially "effective unfaithfulness" can appear due to lack of samples
 ** Probabilistic Graphical Models and Independece
+- no hidden/latent variables
+- no conditioning
+*** DAGs and UGs
+*** Graphical and Probabilistic Independece
+- semi graphoid
+- global markov condition
+- faithfulness
 ** The Faithfulness Assumption
 ** When is Faithfulness Violated
 *** High order interactions
+- BN are typically faithful [cite:@boeken2025]
 *** When samples are limited
+*** Previous relaxations
+- we conjecture that we sit between [cite:@marx2020]
+  and [cite:@forster2018]
+- our experimental results indicate that for limited samples, looking at
+  higher order relations might be bad anyways
 ** kOMB: An algorithm for high-order markov blanket discovery
 *** What would be nice in theory
 **** Algorithm
@@ -160,10 +176,19 @@
 **** Proof
 
 *** What we need to do with limited samples
+*** bound on separator
 *** Statistical Test
 ** Pruning the Search Space of kOMB
 - We found that it reduced the visited nodes by x%
 ** Experiments
+*** implementation details for conditional test
+- weak test check
+- ci test used
+- alpha
+- memorization
 *** Parity
 *** Known Benchmarks
 **** at different k orders
+** Future work
+- pruning the search space using proxy functions
+- how to determine k and l

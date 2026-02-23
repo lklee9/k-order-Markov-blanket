@@ -72,15 +72,18 @@
 \def\df{{\textit{df}}}
 \def\cdf{{F_{\chi^{2}}}}
 \def\tree{{\mathcal{T}}}
+\def\method{\emph{kOMB}}
 % \newcommand{\perpperp}{\protect\mathpalette{\protect\independenT}{\perp}}
 % \def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
 \newcommand{\perpperp}{\Perp}
+\newcommand{\indeps}[1]{\mathcal{J}(#1)}
 \newcommand{\indep}[1]{\perpperp_{#1}}
 \newcommand{\dep}[1]{\:\cancel{\perpperp}_{#1}\:}
 \newcommand{\kassoc}[3]{\textit{asc}_{#1}(#2\mid #3)}
+\newcommand{\assoc}[4]{\textit{asc}_{#1}(#2\mid #3\:; #4)}
 \newcommand{\lassoc}[3]{\textit{asc}^{(l)}_{#1}(#2\mid #3)}
 \newcommand{\kinter}[2]{\textit{asc}_{#1}(#2)}
-\newcommand{\linter}[3]{\textit{asc}^{(l)}_{#1}(#2)}
+\newcommand{\linter}[2]{\textit{asc}^{(l)}_{#1}(#2)}
 \newcommand{\kdep}[3]{\textit{dep}_{#1}(#2\mid #3)}
 \newcommand{\ldep}[3]{\textit{dep}^{(l)}_{#1}(#2\mid #3)}
 \newcommand{\kstrict}[2]{\textit{sdep}(#1 \mid #2)}
@@ -89,13 +92,14 @@
 \newcommand{\powerleq}[2]{\mathcal{P}_{\leq #1}(#2)}
 \newcommand{\powereq}[2]{\mathcal{P}_{= #1}(#2)}
 \newcommand{\adj}[2]{\textit{adj}_{#1}(#2)}
+\newcommand{\subverts}{\verts\setminus\{Y,X\}}
+\newcommand{\mbs}[1]{\text{MB}_{#1}}
 \def\mb{{\text{MB}}}
 \newcommand{\pop}{\text{pop}}
 \newcommand{\push}{\text{push}}
 % \newcommand{\max}{\text{max}}
 \newcommand{\cur}{\text{cur}}
 \newcommand{\assocdash}[1]{\stackrel{\mathclap{\normalfont\mbox{#1}}}{\text{---}}}
-\newcommand{\assoc}[1]{\assocdash{}_{\,#1}}
 \newcommand{\notassoc}[1]{\cancel{\vphantom{x}\text{---}}_{\,#1}\,}
 \newcommand{\strict}[1]{\assocdash{s}_{\,#1}}
 \newcommand{\model}{\mathcal{M}}
