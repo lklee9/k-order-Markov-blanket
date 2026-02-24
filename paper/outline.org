@@ -154,9 +154,14 @@
 - global markov condition
 - faithfulness
 ** The Faithfulness Assumption
+- adjacency
+  + used by equivalence class methods
+  + later extended by [cite:@marx2020] for xor
+- 
 ** When is Faithfulness Violated
 *** High order interactions
 - BN are typically faithful [cite:@boeken2025]
+- but are fairly common with limited samples [cite:@uhler2013]
 *** When samples are limited
 *** Previous relaxations
 - we conjecture that we sit between [cite:@marx2020]
@@ -186,9 +191,12 @@
 - ci test used
 - alpha
 - memorization
+- distribution estimation
 *** Parity
 *** Known Benchmarks
 **** at different k orders
-** Future work
+- sometimes f decrease as k increases
+- because we start looking at larger conditioning sets 
+** Limitations and Future work
 - pruning the search space using proxy functions
 - how to determine k and l

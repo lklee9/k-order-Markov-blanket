@@ -247,6 +247,22 @@
   abstract = {Several types of graphs with different conditional independence interpretations---also known as Markov properties---have been proposed and used in graphical models. In this paper, we unify these Markov properties by introducing a class of graphs with four types of edges---lines, arrows, arcs and dotted lines---and a single separation criterion. We show that independence structures defined by this class specialize to each of the previously defined cases, when suitable subclasses of graphs are considered. In addition, we define a pairwise Markov property for the subclass of chain mixed graphs, which includes chain graphs with the LWF interpretation, as well as summary graphs (and consequently ancestral graphs).We prove the equivalence of this pairwise Markov property to the global Markov property for compositional graphoid independence models.}
 }
 
+@article{lemeire2012,
+  title = {Conservative independence-based causal structure learning in absence of adjacency faithfulness},
+  author = {Lemeire, Jan and Meganck, Stijn and Cartella, Francesco and Liu, Tingting},
+  year = 2012,
+  month = dec,
+  journal = {International Journal of Approximate Reasoning},
+  series = {Fifth {{European Workshop}} on {{Probabilistic Graphical Models}} ({{PGM-2010}})},
+  volume = {53},
+  number = {9},
+  pages = {1305--1325},
+  issn = {0888-613X},
+  doi = {10.1016/j.ijar.2012.06.004},
+  urldate = {2026-02-24},
+  abstract = {This paper presents an extension to the Conservative PC algorithm which is able to detect violations of adjacency faithfulness under causal sufficiency and triangle faithfulness. Violations can be characterized by pseudo-independent relations and equivalent edges, both generating a pattern of conditional independencies that cannot be modeled faithfully. Both cases lead to uncertainty about specific parts of the skeleton of the causal graph. These ambiguities are modeled by an f-pattern. We prove that our Adjacency Conservative PC algorithm is able to correctly learn the f-pattern. We argue that the solution also applies for the finite sample case if we accept that only strong edges can be identified. Experiments based on simulations and the ALARM benchmark model show that the rate of false edge removals is significantly reduced, at the expense of uncertainty on the skeleton and a higher sensitivity for accidental correlations.}
+}
+
 @article{li2021,
   title = {Markov {{Blanket Discovery}} using {{Minimum Message Length}}},
   author = {Li, Yang and Korb, K. and Allison, L.},
@@ -634,6 +650,22 @@
   urldate = {2025-09-15},
   abstract = {We present a new algorithm for Bayesian network structure learning, called Max-Min Hill-Climbing (MMHC). The algorithm combines ideas from local learning, constraint-based, and search-and-score techniques in a principled and effective way. It first reconstructs the skeleton of a Bayesian network and then performs a Bayesian-scoring greedy hill-climbing search to orient the edges. In our extensive empirical evaluation MMHC outperforms on average and in terms of various metrics several prototypical and state-of-the-art algorithms, namely the PC, Sparse Candidate, Three Phase Dependency Analysis, Optimal Reinsertion, Greedy Equivalence Search, and Greedy Search. These are the first empirical results simultaneously comparing most of the major Bayesian network algorithms against each other. MMHC offers certain theoretical advantages, specifically over the Sparse Candidate algorithm, corroborated by our experiments. MMHC and detailed results of our study are publicly available at http://www.dsl-lab.org/supplements/mmhc\_paper/mmhc\_index.html.},
   langid = {english}
+}
+
+@article{uhler2013,
+  title = {Geometry of the {{Faithfulness Assumption}} in {{Causal Inference}}},
+  author = {Uhler, Caroline and Raskutti, Garvesh and B{\"u}hlmann, Peter and Yu, Bin},
+  year = 2013,
+  journal = {The Annals of Statistics},
+  volume = {41},
+  number = {2},
+  eprint = {23566569},
+  eprinttype = {jstor},
+  pages = {436--463},
+  publisher = {Institute of Mathematical Statistics},
+  issn = {0090-5364},
+  urldate = {2026-02-23},
+  abstract = {Many algorithms for inferring causality rely heavily on the faithfulness assumption. The main justification for imposing this assumption is that the set of unfaithful distributions has Lebesgue measure zero, since it can be seen as a collection of hypersurfaces in a hypercube. However, due to sampling error the faithfulness condition alone is not sufficient for statistical estimation, and strong-faithfulness has been proposed and assumed to achieve uniform or high-dimensional consistency. In contrast to the plain faithfulness assumption, the set of distributions that is not strong-faithful has nonzero Lebesgue measure and in fact, can be surprisingly large as we show in this paper. We study the strong-faithfulness condition from a geometric and combinatorial point of view and give upper and lower bounds on the Lebesgue measure of strong-faithful distributions for various classes of directed acyclic graphs. Our results imply fundamental limitations for the PC-algorithm and potentially also for other algorithms based on partial correlation testing in the Gaussian case.}
 }
 
 @article{wang2020,

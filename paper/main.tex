@@ -54,16 +54,21 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % THEOREMS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{thmtools}
+
 \theoremstyle{plain}
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{proposition}[theorem]{Proposition}
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{corollary}[theorem]{Corollary}
+\declaretheorem[name=Theorem]{theorem}
+\declaretheorem[name=Proposition]{proposition}
+\declaretheorem[name=Lemma]{lemma}
+\declaretheorem[name=Corollary]{corollary}
+
 \theoremstyle{definition}
-\newtheorem{definition}[theorem]{Definition}
-\newtheorem{assumption}[theorem]{Assumption}
+\declaretheorem[name=Definition]{definition}
+\declaretheorem[name=Assumption]{assumption}
+
 \theoremstyle{remark}
-\newtheorem{remark}[theorem]{Remark}
+\declaretheorem[name=Remark]{remark}
+\declaretheorem[name=Example]{example}
 
 % Todonotes is useful during development; simply uncomment the next line
 %    and comment out the line below the next line to turn off comments
@@ -100,6 +105,7 @@
 
 \newacronym{dag}{DAG}{Directed acyclic graph}
 \newacronym{ug}{UG}{Undirected graph}
+\newacronym{pgm}{PGM}{Probabilistic graphical model}
 
 \hypersetup{hidelinks}
 
@@ -346,7 +352,7 @@ conditional independency in $\pr$---more formally known as the Global
 Markov property.
 
 \begin{assumption}[Global Markov Property]\label{def:global-markov}
-  Assume we have a probabilistic graphical model $\model=(\gr,\pr)$.
+  Assume we have a \gls{pgm} $\model=(\gr,\pr)$.
   Then we say that the joint distribution $\pr$ is \emph{Markov} to the
   graph $\gr$ when for all disjoint subsets
   $\rmX,\rmY,\rmS\subseteq\verts$~\citep{hammersley1971,lauritzen2018}, 
@@ -388,8 +394,8 @@ models.
     $(\rmX\indep{}\rmY \mid \rmW\cup\rmZ) \wedge
     (\rmX\indep{}\rmW\mid\rmZ)\implies \rmX\indep{}\rmY\cup\rmW\mid\rmZ$
   \end{enumerate}
-  The model is called a graphoid if it obeys the folliwng additional
-  property~\citep{pearl1985}:
+  The independence model is called a graphoid if it also obeys the
+  folliwng additional property~\citep{pearl1985}:
   \begin{enumerate}[resume]
   \item Intersection:
     $(\rmX \indep{} \rmY \mid \rmZ \cup \rmW) \wedge
@@ -410,10 +416,10 @@ graphical Markov blanket of some target variable $Y\in\verts$.
 \begin{definition}[Markov Blanket and Boundary] \label{def:mb}
   For a single variable $Y\in\verts$, the Markov blanket of $Y$ in $\gr$
   is any subset $\rmM \subseteq \rmV\setminus Y$\footnote{For
-    convenience we allow set operations between variables sets and
+    convenience we allow set operations between variable sets and
     single variables to implicitly mean the operation between the
     variable set and the atomic set containing the single variable---for
-    example $\rmV \setminus Y \coloneq \rmV \setminus \{Y\}$.}
+    example: $\rmV \setminus Y \coloneq \rmV \setminus \{Y\}$.}
   such that every other variable in $\verts \setminus (Y \cup \rmS)$ is
   graphically separated from $Y$ by $\rmS$,
   \begin{equation}
@@ -434,18 +440,33 @@ it. However, since colloqually the term Markov blanket is commonly used
 to implicitly refer to the Markov boundary, we shall use the term Markov
 blanket in such a fashion as well.
 
-However, it is important to note that only graphs with an independence
-model $\indeps{\gr}$ that satisfies the symmetry, decomoposition,
-intersection, and weak union graphoid axioms in \Cref{def:graphoid} are
-guranteed to have a unique Markov boundary $\mbs{\gr}(Y)$. Throughout
-this paper we will assume that this is true. That said, there has been
-some previous work done on addressing the case when the Markov boundary
-is not unique~\citep{statnikov2013}.
+% However, it is important to note that only graphs with an independence
+% model $\indeps{\gr}$ that satisfies the symmetry, decomoposition,
+% intersection, and weak union graphoid axioms in \Cref{def:graphoid}
+% are guranteed to have a unique Markov boundary
+% $\mbs{\gr}(Y)$. Throughout this paper we will assume that this is
+% true.  That said, there has been some previous work done on addressing
+% the case when the Markov boundary is not unique~\citep{statnikov2013}.
 
--methods to learn MB
--common assumption is Faithfulness.
+Several methods exist for discovering the Markov blanket of a target
+variable $Y\in\verts$ in $\gr$ with one of the larger class of methods
+being constraint-based approaches~\citep{
+  margaritis1999,tsamardinos2003,schluter2014,ling2019}. These
+approaches iteratively test conditional independence statements---using
+the given data sampled from $\pr$---to grow and shrink a candidate
+Markov blanket of $Y$ in $\gr$. However, the Markov blanket of $Y$ in
+the joint distribution $\pr$ might not be the same as its Markov blanket
+in the graph $\gr$. Following the Global Markov Property in
+\Cref{def:global-markov}, we at know that the Markov blanket of
+$Y$ in $\pr$ is a subset of the Markov blanket in $\gr$---which this
+might prevent us from fully recovering the Markov blanket in
+$\gr$. Therefore, in order to ensure that the Markov blankets of $Y$ in
+both $\pr$ and $\gr$ are equal, a common assumption constraint-based
+approaches make is that $\gr$ is \emph{faithful} to the joint
+distribution $\pr$ as defined in \Cref{def:faith}~\citep{spirtes2001}.
+
 \begin{definition}[Faithfulness]\label{def:faith}
-  Given a probabilistic graphical model $\model=(\gr, \pr)$, the graph
+  Given a \gls{pgm} $\model=(\gr, \pr)$, the graph
   $\gr$ is \emph{faithful} to the joint distribution $\pr$ if for all
   disjoint subsets $\rmX,\rmY,\rmS\subseteq\verts$~\citep{spirtes2001},
   \begin{equation}
@@ -453,53 +474,56 @@ is not unique~\citep{statnikov2013}.
     \rmX \indep{\pr} \rmY \mid \rmS
     \implies \rmX \indep{\gr} \rmY \mid \rmS
   \end{equation}
-  which is also the inverse of the global Markov property in
-  \Cref{def:global-markov}.
+  which is basically the reverse direction of the global Markov property
+  in \Cref{def:global-markov}.
 \end{definition}
 
-
+Therefore, by assuming both the Global Markov Property in
+\Cref{def:global-markov} and the faithfulness assumption in
+\Cref{def:faith}, the conditional independencies of both $\gr$ and $\pr$
+then coincide, $\indeps{\gr}=\indeps{\pr}$. However faithfulness can be
+violated in many ways and we will explore some of the ways it can be
+violated in the following section.
 
 
 %%% Faithfulness
 \section{Faithfulness Violations and Existing Relaxations}
-Probably the most well-known
+Probably the most well-known example is xor \todo{todo}
+\begin{figure}
+  \centering
+  \input{fig/parity}
+  \caption{parity}
+  \label{fig:parity}
+\end{figure}
+\begin{example}\label{ex:parity}
+  
+\end{example}
+\subsection{Violations due to Finite Samples}
 %%% k-oder
 \section{The k-Order Faithfulness Relaxation}
 In this section we will introduce our generalisation of the faithfulness
-assumption in \Cref{def:faith} for finding conditional dependancies that
-require 
+assumption in \Cref{def:faith} for finding conditional dependancies
+between two variables in $\verts$ that require considering $k$
+additional variables to be found. But before that, we first define in
+\Cref{def:k-dep} what it means for two distinct variables $Y,X\in\verts$
+to only be conditionally dependent given some $k$-sized subset
+$\rmZ\subseteq\subverts, |\rmZ|\leq k$.
 
-\begin{definition}[Power Sets of Limited Size]
-  Let $\rmX$ be a set of elements and $k\leq |\rmX|$ be some natural
-  number smaller than the cardinality of $\rmX$. Then we use the
-  notation
-  \begin{equation}
-    \label{eq:17}
-    \powereq{k}{\rmX} := \{\rmZ \subseteq \rmX : |\rmZ| = k\}
-  \end{equation}
-  to define the set of all the subsets of $\rmX$ with cardinality $k$
-  and
-  \begin{equation}
-    \label{eq:18}
-    \powerleq{k}{\rmX} := \{\rmZ \subseteq \rmX : |\rmZ| \leq k\}
-  \end{equation}
-  to denote the set of all the subsets of $\rmX$ with cardinality less
-  than or equal to $k$.
-\end{definition}
 
-\begin{definition}[$k$-Order Dependence]
-  For a set of random variables $\rmV$, let $Y,X\in\rmV$ and
-  $\rmZ=\{Z_{1},Z_{2},\ldots,Z_{k}\}\subset\rmV$ be distinct random
-  variables in $\rmV$. Let us denote the absence of any subset
-  $\rmS \subseteq \rmV \setminus \{Y,X\}$ that renders $Y$ and $X$ to be
-  conditionally independent given $\rmZ \cup \rmS$ as
+\begin{definition}[$k$-Order Dependence]\label{def:k-dep}
+  Given a \gls{pgm} $\model=(\gr, \pr)$, let $Y,X\in\rmV$ be two
+  distinct random variables and $\rmS,\rmZ\subseteq\subverts$ be two
+  disjoint subsets. Then we denote the absence of any subset of
+  $\rmS'\subseteq\rmS$ that renders $Y$ and $X$ to be
+  conditionally independent given $\rmZ \cup \rmS'$ as
   \begin{equation}
-    \label{eq:20}
-    \kassoc{\rmV}{Y,X}{\rmS}
-    := \exists \rmZ \subseteq \rmV \setminus \{Y,X\} :
-    Y \dep{\pr} X \mid \rmZ \cup \rmS.
+    \label{eq:k-dep-asc}
+    \kassoc{\rmS}{Y,X}{\rmZ}
+    := \forall \rmS' \subseteq \rmS :
+    Y \dep{\pr} X \mid \rmZ \cup \rmS'.
   \end{equation}
-  Here we say that $Y$ and $X$ are associated w.r.t. $\rmZ$.
+  Here we say that $Y$ and $X$ are $|\rmZ|$-order associated
+  w.r.t. $\rmZ$.
   % Under this
   % definition, it follows that 
   % \begin{equation}
@@ -508,61 +532,147 @@ require
   % \end{equation}
   % due to the absence of any probabilistic separators between $Y$ and
   % $X$.
-  Of course under this definition there might be some strict subset
-  $\rmZ' \subset \rmZ$ where $\kdep{\verts}{Y,X}{\rmZ'}$ still
-  holds. Therefore we say $Y$ and $X$ are $|\rmZ|$-order dependent w.r.t
+  Of course under this definition there might be some proper subset
+  $\rmZ' \subset \rmZ$ where $\kassoc{\rmS}{Y,X}{\rmZ'}$ still
+  holds. Therefore we say $Y$ and $X$ are $|\rmZ|$-order dependent on
   $\rmZ$ only if this is not the case,
   \begin{gather}
     \begin{aligned}
-      &\kdep{\rmV}{Y,X}{\rmZ}\\
-      &:= \kassoc{\rmV}{Y,X}{\rmZ} \wedge
-        \forall \rmZ' \subset \rmZ : \neg\, \kassoc{\rmV}{Y,X}{\rmZ'}.
+      &\kdep{\rmS}{Y,X}{\rmZ}\\
+      &:= \kassoc{\rmS}{Y,X}{\rmZ} \wedge
+        \forall \rmZ' \subset \rmZ : \neg\,\kassoc{\rmS}{Y,X}{\rmZ'}.
     \end{aligned}
+    \label{eq:k-dep-dep}
   \end{gather}
+  \todo{maybe add some closing lines to the def here}
 \end{definition}
-difference between assoc and dep
+With the definition of $k$-order dependance in \Cref{def:k-dep}, we are
+able to capture parity-like relations over $k+2$ variables---such as the
+one in \Cref{ex:parity}. Specifically we know that the stochastic-parity
+relationship in \Cref{ex:parity} is $2$-order dependent since for
+distinct variables $A,B\in\{X_{1},X_{2},X_{3},Y\}$, $\rmZ$ must always
+contain the other two variables for $\kassoc{\emptyset}{A,B}{\rmZ}$ to
+be true.
 
-prevents chains like
-$X_{1}\rightarrow Y \rightarrow X_{2}$ to be included in this definition.
+Further note that when $k=1$, our notion of $k$-order dependence is
+somewhat similar to \emph{$2$-association} in \citet[Definition
+6]{marx2020}---but mainly with respect to being able to capture the
+relationships between \emph{Unfaithful Triples} as defined in
+\citet[Definition 5]{marx2020}.
 
-$Y\strict{k}\rmX$ results in DAGs with a collider structure, or a UG with
-a clique over all the variables.
-assoc
-results in something
-like stochastic \texttt{AND} operator.
-\begin{lemma}[Finding $k$-dependance from association]
+There are two aspects of \Cref{def:k-dep} whose purpose might not
+immediately jump out. The first being that in \Cref{eq:k-dep-asc}, we
+require $\kassoc{\rmS}{Y,X}{\rmZ}$ to check for all subsets
+$\rmS'\subseteq\rmS$ that $Y\dep{\pr}X\mid\rmZ\cup\rmS'$---instead of
+just checking if $Y\dep{\pr}X\mid\rmZ\cup\rmS$. This requirement ensures
+that $Y$ and $X$ are dependent as long as they are conditioned on
+$\rmZ$---forcing a distinction between the possible dependants $\rmZ$
+and the possible separators $\rmS$. The other aspect of \Cref{def:k-dep}
+that is not straightforward is that we define both $k$-order association
+and dependance over some arbitrary subset $\rmS\subseteq\subverts$
+instead of just over the entirety of $\subverts$ or $\mbs{\gr}(Y)$. This
+allows us to reason about what the implications of
+$\kdep{\rmS}{Y,X}{\rmZ}$ are when we only condition on a subset of the
+available variables over $\verts$ in \Cref{lem:subset} later; which will
+help us show---later in \Cref{sec:algo}---that our algorithm {\method}
+correctly recovers the Markov boundary of some variable $Y\in\verts$.
+
+Since henceforth we need to reason about subsets of $\subverts$ with a
+restricted cardinality; before continuing we will first define some
+notational shorthand in \Cref{def:powerset} for dealing with such sets
+of cardinality restricted subsets.
+
+\begin{definition}[Power Sets of Limited
+  Cardinality]\label{def:powerset}
+  Let $\verts$ be a set of elements and
+  $k\in\mathbb{N} : k\leq |\verts|$ be some natural number smaller than
+  the cardinality of $\verts$. Then we use the notation,
+  \begin{equation}
+    \label{eq:17}
+    \powereq{k}{\verts} := \{\rmZ \subseteq \verts : |\rmZ| = k\},
+  \end{equation}
+  to denote the set of all the subsets of $\verts$ with cardinality $k$
+  and,
+  \begin{equation}
+    \label{eq:18}
+    \powerleq{k}{\verts} := \{\rmZ \subseteq \verts : |\rmZ| \leq k\},
+  \end{equation}
+  to denote the set of all the subsets of $\verts$ with cardinality less
+  than or equal to $k$.
+\end{definition}
+
+Before we introduce our generalisation of the faithfulness
+assumption to $k$-order dependencies, we will first show in
+\Cref{lem:k-dep-to-assoc} that $k$-order associations w.r.t. $\rmZ$
+implies the existance of a $k$-order dependence w.r.t. some subset of
+$\rmZ$.
+
+\begin{restatable}[$k$-Order Dependance Arises from Association]{lemma}{kdeptoassoc}
   \label{lem:k-dep-to-assoc}
-  For distinct random variables $Y,X\in\rmV$ and
-  $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$, the following holds
-  for all $\rmS \subset \rmV \setminus \rmX \cup \{Y\}$
+  Given a \gls{pgm} $\model=(\gr,\pr)$, let $Y,X\in\rmV$ be
+  distinct random variables and $\rmS,\rmZ\subset\subverts$ be disjoint
+  subsets. Then the following holds for all $Y,X,\rmS,\rmZ$:
   \begin{equation}
     \label{eq:11}
-    \kassoc{k}{Y,X}{\rmS}
-    \implies \exists k' \in [k] : \kdep{k'}{Y,X}{\rmS}
+    \kassoc{\rmS}{Y,X}{\rmZ}
+    \implies \exists \rmZ' \subseteq \rmZ :
+    \kdep{\rmS}{Y,X}{\rmZ'}.
   \end{equation}
-  where $[k]\coloneq\{i\in\mathbb{Z} : 0 \leq i \leq k\}$.
-\end{lemma}
+  In other words, $k$-order association w.r.t. $\rmZ$ implies
+  some---possibly lower order---dependence w.r.t. $\rmZ'\subseteq\rmZ$.
+\end{restatable}
 \begin{proof}[Proof by induction]
-  With subsets of $\rmX$ of size $1$, $\rmZ\in\powereq{1}{\rmX}$, we
-  know by definition that if $X$ and $Y$ are associated w.r.t. $\rmZ$,
-  it immediately follows that $X$ and $Y$ are also $1$-dependant
-  w.r.t. $\rmZ$ and vice versa,
-  \begin{equation}
+  When $\rmZ'$ is an empty set, and therefore a subset of $\rmZ$ with
+  cardinality $0$, we know by definition that $X$ and $Y$ being
+  $0$-order dependent is equivalent to them being $0$-order associated,
+  \begin{gather}
     \label{eq:12}
-    \kassoc{\verts}{X,Y}{\rmZ}
-    \iff \kdep{\verts}{X,Y}{\rmZ}.
+    \begin{aligned}
+      &\kdep{\verts}{X,Y}{\emptyset}\\
+      &=\kassoc{\rmS}{Y,X}{\emptyset} \wedge
+      \forall \rmZ^{*} \subset \emptyset
+        : \neg\,\kassoc{\rmS}{Y,X}{\rmZ^{*}}\\
+      &=\kassoc{\rmS}{Y,X}{\emptyset},
+    \end{aligned}
+  \end{gather}
+  since there are no proper subsets of the empty set to begin with.
+  
+  Now assume that $Y$ and $X$ are not $m$-order associated ---where
+  $m \leq k < |\rmZ|$---w.r.t. any subsets in $\powerleq{k}{\rmZ}$,
+  \begin{equation}
+    \label{eq:k-dep-to-assoc-eq1}
+    \forall \rmZ^{*} \in \powerleq{k}{\rmZ} :
+    \neg\,\kassoc{\rmS}{Y,X}{\rmZ^{*}}.
   \end{equation}
-  Now assume that $Y$ is not associated with any subsets in
-  $\powerleq{k}{\rmX}$. Then we know that if $Y$ is associated with any
-  subset in $\powereq{k+1}{\rmX}$, it implies a $(k+1)$-dependance
-  between $X$ and $Y$. Therefore the existance of any association
-  implies a potentially lower order dependance for some subset.
+  Then we know that if $Y$ and $X$ are $(k+1)$-order associated with any
+  subset $\rmZ' \in \powereq{k+1}{\rmZ}$,
+  \begin{equation}
+    \label{eq:k-dep-to-assoc-eq2}
+    \kassoc{\rmS}{Y,X}{\rmZ'},
+  \end{equation}
+  taking the conjunction of \Cref{eq:k-dep-to-assoc-eq1} and
+  \Cref{eq:k-dep-to-assoc-eq2} results in $Y$ and $X$ being
+  $(k+1)$-order dependent w.r.t. $\rmZ'$,
+  \begin{align}
+    &\kassoc{\rmS}{Y,X}{\rmZ'} \wedge
+      \forall \rmZ^{*} \in \powerleq{k}{\rmZ'} :
+      \neg\,\kassoc{\rmS}{Y,X}{\rmZ^{*}}\nonumber\\
+    &\iff \kdep{\rmS}{Y,X}{\rmZ'}, \label{eq:14}
+  \end{align}
+  since $\powerleq{k}{\rmZ'}\subseteq\powerleq{k}{\rmZ}$ and we know
+  that---at the worst---$Y$ and $X$ are $(k+1)$-order associated when
+  $k=|\rmZ|-1$.
 \end{proof}
 
-\begin{definition}[$k$-Order Faithfulness]\label{def:k-faith}
-  Given the probabilistic graphical model $\model=(\gr, \pr)$ where
-  $\gr = (\verts, \edges)$, then $\gr$ is $k$-order faithful to $\pr$ if
-  and only if $\forall \rmS \subseteq \verts\setminus\{Y,X\}$ whenever
+With all the preliminary setup out of the way, we now introduce our
+generalisation of the faithfulness assumption in \Cref{def:faith} to
+higher order dependence relationships using our definition of $k$-order
+dependence in \Cref{def:k-dep}.
+
+\begin{assumption}[$k$-Order Faithfulness]\label{def:k-faith}
+  Given the \gls{pgm} $\model=(\gr, \pr)$, $\gr$ is $k$-order faithful
+  to $\pr$ if and only if
+  $\forall \rmS \subseteq \verts\setminus\{Y,X\}$, whenever,
   \begin{gather}
     \label{eq:k-faith-indep}
     \begin{aligned}
@@ -570,106 +680,48 @@ like stochastic \texttt{AND} operator.
         \exists \rmS' \subseteq \rmS :
       Y \indep{\pr} X \mid \rmZ \cup \rmS'\\
       &\implies
-      Y \indep{\gr} X \mid \rmS,
+      Y \indep{\gr} X \mid \rmS.
     \end{aligned}
   \end{gather}
   More useful however is its contrapositive which states
-  that $\forall \rmS \subseteq \verts\setminus\{Y,X\}$:
+  that $\forall \rmS \subseteq \verts\setminus\{Y,X\}$,
   \begin{gather}
     \label{eq:k-faith-1}
     \begin{aligned}
       &Y \dep{\gr} X \mid \rmS\\
       &\implies
       \exists \rmZ \in \power{\leq k}(\verts\setminus\{Y,X\}) :
-      %   \forall \rmS' \subseteq \rmS :
-      %   Y \dep{\pr} X \mid \rmZ \cup \rmS.
-        \kassoc{\rmS}{Y,X}{\rmZ},
-    \end{aligned}
-    \intertext{where}
-    \begin{aligned}
-      \kassoc{\rmS}{Y,X}{\rmZ} \coloneq
-      \forall \rmS' \subseteq \rmS : Y \dep{\pr} X \mid \rmZ \cup \rmS.
+        \kassoc{\rmS}{Y,X}{\rmZ}.
     \end{aligned}
   \end{gather}
   However, the definition in \Cref{eq:k-faith-1} allows $k$ to be larger
   than it needs to be---i.e. $k$ is not strict. Therefore, we say that
   the graph $\gr$ is \emph{strictly} $k$-order faithful to the
-  distribution $\pr$ if $\forall \rmS \subseteq \verts\setminus\{Y,X\}$:
+  distribution $\pr$ if $\forall \rmS \subseteq \verts\setminus\{Y,X\}$,
   \begin{gather}
-    \label{eq:10}
+    \label{eq:k-faith-2}
     \begin{aligned}
       &Y \dep{\gr} X \mid \rmS\\
       &\implies
       \exists \rmZ \in \powereq{k}{\verts\setminus\{Y,X\}} :
-      \kdep{\rmS}{Y,X}{\rmZ}
-    \end{aligned}
-    \intertext{where}
-    \begin{aligned}
-      &\kdep{\rmS}{Y,X}{\rmZ}\\
-      &\coloneq
-        \kassoc{\rmS}{Y,X}{\rmZ}
-        \wedge
-        (\forall \rmZ' \subset \rmZ :
-                \neg\kassoc{\rmS}{Y,X}{\rmZ'}).
+      \kdep{\rmS}{Y,X}{\rmZ},
     \end{aligned}
   \end{gather}
-  This implication follows directly from \Cref{lem:k-dep-to-assoc}.
-% \begin{gather}
-%     \begin{aligned}
-%       &\forall \rmS \subseteq \subverts{YX} :
-%       Y \dep{\gr} X \mid \rmS\\
-%       &\implies
-%       \exists \rmZ \in \power{\leq k}(\subverts{YX})\:\:
-%       \forall \rmS \subseteq \subverts{YX} :
-%       Y \dep{\pr} X \mid \rmZ \cup \rmS\\
-%       % &\implies 
-%       % \exists \rmZ \in \power{\leq k}(\subverts{YX}):
-%       % \kassoc{\verts}{Y,X}{\rmZ}\\
-%       % &\implies
-%       % \exists \rmZ \in \power{\leq k}(\subverts{YX}):
-%       % \kdep{\verts}{Y,X}{\rmZ}
-%     \end{aligned}
-%   \end{gather}
-\end{definition}
-rules out deterministic functions?
+  where this definition in \Cref{eq:k-faith-2} logically follows from
+  \Cref{eq:k-faith-1} as a result of \Cref{lem:k-dep-to-assoc}.
+  \todo{maybe use another symbol for k in strict def}
+\end{assumption}
+
+With this new generalisation of the faithfulness assumption, we will now
+present an initial algorithm---{\method}---that makes use of our
+$k$-order faithfulness assumption for learing the Markov blanket of some
+variable $Y\in\verts$.
 
 %%% Algorithm
-\section{kOMB: k-order Markov Blanket}
-% \begin{lemma}[Ruling out $k$-associations]
-%   For distinct random variables $Y\in\rmV$ and
-%   $\rmX=\{X_{1},X_{2},\ldots,X_{k}\}\subset\rmV$, the following holds
-%   for all $\rmS \subset \rmV \setminus \rmX \cup \{Y\}$
-%   \begin{gather}
-%     \label{eq:3}
-%     \begin{aligned}
-%       Y\indep{}\rmX \mid \rmS
-%       \implies
-%       &\forall \rmZ\subseteq\rmX : Y\indep{}\rmZ \mid \rmS \cup
-%         (\rmX\setminus\rmZ)\\
-%       \implies
-%       &Y\notassoc{\leq k}\rmX
-%     \end{aligned}
-%   \end{gather}
-%   as a consequence of the weak union graphoid axiom.
-% \end{lemma}
-
-
-% \begin{lemma}[kOMB $k$-associations detection]
-%   For random variables $\rmX \subset \rmV$ and
-%   $Y,Z \in \rmV$, asumming $Z\in \mb(Y)$ and $k$-Adjacency Faithfulness
-%   \begin{equation} 
-%     \label{eq:7}
-%     \begin{aligned}
-%       &\bigl(\rmX \indep{} Y \mid \rmS\bigr)
-%         \wedge
-%         \bigl(\rmX \cup \{Z\} \dep{} Y \mid \rmS\bigr)\\
-%       &\implies \exists \rmW \subseteq \rmX :
-%          Y\strict{|\rmW|+1}\rmW \cup \{Z\}
-%     \end{aligned}
-%   \end{equation}
-% \end{lemma}
-
-\begin{lemma}[$k$-dependance implies inter-association]\label{lem:k-dep-inter}
+\section{kOMB: k-order Markov Blanket}\label{sec:algo}
+- we need subset lemma
+- but first
+\begin{lemma}[$k$-Order Dependance Implies Inter-Association]\label{lem:k-dep-inter}
   \begin{gather}
     \label{eq:13}
     \kdep{\rmS}{Y,X}{\rmZ}
@@ -1401,56 +1453,7 @@ We then construct a Bayesian network for each
 
 \appendix
 \section{Appendix}
-You may include other additional sections here.
-\subsection{G-Test}
-The G-test is a statistical test that seeks to reject the hypothesis
-that a set of observed discrete data follows some assumed
-distribution. A common use for the G-test is to test if the dimensions
-in some multidimensional data are independent. Conducting this test
-first involves computing the G-statistic,
-\begin{equation}
-  \label{eq:g-stat}
-  G = 2 \sum_{i} O_{i}\cdot \ln\Biggl(\frac{O_{i}}{E_{i}}\Biggr),
-\end{equation}
-where $O_{i}\geq 0$ are the observed counts in the cells and $E_{i} > 0$
-are the expected counts under the distribution assumed in the null
-hypothesis.
-
-In this paper, we are specifically interested in using the G-test to
-test the null hypothesis that some subset $\rmS$ of the variables
-$\rmS\subset\rmX \setminus (\{\rvt\} \cup \mb)$ is conditionally
-independent to the variable $\rvt$ given the a candidate Markov blanket
-$\mb$,
-\begin{equation*}
-  H_{0}(\rmS): \rmS \indep \rvt \mid \mb.
-\end{equation*}
-The G-statistic for testing this hypothesis is
-then~\citep{tsamardinos2006}
-\begin{align*}
-  G(\rmS)
-  &= 2 \sum_{\rvx_{\rvs},\rvx_{t},\rvx_{\rvc}}
-    O(\rvx_{\rvs},\rvx_{t},\rvx_{\rvc})\cdot
-    \ln\Biggl(
-    \frac{P(\rvx_{\rvs},\rvx_{t}\mid\rvx_{\rvc}) P(\rvx_{\rvc})}
-    {P(\rvx_{\rvs}\mid\rvx_{\rvc})P(\rvx_{t}\mid\rvx_{\rvc})
-    P(\rvx_{\rvc})}\Biggr)\\
-  &= 2 \sum_{\rvx_{\rvs},\rvx_{t},\rvx_{\rvc}}
-    O(\rvx_{\rvs},\rvx_{t},\rvx_{\rvc})\cdot
-    \ln\Biggl(
-    \frac{O(\rvx_{\rvs},\rvx_{t},\rvx_{\rvc}) O(\rvx_{\rvc})}
-    {O(\rvx_{\rvs},\rvx_{\rvc})O(\rvx_{t},\rvx_{\rvc})}\Biggr).
-\end{align*}
-Under the null hypothesis, the distribution of this statistic $G(\rmS)$
-is then approximately $\chi^{2}(\df(\rmS))$ distributed
-where~\citep{tsamardinos2006}
-\begin{align*}
-  \df(\rmS) &= (|\rvt|-1) \cdot
-              \Biggl(\prod_{\rvs\in\rmS}|\rvs| - 1\Biggr) \cdot
-              \Biggl(\prod_{\rvc\in\mb}|\rvc|\Biggr)
-\end{align*}
-is the degrees of freedomn in the statistical test. 
-
-
+\input{apx.tex}
 
 \end{document}
 

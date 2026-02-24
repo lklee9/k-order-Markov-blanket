@@ -1,0 +1,56 @@
+\subsection{Proofs}
+\kdeptoassoc*
+\subsection{Implementation Details of kOMB}
+The G-test is a statistical test that seeks to reject the hypothesis
+that a set of observed discrete data follows some assumed
+distribution. A common use for the G-test is to test if the dimensions
+in some multidimensional data are independent. Conducting this test
+first involves computing the G-statistic,
+\begin{equation}
+  \label{eq:g-stat}
+  G = 2 \sum_{i} O_{i}\cdot \ln\Biggl(\frac{O_{i}}{E_{i}}\Biggr),
+\end{equation}
+where $O_{i}\geq 0$ are the observed counts in the cells and $E_{i} > 0$
+are the expected counts under the distribution assumed in the null
+hypothesis.
+
+In this paper, we are specifically interested in using the G-test to
+test the null hypothesis that some subset $\rmS$ of the variables
+$\rmS\subset\rmX \setminus (\{\rvt\} \cup \mb)$ is conditionally
+independent to the variable $\rvt$ given the a candidate Markov blanket
+$\mb$,
+\begin{equation*}
+  H_{0}(\rmS): \rmS \indep \rvt \mid \mb.
+\end{equation*}
+The G-statistic for testing this hypothesis is
+then~\citep{tsamardinos2006}
+\begin{align*}
+  G(\rmS)
+  &= 2 \sum_{\rvx_{\rvs},\rvx_{t},\rvx_{\rvc}}
+    O(\rvx_{\rvs},\rvx_{t},\rvx_{\rvc})\cdot
+    \ln\Biggl(
+    \frac{P(\rvx_{\rvs},\rvx_{t}\mid\rvx_{\rvc}) P(\rvx_{\rvc})}
+    {P(\rvx_{\rvs}\mid\rvx_{\rvc})P(\rvx_{t}\mid\rvx_{\rvc})
+    P(\rvx_{\rvc})}\Biggr)\\
+  &= 2 \sum_{\rvx_{\rvs},\rvx_{t},\rvx_{\rvc}}
+    O(\rvx_{\rvs},\rvx_{t},\rvx_{\rvc})\cdot
+    \ln\Biggl(
+    \frac{O(\rvx_{\rvs},\rvx_{t},\rvx_{\rvc}) O(\rvx_{\rvc})}
+    {O(\rvx_{\rvs},\rvx_{\rvc})O(\rvx_{t},\rvx_{\rvc})}\Biggr).
+\end{align*}
+Under the null hypothesis, the distribution of this statistic $G(\rmS)$
+is then approximately $\chi^{2}(\df(\rmS))$ distributed
+where~\citep{tsamardinos2006}
+\begin{align*}
+  \df(\rmS) &= (|\rvt|-1) \cdot
+              \Biggl(\prod_{\rvs\in\rmS}|\rvs| - 1\Biggr) \cdot
+              \Biggl(\prod_{\rvc\in\mb}|\rvc|\Biggr)
+\end{align*}
+is the degrees of freedomn in the statistical test. 
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "main"
+%%% End:
