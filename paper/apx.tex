@@ -1,6 +1,6 @@
-% Proofs
+%%% Proofs
 \section{Proofs}\label{apx:proofs}
-%% k dep to assoc
+%%%% k dep to assoc
 \kdeptoassoc*
 \begin{proof}[Proof by induction]
   When $\rmZ'$ is an empty set, and therefore a subset of $\rmZ$ with
@@ -45,7 +45,7 @@
   $k=|\rmZ|-1$.
 \end{proof}
 
-%% k dep to inter
+%%%% k dep to inter
 \kdepinter*
 \begin{proof}
   First assume that $\kdep{\rmS}{Y,X}{\rmZ}$ which from its definition
@@ -115,7 +115,7 @@
 \end{proof}
 
 
-%% Dep subset
+%%%% Dep subset
 \depsubset*
 \begin{proof}
   Recall that $\kdep{\rmS}{Y,X}{\rmZ}$ is defined in \Cref{def:k-dep} as
@@ -165,8 +165,155 @@
   which concludes this proof.
 \end{proof}
 
+%%% Proofs of Theorems
+\section{Proofs for Theorems}
+\citest*
 
-% Implementation
+\begin{proof}
+  The function \textit{find\_cond} first iterates through all the
+  subsets $\rmX'\in\powerleq{k-|\rmX|}{\rmS}$ and for each $\rmX'$ where
+  $Y \dep{\pre} X \mid \rmX'$ (line 9 in \textit{find\_cond}), it passes
+  $\rmX'$ to the function \textit{no\_seps} (line 10 in
+  \textit{find\_cond}) to determine if there are any subsets
+  $\rmS'\in\powerleq{l}{\rmS\setminus\rmX'}$ that results in
+  $Y \dep{\pre} X \mid \rmX'\cup \rmS'$ (line 3 in \textit{no\_seps}).
+  As soon as \textit{no\_seps} finds such a $\rmS'$, it returns
+  \texttt{False} (line 4 in \textit{no\_seps}), and \textit{find\_cond}
+  will need to go to the next iteration. Otherwise, if \textit{no\_seps}
+  is unable to find any such subset $\rmS'$, it returns \texttt{True}
+  (line 5 in \textit{no\_seps}), and \textit{find\_cond} then
+  immediately returns $\rmZ=\rmX'\cup\rmX$ (line 11 in
+  \textit{find\_cond}) as there are no $l$-bounded subsets of $\rmS$
+  that renders $Y$ and $X$ conditionally independent given
+  $\rmZ$. However, if \textit{find\_cond} completes all its iteration
+  without returning early, then we know that all subset $\rmX'$ has some
+  $l$-bounded subset $\rmS'$ that will cause
+  $Y\indep{\pre}X\mid\rmX'\cup\rmX\cup\rmS'$. Therefore
+  \textit{find\_cond} just returns the emptyset in this case (line 12 in
+  \textit{find\_cond}).
+\end{proof}
+
+\assocmine*
+\begin{proof}
+  During each function call, \textit{find\_inter\_dep} is passed
+  some--potentially empty---set $\rmX$ and it then iterates through each
+  varible $X$ that has not been included in $\rmX$ yet,
+  $X\in\verts\setminus(Y \cup \rmX \cup \rmS)$. In each iteration it
+  calls the function \textit{find\_cond} to find a subset
+  $\rmX' \in \powerleq{k-|\rmX|}{\rmS}$ such that
+  \begin{equation*}
+    \forall \rmS' \in \powerleq{l}{\rmS \setminus \rmX'} :
+    Y\dep{\pre}X  \mid \rmX \cup \rmX' \cup \rmS'.
+  \end{equation*}
+  When \textit{find\_cond} fails to find such a set $\rmX'$, it just
+  returns an empty set, causing \textit{find\_inter\_dep} to check the
+  next variable $X$ not already in $\rmX\cup\rmS$. 
+  
+  Otherwise, when a suitable set $\rmX'$ is found, \textit{find\_cond}
+  returns $\rmZ=\rmX'\cup\rmX$ and $\rmZ$ is then passed on to the
+  function \textit{make\_strict} to remove any superfluous variables
+  resulting in the set $\rmZ'\subseteq(\rmZ\cup X)$ such that,
+  \begin{align*}
+    &\forall Z \in \rmZ'\:\:
+    \forall \rmS' \in \powerleq{l}{\rmS}:
+    Y \dep{\pre} Z \mid \rmZ \cup \rmS' \setminus Z\\
+    &\iff \forall Z \in \rmZ' :
+      \lassoc{\rmS}{Y,Z}{\rmZ\setminus Z}\\
+    &\iff \linter{\rmS}{Y,X\cup\rmX\cup\rmX'}.
+  \end{align*}
+  Furthermore, since \textit{find\_inter\_dep} explores the enumeration
+  tree of the set $\verts \setminus (Y \cup \rmS)$ up to subsets of
+  cardinality $k$ (lines 13 to 17 in \textit{find\_inter\_dep}) , we
+  know that every subset
+  $\rmX\in\powerleq{k}{\verts \setminus (Y \cup \rmS)}$ will be
+  explored---barring any early returns. In combination with
+  \textit{find\_cond} exploring the subsets
+  $\rmX' \in \powerleq{k-|\rmX|}{\rmS}$, \textit{find\_inter\_dep}
+  returns $X\cup\rmZ$ where $\rmZ=\rmX\cup\rmX'$ if and only if
+  \begin{align*}
+    \exists \rmZ \in \powerleq{k}{\hat{\verts}} \:\:
+    \exists X \in \hat{\verts}\setminus(\rmX\cup\rmS) :
+    \linter{\rmS}{Y,X\cup\rmZ}.
+  \end{align*}
+  where $\hat{\verts}=\verts\setminus Y$. If no such $X$ and $\rmZ$ can
+  be found, \textit{find\_inter\_dep} will return an empty set when
+  every subset $\rmX\in\powerleq{k}{\verts\setminus (Y\cup\rmS)}$ has
+  been explored.
+\end{proof}
+
+\algkomb*
+\begin{proof}
+  First let $\hat{\verts}=\verts\setminus Y$.  At each iteration of the
+  grow phase, if there is a variable $X$ and subset $\rmZ$ where
+  following logical statement is true,
+  \begin{equation*}
+    \exists \rmZ \in \powerleq{k}{\hat{\verts}} \:\:
+    \exists X \in \hat{\verts}\setminus(\rmX\cup\rmS) :
+    \linter{\rmS}{Y,X\cup\rmZ},
+  \end{equation*}
+  then the function \textit{find\_inter\_dep} will return the set
+  $(X\cup\rmZ)$. Furthermore, we know that under the $k$-order
+  faithfulness assumption, for some
+  existing---potentially empty---candidate Markov blanket 
+  $\rmS\subseteq \subverts$, $k'\leq k$, and for all possible $X$,
+  \begin{align}
+    &Y \dep{\gr} X \mid \verts \iff X \in \mbs{\gr}(Y)
+      \label{eq:komb-1}\\
+    &\implies \exists \rmZ \in \powereq{k'}{\subverts}:
+      \kdep{\verts}{Y,X}{\rmZ}
+      \label{eq:komb-2}\\
+    &\implies \exists \rmZ \in \powereq{k'}{\subverts}:
+      \kinter{\rmS}{Y,X\cup\rmZ}\label{eq:komb-3}\\
+    &\implies \exists \rmZ \in \powereq{k'}{\subverts}:
+      \linter{\rmS}{Y,X\cup\rmZ}\label{eq:komb-4},
+  \end{align}
+  where \Cref{eq:komb-1,eq:komb-2} is true by definition, the
+  implication in \Cref{eq:komb-3} follows from the result in
+  \Cref{lem:subset}, and \Cref{eq:komb-4} is true under the $l$-bounded
+  separator assumption in \Cref{def:bound-sep}.
+  
+  Therefore, we know that whenever there exists some $X$ that is in the
+  true Markov blanket of $Y$ but not yet included in the candidate
+  Markov blanket $\rmS$, thanks to the implication in \Cref{eq:komb-4},
+  we know that \textit{find\_inter\_dep} will be able to find and
+  approapiate $\rmZ$ such that $\linter{\rmS}{Y,X\cup\rmZ}$ is true and
+  the set $X\cup\rmZ$ will be added into $\rmS$.
+
+  Therefore once \textit{find\_inter\_dep} starts to return empty sets,
+  we know that there is no more varibles left in
+  $\hat{\verts}\setminus\rmS$ that are in the true Markov blanket of
+  $Y$,
+  \begin{equation*}
+    \mbs{\gr}(Y) \subseteq \rmS.
+  \end{equation*}
+
+  During the shrink phase, {\method} iteratively calls
+  \textit{find\_cond} on every variable in $\rmS$ and removes that
+  variable from $\rmS$ if \textit{find\_cond} returns an empty set. We
+  know that given the variable $X$ and initial conditioning set
+  $\emptyset$, \textit{find\_cond} returns the empty set if,
+  \begin{align*}
+    &\forall \rmZ\in\powerleq{k}{\rmS\setminus X}\:\:
+    \exists \rmS'\in\powerleq{l}{\rmS\setminus(X\cup\rmZ)} :\\
+    &Y \indep{\pre} X \mid \rmZ \cup \rmS'\\
+    &\iff \\
+    &\forall \rmZ\in\powerleq{k}{\subverts}\:\:
+    \exists \rmS'\in\powerleq{l}{\rmS\setminus X} :\\
+    &Y \indep{\pre} X \mid \rmZ \cup \rmS' \\
+    &\iff Y \indep{\gr} X \mid (\rmS\setminus X)
+  \end{align*}
+  where the biconditionals follow from the global Markov property since
+  $\mbs{\gr}(Y)\subseteq\rmS$ and the $l$-bounded separator
+  assumption.
+
+  Therefore, whenever a variable $X\in\rmS$ is not in the Markov blanket
+  of $Y$, \textit{find\_cond} returns an empty set and $X$ is removed
+  from $\rmS$. As such, after the shrink phase, the subset $\rmS$ is
+  exactly the graphical Markov blanket of $Y$, $\rmS=\mbs{\gr}(Y)$.
+\end{proof} 
+
+
+%%% Implementation
 \section{Implementation Details of kOMB}
 The G-test is a statistical test that seeks to reject the hypothesis
 that a set of observed discrete data follows some assumed

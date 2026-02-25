@@ -167,6 +167,8 @@
   + for example in figure 1
 - faithful violations has been studied in the past and
   + relaxations exists
+  + marx more practical due to only cosidering unfaithful triples
+  + but might not capture faithfulness violations over more than 3 vars
 - in this work
 ** Probabilistic Graphical Models and Independece
 - no hidden/latent variables

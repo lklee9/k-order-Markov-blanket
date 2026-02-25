@@ -272,27 +272,35 @@ we will propose later in \Cref{sec:algo}. A full walkthrough of this
 example can be found later in \Cref{ex:exactly-1} under
 \Cref{sec:violation}.\todo{maybe add more explaination here?}
 
-one para about relaxations of faithfulness \todo{todo}
-- current relaxations either too weak or too strong
+There are several weaker assumptions compared to faithfulness one can
+employ to assist in MB discovery; such as adjacency and orientation
+faithfulness~\citep{spirtes2001},
+Pearl-minimality~\citep{pearl1988,pearl2009},
+SGS-minimality~\citep{spirtes2001}, frugality~\citep{forster2018}, and
+more recently $2$-adjacency faithfulness~\citep{marx2021}. The
+$2$-adjacency assumption in particular is quite practical as by limiting
+faithfulness violations to ``Unfaithful Triples'' as defined
+in~\citet[Definition 5]{marx2021}, it emits an algorithm with a much
+smaller search space compared to frugality. However, although the
+$2$-adjacency faithfulness can find xor-type relations, it is unable to
+find higher order parity relationships between more than $3$ varibles.
+
 
 %%%% Contributions
-Therefore, motivated by such violations of faithfulness, we will propose
-a direct relaxation of the faithfulness assumption for higher order
+\paragraph{Contributions}
+Therefore, motivated by the considerations above, we will propose a
+direct relaxation of the faithfulness assumption for higher order
 relations between $k+2$ variables which we will call: the $k$-order
 faithfulness assumption. This new relaxation of faithfulness will allow
 us to infer---from sample data---the graphical Markov blanket of a
-variable under some certain mild conditions, which we will empirically
-show by implementing a proof of concept algorithm called $k$-order
-Markov blanket (kOMB).\todo{complete this}
+variable under some certain mild conditions. We will show
+this by implementing a---theorectically complete---proof of concept
+algorithm called $k$-order Markov blanket (kOMB). We then empirically
+show that kOMB can overcome empirical faithfulness violations and that
+it performs similarly---if not better---than some existing
+constraint-based mehtod on well known benchmark datasets.
 
-Contributions and outline \todo{todo}
-\begin{enumerate}
-\item new faithfulness relaxation
-\item both theoretical and code implementation of algo that uses this
-assumption
-\item empirically showing the benefits of this relaxation on well known
-benchmark data
-\end{enumerate}
+Our paper will be structured as follows: \todo{todo}
 
 %%% background
 \section{Probabilistic Graphical Models and Independencies}
@@ -684,19 +692,19 @@ dependence in \Cref{def:k-dep}.
   However, the definition in \Cref{eq:k-faith-1} allows $k$ to be larger
   than it needs to be---i.e. $k$ is not strict. Therefore, we say that
   the graph $\gr$ is \emph{strictly} $k$-order faithful to the
-  distribution $\pr$ if $\forall \rmS \subseteq \verts\setminus\{Y,X\}$,
+  distribution $\pr$ if $\forall \rmS \subseteq \verts\setminus\{Y,X\}$
+  and $k'\leq k$,
   \begin{gather}
     \label{eq:k-faith-2}
     \begin{aligned}
       &Y \dep{\gr} X \mid \rmS\\
       &\implies
-      \exists \rmZ \in \powereq{k}{\verts\setminus\{Y,X\}} :
+      \exists \rmZ \in \powereq{k'}{\verts\setminus\{Y,X\}} :
       \kdep{\rmS}{Y,X}{\rmZ},
     \end{aligned}
   \end{gather}
   where this definition in \Cref{eq:k-faith-2} logically follows from
   \Cref{eq:k-faith-1} as a result of \Cref{lem:k-dep-to-assoc}.
-  \todo{maybe use another symbol for k in strict def}
 \end{assumption}
 
 With this new generalisation of the faithfulness assumption, we will now
@@ -857,8 +865,11 @@ conditionally independent given $\rmZ\cup\rmS'$.
     &Y \dep{\gr} X \mid \rmS\\
     &\implies
       \exists \rmZ \in \power{\leq k}(\verts')\:\:
-      \forall \rmS' \in \powerleq{l}{\rmS}:
+      \forall \rmS' \subseteq \rmS:
       Y \dep{\pr} X \mid \rmZ \cup \rmS'\\
+    &\iff
+      \exists \rmZ \in \power{\leq k}(\verts') :
+      \kassoc{\rmS}{Y,X}{\rmZ}\\
     &\iff \exists \rmZ \in \powerleq{k}{\verts'} :
     \lassoc{\rmS}{Y,X}{\rmZ},
     % &\implies \exists \rmZ \in \powereq{k}{\verts'} :
@@ -949,6 +960,39 @@ blanket of some target variable $Y\in\verts$ assuming that
   \Return{$\rmS$}\;
 \end{algorithm}
 
+\begin{restatable}[Correctness of \Cref{alg:ci-test}]{theorem}{citest}
+  Given an estimated distribution $\pre$, distinct variables
+  $Y,X\in\verts$, disjoint subsets $\rmX,\rmS\subset\subverts$, and the
+  natural numbers $k,l\in\mathbb{N}$\footnote{We adopt the definition of
+    the natural numbers in which $0$ is included.}; the function
+  \textit{find\_cond} in \Cref{alg:ci-test} returns the set
+  $\rmX'\cup\rmX$ if and only if
+  $\exists \rmX' \in \powerleq{k-|\rmX|}{\rmS}$ where,
+  \begin{equation}
+    \label{eq:25}
+    \forall \rmS' \in \powerleq{l}{\rmS \setminus \rmX'} :
+    Y \dep{\pre} X \mid \rmX \cup \rmX' \cup \rmS'.
+  \end{equation}
+  Otherwise \textit{find\_cond} just returns an empty set.
+\end{restatable}
+
+\begin{restatable}[Correctness of \Cref{alg:assoc-mine}]{theorem}{assocmine}
+  Given an estimated distribution $\pre$, the target variable whose
+  Markov blanket in $\gr$ we want to discover $Y\in\verts$, the current
+  candidate Markov blanket $\rmS\subset\verts\setminus Y$, the remaining
+  variables not already in the candidate Markov blanket
+  $\verts'=\verts\setminus(Y\cup \rmS)$, and the natural numbers
+  $k,l\in\mathbb{N}$; the function \textit{find\_inter\_dep} in
+  \Cref{alg:assoc-mine} returns the set $X\cup\rmZ$ if
+  \begin{equation}
+    \exists \rmZ \in \powerleq{k}{\hat{\verts}} \:\:
+    \exists X \in \hat{\verts}\setminus(\rmX\cup\rmS) :
+    \linter{\rmS}{Y,X\cup\rmZ}.
+  \end{equation}
+  where $\rmZ=\rmX\cup\rmX'$ and $\hat{\verts}=\verts\setminus Y$.
+  Otherwise, \textit{find\_inter\_dep} just returns the empty set.
+\end{restatable}
+
 
 \begin{algorithm}
   \caption{Association Mining}\label{alg:assoc-mine}
@@ -1034,148 +1078,29 @@ blanket of some target variable $Y\in\verts$ assuming that
 \end{algorithm}
 
 
-\begin{restatable}[Correctness of \Cref{alg:ci-test}]{theorem}{citest}
-  Given an estimated distribution $\pre$, distinct variables
-  $Y,X\in\verts$, disjoint subsets $\rmX,\rmS\subset\subverts$, and the
-  natural numbers $k,l\in\mathbb{N}$; the function \textit{find\_cond}
-  in \Cref{alg:ci-test} returns the set $\rmX'\cup\rmX$ if and only if
-  $\exists \rmX' \in \powerleq{k-|\rmX|}{\rmS}$ where,
-  \begin{equation}
-    \label{eq:25}
-    \forall \rmS' \in \powerleq{l}{\rmS \setminus \rmX'} :
-    Y \dep{\pre} X \mid \rmX \cup \rmX' \cup \rmS'.
-  \end{equation}
-  Otherwise \textit{find\_cond} just returns an empty set.
-\end{restatable}
-\begin{proof}
-  The function \textit{find\_cond} first iterates through all the
-  subsets $\rmX'\in\powerleq{k-|\rmX|}{\rmS}$ and for each $\rmX'$ where
-  $Y \dep{\pre} X \mid \rmX'$ (line 9 in \textit{find\_cond}), it passes
-  $\rmX'$ to the function \textit{no\_seps} (line 10 in
-  \textit{find\_cond}) to determine if there are any subsets
-  $\rmS'\in\powerleq{l}{\rmS\setminus\rmX'}$ that results in
-  $Y \dep{\pre} X \mid \rmX'\cup \rmS'$ (line 3 in \textit{no\_seps}).
-  As soon as \textit{no\_seps} finds such a $\rmS'$, it returns
-  \texttt{False} (line 4 in \textit{no\_seps}), and \textit{find\_cond}
-  will need to go to the next iteration. Otherwise, if \textit{no\_seps}
-  is unable to find any such subset $\rmS'$, it returns \texttt{True}
-  (line 5 in \textit{no\_seps}), and \textit{find\_cond} then
-  immediately returns $\rmZ=\rmX'\cup\rmX$ (line 11 in
-  \textit{find\_cond}) as there are no $l$-bounded subsets of $\rmS$
-  that renders $Y$ and $X$ conditionally independent given
-  $\rmZ$. However, if \textit{find\_cond} completes all its iteration
-  without returning early, then we know that all subset $\rmX'$ has some
-  $l$-bounded subset $\rmS'$ that will cause
-  $Y\indep{\pre}X\mid\rmX'\cup\rmX\cup\rmS'$. Therefore
-  \textit{find\_cond} just returns the emptyset in this case (line 12 in
-  \textit{find\_cond}).
-\end{proof}
-
-\begin{restatable}[Correctness of \Cref{alg:assoc-mine}]{theorem}{assocmine}
-  Given an estimated distribution $\pre$, the target variable whose
-  Markov blanket in $\gr$ we want to discover $Y\in\verts$, the current
-  candidate Markov blanket $\rmS\subset\verts\setminus Y$, the remaining
-  variables not already in the candidate Markov blanket
-  $\verts'=\verts\setminus(Y\cup \rmS)$, and the natural numbers
-  $k,l\in\mathbb{N}$; the function \textit{find\_inter\_dep} in
-  \Cref{alg:assoc-mine} returns the set $X\cup\rmZ$ if
-  \begin{equation}
-    \exists \rmZ \in \powerleq{k}{\hat{\verts}} \:\:
-    \exists X \in \hat{\verts}\setminus(\rmX\cup\rmS) :
-    \linter{\rmS}{Y,X\cup\rmZ}.
-  \end{equation}
-  where $\rmZ=\rmX\cup\rmX'$ and $\hat{\verts}=\verts\setminus Y$.
-  Otherwise, \textit{find\_inter\_dep} just returns the empty set.
-\end{restatable}
-\begin{proof}
-  % The function \textit{find\_inter\_dep} in \Cref{alg:komb} is a
-  % recursive function where for each recursive call of the function, it
-  % is passed a subset of all the variables except $Y$ and $\rmS$ with
-  % length less than or equal to $k$,
-  % $\rmX \in \powerleq{k}{\verts' \setminus \rmS}$.
-
-  During each function call, \textit{find\_inter\_dep} is passed
-  some--potentially empty---set $\rmX$ and it then iterates through each
-  varible $X$ that has not been included in $\rmX$ yet,
-  $X\in\verts\setminus(Y \cup \rmX \cup \rmS)$. In each iteration it
-  calls the function \textit{find\_cond} to find a subset
-  $\rmX' \in \powerleq{k-|\rmX|}{\rmS}$ such that
-  \begin{equation*}
-    \forall \rmS' \in \powerleq{l}{\rmS \setminus \rmX'} :
-    Y\dep{\pre}X  \mid \rmX \cup \rmX' \cup \rmS'.
-  \end{equation*}
-  When \textit{find\_cond} fails to find such a set $\rmX'$, it just
-  returns an empty set, causing \textit{find\_inter\_dep} to check the
-  next variable $X$ not already in $\rmX\cup\rmS$. 
-  
-  Otherwise, when a suitable set $\rmX'$ is found, \textit{find\_cond}
-  returns $\rmZ=\rmX'\cup\rmX$ and $\rmZ$ is then passed on to the
-  function \textit{make\_strict} to remove any superfluous variables
-  resulting in the set $\rmZ'\subseteq(\rmZ\cup X)$ such that,
-  \begin{align*}
-    &\forall Z \in \rmZ'\:\:
-    \forall \rmS' \in \powerleq{l}{\rmS}:
-    Y \dep{\pre} Z \mid \rmZ \cup \rmS' \setminus Z\\
-    &\iff \forall Z \in \rmZ' :
-      \lassoc{\rmS}{Y,Z}{\rmZ\setminus Z}\\
-    &\iff \linter{\rmS}{Y,X\cup\rmX\cup\rmX'}.
-  \end{align*}
-  Furthermore, since \textit{find\_inter\_dep} explores the enumeration
-  tree of the set $\verts \setminus (Y \cup \rmS)$ up to subsets of
-  cardinality $k$ (lines 13 to 17 in \textit{find\_inter\_dep}) , we
-  know that every subset
-  $\rmX\in\powerleq{k}{\verts \setminus (Y \cup \rmS)}$ will be
-  explored---barring any early returns. In combination with
-  \textit{find\_cond} exploring the subsets
-  $\rmX' \in \powerleq{k-|\rmX|}{\rmS}$, \textit{find\_inter\_dep}
-  returns $X\cup\rmZ$ where $\rmZ=\rmX\cup\rmX'$ if and only if
-  \begin{align*}
-    \exists \rmZ \in \powerleq{k}{\hat{\verts}} \:\:
-    \exists X \in \hat{\verts}\setminus(\rmX\cup\rmS) :
-    \linter{\rmS}{Y,X\cup\rmZ}.
-  \end{align*}
-  where $\hat{\verts}=\verts\setminus Y$. If no such $X$ and $\rmZ$ can
-  be found, \textit{find\_inter\_dep} will return an empty set when
-  every subset $\rmX\in\powerleq{k}{\verts\setminus (Y\cup\rmS)}$ has
-  been explored.
-\end{proof}
 
 \begin{restatable}[Correctness of \Cref{alg:komb}]{theorem}{algkomb}
-    Given an estimated distribution $\pre$, the target variable whose
-  graphical Markov blanket we want to discover $Y\in\verts$, the current
-  candidate Markov blanket $\rmS\subset\verts\setminus Y$, the remaining
-  variables not already in the candidate Markov blanket
-  $\verts'=\verts\setminus(Y\cup \rmS)$, and the natural numbers
-  $k,l\in\mathbb{N}$; the function \textit{find\_inter\_dep} in
-  \Cref{alg:assoc-mine} returns the set $X\cup\rmZ$ if
+  Given an estimated distribution $\pre$ over variables $\verts$, the
+  target variable whose graphical Markov blanket we want to discover
+  $Y\in\verts$,
+  and the natural numbers $k,l\in\mathbb{N}$; the grow phase of
+  {\method} then grows the candidate Markov blanket $\rmS$ such that,
   \begin{equation}
     \label{eq:27}
-  \mbs{\gr}(Y) \subseteq \rmS 
+    \mbs{\gr}(Y) \subseteq \rmS.
   \end{equation}
+  The shrink phase of {\method} then removes variables from $\rmS$
+  until,
+  \begin{equation}
+    \label{eq:27}
+    \mbs{\gr}(Y) = \rmS,
+  \end{equation}
+  where it subsequently terminates and returns $\rmS$.
 \end{restatable}
-\begin{proof}
-  At each iteration of the grow phase, we obtain
-  \begin{equation*}
-    \rmZ : \kinter{\rmS}{Y,X\cup\rmZ}
-  \end{equation*}
-  since for some $\rmS\subseteq \subverts$
-  \begin{align}
-    &Y \dep{\gr} X \mid \verts \iff X \in \mbs{\gr}(Y)\\
-    &\implies \exists \rmZ \in \powereq{k}{\subverts}:
-      \kdep{\verts}{Y,X}{\rmZ}\\
-    &\implies \exists \rmZ \in \powereq{k}{\subverts}:
-      \kinter{\rmS}{Y,X\cup\rmZ}\\
-    &\implies (X\cup\rmZ) \subseteq \rmS
-  \end{align}
-  where the penultimate implication follows from \Cref{lem:subset} and
-  the last implication follows from line 5 of \Cref{alg:komb} where
-  \method adds the subset $X\cup\rmZ$---found by the algorithm such
-  that $\kinter{\rmS}{Y,X\cup\rmZ}$---into $\rmS$.
-\end{proof}
 
 %%%% Complexity
 \subsection{Complexity of \method}
-
+\todo{todo}
 
 % \section{Lattice Incremental Association Mining for Markov Blankets
 %   (LIAM-MB)}
