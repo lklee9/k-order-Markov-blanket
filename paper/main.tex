@@ -148,29 +148,26 @@
 \maketitle
 
 \begin{abstract}
-  The problem of learning the Markov blanket (MB) of a variable from
-  data has applications in many areas such as learning Bayesian
-  networks, causal discovery, and feature selection. However, for a
-  dataset with $n+1$ variables, enumerating every possible MB for a
-  target variable $t$ has a complexity that's exponential to
-  $n$. Previous approaches have employed advanced techniques to avoid
-  fully exploring this exponential search space. However, these methods
-  are not exhaustive, and therefore incapable of consistently capturing
-  certain higher order relationships between variables; most notably,
-  xor relationships between $t$ and $2$ other binary
-  variables. Therefore, we will revisit the problem of exhaustive MB
-  discovery by using bounds on the G-statistic to help prune the
-  exponential search space. Specifically, we propose a method called
-  Lattice Incremental Association Mining for Markov Blanket discovery
-  (LIAM-MB) which just adds an additional phase between the two phases
-  of Incremental Association Markov Blanket (IAMB)---one of the first
-  approches to MB discovery. Experiments on synthetic Bayesian networks
-  containing xor and parity relationships shows that LIAM-MB is able to
-  capture those relationships while other approaches are unable
-  to. Further experiments on common benchmark datasets will show the
-  cost LIAM-MB incurs for being an exhaustive search compared to
-  existing MB discovery approaches, in particular against its parent
-  method IAMB.
+  The problem of learning the graphical Markov blanket (MB) of a
+  variable from data---sampled from the joint distribution over the
+  variables in the graph---has applications in many areas such as
+  structure learning for Bayesian networks and Markov random fields,
+  causal discovery, and feature selection. However, a common assumption
+  most existing mehtods make is that the conditional independencies in
+  the distribution implies the same separation in the graphical
+  structure---also known as the faithfulness assmuption. Unfortunately,
+  this assumption can be violated due to higher-order conditional
+  dependencies in the distribution---like those in xor and parity-type
+  relations. Furthermore, even having a finite sample can cause
+  empirical violations of faithfulness---which can be quite common in
+  real life scenarios. Therefore, in this paper we propose a ``k-order''
+  relaxation of the faithfulness assumption that captures xor-type and
+  parity type relationships between $k+2$ variables. We then propose a
+  theoretically complete proof of concept algorithm that uses this
+  relaxation of faithfulness for Markov blanket discovery called:
+  k-order markov blanket (kOMB). Finally, we empirically show how kOMB
+  can recover the Markov blanket of a variable under both true and
+  empirical violations of faithfulness.
 \end{abstract}
 
 %%% Intro
