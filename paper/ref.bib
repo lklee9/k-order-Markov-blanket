@@ -209,6 +209,16 @@
   langid = {english}
 }
 
+@inproceedings{inazumi2011,
+  title = {Discovering causal structures in binary exclusive-or skew acyclic models},
+  booktitle = {Conference on {{Uncertainty}} in {{Artificial Intelligence}}},
+  author = {Inazumi, Takanori and Washio, T. and Shimizu, Shohei and Suzuki, J. and Yamamoto, Akihiro and Kawahara, Y.},
+  year = 2011,
+  month = jul,
+  urldate = {2026-02-25},
+  abstract = {Discovering causal relations among observed variables in a given data set is a main topic in studies of statistics and artificial intelligence. Recently, some techniques to discover an identifiable causal structure have been explored based on non-Gaussianity of the observed data distribution. However, most of these are limited to continuous data. In this paper, we present a novel causal model for binary data and propose a new approach to derive an identifiable causal structure governing the data based on skew Bernoulli distributions of external noise. Experimental evaluation shows excellent performance for both artificial and real world data sets.}
+}
+
 @book{koller2009,
   title = {Probabilistic graphical models: principles and techniques - adaptive computation and machine learning},
   shorttitle = {Probabilistic graphical models},
@@ -363,14 +373,18 @@
   langid = {english}
 }
 
-@inproceedings{marx2020,
-  title = {A {{Weaker Faithfulness Assumption}} based on {{Triple Interactions}}},
-  booktitle = {Conference on {{Uncertainty}} in {{Artificial Intelligence}}},
-  author = {Marx, Alexander and Gretton, A. and Mooij, J.},
-  year = 2020,
-  month = oct,
-  urldate = {2026-01-13},
-  abstract = {One of the core assumptions in causal discovery is the faithfulness assumption---i.e. assuming that independencies found in the data are due to separations in the true causal graph. This assumption can, however, be violated in many ways, including xor connections, deterministic functions or cancelling paths. In this work, we propose a weaker assumption that we call 2-adjacency faithfulness. In contrast to adjacency faithfulness, which assumes that there is no conditional independence between each pair of variables that are connected in the causal graph, we only require no conditional independence between a node and a subset of its Markov blanket that can contain up to two nodes. Equivalently, we adapt orientation faithfulness to this setting. We further propose a sound orientation rule for causal discovery that applies under weaker assumptions. As a proof of concept, we derive a modified Grow and Shrink algorithm that recovers the Markov blanket of a target node and prove its correctness under strictly weaker assumptions than the standard faithfulness assumption.}
+@inproceedings{marx2021,
+  title = {A weaker faithfulness assumption based on triple interactions},
+  booktitle = {Proceedings of the {{Thirty-Seventh Conference}} on {{Uncertainty}} in {{Artificial Intelligence}}},
+  author = {Marx, Alexander and Gretton, Arthur and Mooij, Joris M.},
+  year = 2021,
+  month = dec,
+  pages = {451--460},
+  publisher = {PMLR},
+  issn = {2640-3498},
+  urldate = {2026-02-25},
+  abstract = {One of the core assumptions in causal discovery is the faithfulness assumption---i.e. assuming that independencies found in the data are due to separations in the true causal graph. This assumption can, however, be violated in many ways, including xor connections, deterministic functions or cancelling paths. In this work, we propose a weaker assumption that we call 2-adjacency faithfulness. In contrast to adjacency faithfulness, which assumes that there is no conditional independence between each pair of variables that are connected in the causal graph, we only require no conditional independence between a node and a subset of its Markov blanket that can contain up to two nodes. Equivalently, we adapt orientation faithfulness to this setting. We further propose a sound orientation rule for causal discovery that applies under weaker assumptions. As a proof of concept, we derive a modified Grow and Shrink algorithm that recovers the Markov blanket of a target node and prove its correctness under strictly weaker assumptions than the standard faithfulness assumption.},
+  langid = {english}
 }
 
 @inproceedings{meek1995,

@@ -162,7 +162,7 @@
   empirical violations of faithfulness---which can be quite common in
   real life scenarios. Therefore, in this paper we propose a ``k-order''
   relaxation of the faithfulness assumption that captures xor-type and
-  parity type relationships between $k+2$ variables. We then propose a
+  parity type relationships between k+2 variables. We then propose a
   theoretically complete proof of concept algorithm that uses this
   relaxation of faithfulness for Markov blanket discovery called:
   k-order markov blanket (kOMB). Finally, we empirically show how kOMB
@@ -234,11 +234,11 @@ type of $\gr$.
     \end{tabular}
 };
 \end{tikzpicture}
-\label{fig:intro}
 \caption{ \centering Recovering the Markov blanket (MB) of variable $Y$
-  when $Y$ is the output of a stochastic boolean function that returns
+  when $Y$ is the output of a noisy boolean function that returns
   $1$ when only one of $X_{1}$, $X_{2}$, and $X_{3}$ is $1$. Each parent
-  variable are Bernoulli random variables with parameter $p=0.5$.}
+  variable are Bernoulli random variables with parameter
+  $p=0.5$.\todo{describe this more}}\label{fig:intro}
 \end{figure}
 
 %%%% Standard Assumptions
@@ -248,18 +248,16 @@ structure $\gr$ imply that the same conditional independency must exist
 in the joint distriubiton $\pr$. The second assumption---known as the
 fatihfulness assumption---goes the opposite direction, that is any
 conditional independencies in $\pr$ imply the same separation in $\gr$.
-Although incredibly useful for developing methods for MB discovery, it
-has received some critisism in the past \todo{cite}.
 
 Eventhough, theoretically, Bayesian networks with faithfulness
 violations has Lebesgue measure
 zero~\citep{meek1995,spirtes2001,boeken2025}, these ``typicality''
 results depend on somewhat arbitrary choices--for instance on the choice
-of $\sigma$-ideal~\citep{boeken2025}. Indeed, there are well known
-examples of some---very simple---Bayesian networks that violates
-faithfulness. The most famous of which being the (stochastic) xor
-Bayesian network for violations involving three variables, and
-(stochastic) parity Bayesian networks for higher order faithfulness
+of $\sigma$-ideal~\citep{boeken2025}. There are well known examples of
+some---very simple---Bayesian networks that violates faithfulness. The
+most famous of which being the (noisy) xor Bayesian network for
+violations involving three variables~\cite{inazumi2011,marx2021}, and
+(noisy) parity Bayesian networks for higher order faithfulness
 violations. \Cref{ex:parity} in \Cref{sec:violation} contains an example
 of such a Bayesian network.
 
@@ -271,11 +269,22 @@ small example in \Cref{fig:intro} is one such case where the true
 Bayesian network is faithful, but due to a finite sample, empirical
 faithfulness violations occur---which can be overcomed by the algorithm
 we will propose later in \Cref{sec:algo}. A full walkthrough of this
-example can be found later in \Cref{ex:exactly-1} under \Cref{sec:violation}.
+example can be found later in \Cref{ex:exactly-1} under
+\Cref{sec:violation}.\todo{maybe add more explaination here?}
 
 one para about relaxations of faithfulness \todo{todo}
+- current relaxations either too weak or too strong
 
 %%%% Contributions
+Therefore, motivated by such violations of faithfulness, we will propose
+a direct relaxation of the faithfulness assumption for higher order
+relations between $k+2$ variables which we will call: the $k$-order
+faithfulness assumption. This new relaxation of faithfulness will allow
+us to infer---from sample data---the graphical Markov blanket of a
+variable under some certain mild conditions, which we will empirically
+show by implementing a proof of concept algorithm called $k$-order
+Markov blanket (kOMB).\todo{complete this}
+
 Contributions and outline \todo{todo}
 \begin{enumerate}
 \item new faithfulness relaxation
@@ -375,7 +384,7 @@ Markov property.
 \end{assumption}
 
 Despite their differences, the independence models of $\gr$ and $\pr$
-are both known to obey a set of axioms called the (semi-)graphoid
+are both known to obey a set of axioms called the (semi)-graphoid
 axioms~\citep{pearl1989}. These axioms are particully useful when
 attempting to prove various theorems relating to probabilistic graphical
 models.
@@ -415,7 +424,7 @@ models.
 \end{definition}
 
 As mentioned in \Cref{sec:intro}, we are interested in learning the
-graphical Markov blanket of some target variable $Y\in\verts$.
+graphical Markov blanket of some target variable $Y\in\verts$ defined as follows.
 \begin{definition}[Markov Blanket and Boundary] \label{def:mb}
   For a single variable $Y\in\verts$, the Markov blanket of $Y$ in $\gr$
   is any subset $\rmM \subseteq \rmV\setminus Y$\footnote{For
@@ -574,9 +583,9 @@ contain the other two variables for $\kassoc{\emptyset}{A,B}{\rmZ}$ to
 be true.
 
 Further note that when $k=1$, our notion of $k$-order dependence---
-similar to \emph{$2$-association} in \citet[Definition 6]{marx2020}---is
+similar to \emph{$2$-association} in \citet[Definition 6]{marx2021}---is
 able to capture the relationships between \emph{Unfaithful Triples}
-which includes xor-type relationships \citep[Definition 5]{marx2020}.
+which includes xor-type relationships \citep[Definition 5]{marx2021}.
 
 There are two aspects of \Cref{def:k-dep} whose purpose might not
 immediately jump out. The first being that in \Cref{eq:k-dep-asc}, we
@@ -1131,7 +1140,14 @@ blanket of some target variable $Y\in\verts$ assuming that
   been explored.
 \end{proof}
 
-\begin{restatable}[Correctness of Grow Phase in \Cref{alg:komb}]{theorem}{algkomb}
+\begin{restatable}[Correctness of \Cref{alg:komb}]{theorem}{algkomb}
+    Given an estimated distribution $\pre$, the target variable whose
+  graphical Markov blanket we want to discover $Y\in\verts$, the current
+  candidate Markov blanket $\rmS\subset\verts\setminus Y$, the remaining
+  variables not already in the candidate Markov blanket
+  $\verts'=\verts\setminus(Y\cup \rmS)$, and the natural numbers
+  $k,l\in\mathbb{N}$; the function \textit{find\_inter\_dep} in
+  \Cref{alg:assoc-mine} returns the set $X\cup\rmZ$ if
   \begin{equation}
     \label{eq:27}
   \mbs{\gr}(Y) \subseteq \rmS 
