@@ -34,6 +34,8 @@
 % if you use cleveref..
 \usepackage[capitalize,noabbrev]{cleveref}
 
+\Crefname{assumption}{Assumption}{Assumptions}
+
 \usepackage{subcaption}
 \usepackage{url}
 \usepackage{multirow}
@@ -78,7 +80,7 @@
 \newcommand{\todo}[1]{\colorbox{yellow}{#1}}
 
 \usepackage{tikz}
-\usetikzlibrary{positioning,graphs}
+\usetikzlibrary{positioning,graphs,arrows.meta}
 \usetikzlibrary{trees} % needed for tidy tree layouts
 \usetikzlibrary{matrix}
 \usepackage[normalem]{ulem} % for \sout
@@ -103,9 +105,11 @@
 \usepackage{glossaries-extra}
 \setkeys{glslink}{hyper=false}
 
-\newacronym{dag}{DAG}{Directed acyclic graph}
-\newacronym{ug}{UG}{Undirected graph}
-\newacronym{pgm}{PGM}{Probabilistic graphical model}
+\newacronym{dag}{DAG}{directed acyclic graph}
+\newacronym{ug}{UG}{undirected graph}
+\newacronym{pgm}{PGM}{probabilistic graphical model}
+\newacronym{ci}{CI}{conditional independence}
+\newacronym{gs}{GS}{Grow and Shrink}
 
 \hypersetup{hidelinks}
 
@@ -172,115 +176,112 @@
 %%% Intro
 \section{Introduction}\label{sec:intro}
 %%%% What is MB Discovery
-Exhaustive vs. Exact
+The goal of the Markov blanket (MB) discovery problem is to infer the
+Markov blanket of some variable $Y$ in the graph $\gr$ given a dataset
+$\db$ sampled from the joint distribution $\pr$ over the variables in
+$\gr$.  Originating from the Bayesian network and Causal learning
+literature~\citep{margaritis1999,tsamardinos2003,ling2021,hu2024}, the
+MB discovery problem has also been discussed and utilised in the feature
+selection literature as well~\citep{tsamardinos2003a,wang2020}. That
+said, we are specifically interested in inferring the Markov blanket of
+$Y$ in the graph $\gr$, both when $\gr$ is a directed or undirected
+graph. Therefore, whenever possible we will try to keep our notation and
+exposition agnostic to the graph type of $\gr$.
 
-The Markov blanket (MB) discovery problem is...
-dataset $\db$, target variable $t$
-
-originally discussed in the context of learning Bayesian
-networks~\citep{margaritis1999,tsamardinos2003}
-
-However has been later discussed and used in feature
-selection~\citep{wang2020,tsamardinos2003a} and causal
-discovery~\citep{hu2024,ling2021}.
-%%%% Why is MB Discovery hard
-A naive approach to MB discovery would just involve enumerating over all
-the possible MBs of the target variable $t$. However the number of
-possible MBs is exponential with respect to $n$,
-\begin{equation}
-  \label{eq:1}
-  \sum_{i=1}^{n}\binom{n}{i}=2^{n},
-\end{equation}
-where $n$ is the number of variables in $\db$ other than $t$. Therefore
-this 
-
-An exhaustive enumeration of all possible
-
-
-difficulty of xor
 
 %%%% Why there is a gap in literature
-- SOTA methods avoid this exponential search space at a cost
-- cannot recover even simple xor relations
-- example
 \begin{figure}
   \centering
   % \begin{subfigure}{0.7\linewidth}
   \begin{tikzpicture}
   \node[draw, circle, inner sep=2pt] (1) at (-2.5,3) {$X_{1}$};
-  % \node[draw, circle, inner sep=2pt] (2) at (0,1.5) {$X_{2}$};
-  \node[draw, circle, inner sep=2pt] (3) at (-1.5,3) {$X_{2}$};
-  \node[draw, circle, inner sep=3pt] (y) at (-2,2) {$Y$};
-  \draw (1) -- (y);
-  \draw (3) -- (y);
-
-  % \node (PrX) at (0, 2.5){
-  % \begin{tabular}[t]{|cc|}
-  %   \hline
-  %   $\pr_{X_{i}}(0)$ & $\pr_{X_{i}}(1)$\\
-  %   \hline
-  %   0.5 & 0.5\\
-  %   \hline
-  % \end{tabular}
-  % };
-\node (PrX1) at (-4.5, 2){
-    \begin{tabular}[t]{|cc|}
-      \hline
-      $\pr_{X_{1}}(0)$ & $\pr_{X_{1}}(1)$\\
-      \hline
-      0.5 & 0.5\\
-      \hline
-    \end{tabular}
-};
-\node (PrX2) at (-4.5, 3){
-    \begin{tabular}[t]{|cc|}
-      \hline
-      $\pr_{X_{2}}(0)$ & $\pr_{X_{2}}(1)$\\
-      \hline
-      0.5 & 0.5\\
-      \hline
-    \end{tabular}
-};
+  \node[draw, circle, inner sep=2pt] (2) at (-1.5,3) {$X_{2}$};
+  \node[draw, circle, inner sep=2pt] (3) at (-0.5,3) {$X_{3}$};
+  \node[draw, circle, inner sep=3pt] (y) at (-1.5,1.75) {$Y$};
+  \draw[-Stealth] (1) -- (y);
+  \draw[-Stealth] (2) -- (y);
+  \draw[-Stealth] (3) -- (y);
+  \node (Z) at (-1.5, 1) {$Z:=\Bigl[\sum_{i=1}^{3}X_{i}=1\Bigr]$};
+  \node (prY) at (-1.5, 0.3) {$\pr(Y=1\mid Z=1)=0.9$};
+  \node (prY2) at (-1.5, -0.25) {$\pr(Y=0\mid Z=0)=0.9$};
 
 
-\node (PrY) at (-3.75, 0.5){
-    \begin{tabular}[t]{|cc|cc|}
-      \hline
-      $X_{1}$ & $X_{2}$ & $\pr_{Y}(0)$ & $\pr_{Y}(1)$\\
-      \hline
-      0 & 0 & 1.0 & 0.0\\
-      0 & 1 & 0.0 & 1.0\\
-      1 & 0 & 0.0 & 1.0\\
-      1 & 1 & 1.0 & 0.0\\
-      \hline
-    \end{tabular}
-};
-\node (PrY) at (3, 1.5){
-    \begin{tabular}[t]{lr}
-      Method & Recall (\%)\\
-      \hline
-      GS~\citep{margaritis1999} & 0.0\\
-      IAMB~\citep{tsamardinos2003} & 0.0\\
-      HITON\_MB\citep{aliferis2003} & 0.0\\
-      PCMB~\citep{pena2007} & 0.0\\
-      LRH\citep{liu2016} & 0.0\\
-      STMB~\citep{gao2017a} & 0.0\\
-      BAMB\citep{ling2019} & 0.0\\
-      \textbf{LIAM-MB (ours)} & \textbf{1.0}\\
+\node (PrY) at (2.75, 1.4){
+      % \setlength{\tabcolsep}{3pt}
+    \begin{tabular}[t]{lcc}
+      \multicolumn{3}{c}{Recall (\%)}\\
+      \toprule
+      % \midrule
+      & \multicolumn{2}{c}{Sample Size}\\
+      Method & 100 & 1000 \\
+      \midrule
+      % GS~\citep{margaritis1999} & 0.0\\
+      % IAMB~\citep{tsamardinos2003} & 0.0\\
+      % HITON\_MB\citep{aliferis2003} & 0.0\\
+      % PCMB~\citep{pena2007} & 0.0\\
+      % LRH\citep{liu2016} & 0.0\\
+      % STMB~\citep{gao2017a} & 0.0\\
+      % BAMB\citep{ling2019} & 0.0\\
+      GS & 28.33 & 100\\
+      IAMB & 23.33 & 100\\
+      % HITON\_MB & 0.0\\
+      % MMMB & 0.0\\
+      % PCMB & 20.00\\
+      LRH & 23.33 & 100\\
+      % STMB & 0.0\\
+      % BAMB & 15.0 & 100\\
+      0-OMB (ours)& 28.33 & 100\\
+      1-OMB (ours)& 77.50 & 100\\
+      \textbf{2-OMB (ours)} & \textbf{100.0} & 100\\
+      \bottomrule
     \end{tabular}
 };
 \end{tikzpicture}
-\caption{
-  \centering
-  Recovering the Markov blanket (MB) of variable $Y$ when $Y$ is
-  the output of the xor boolean function between binary random variables
-  $X_{1}$ and $X_{3}$. Existing approaches are unable to recover the MB
-  and our approach strives to be the first step in plugging this gap.}
+\label{fig:intro}
+\caption{ \centering Recovering the Markov blanket (MB) of variable $Y$
+  when $Y$ is the output of a stochastic boolean function that returns
+  $1$ when only one of $X_{1}$, $X_{2}$, and $X_{3}$ is $1$.}
 \end{figure}
 
+%%%% Standard Assumptions
+Most existing approaches to MB discovery operate under two main
+assuptions. The first assmuption being that any separtions in the graph
+structure $\gr$ imply that the same conditional independency must exist
+in the joint distriubiton $\pr$. The second assumption---known as the
+fatihfulness assumption---goes the opposite direction, that is any
+conditional independencies in $\pr$ imply the same separation in $\gr$.
+Although incredibly useful for developing methods for MB discovery, it
+has received some critisism in the past \todo{cite}.
+
+Eventhough, theoretically, Bayesian networks with faithfulness
+violations has Lebesgue measure
+zero~\citep{meek1995,spirtes2001,boeken2025}, these ``typicality''
+results depend on somewhat arbitrary choices--for instance on the choice
+of $\sigma$-ideal~\citep{boeken2025}. Indeed, there are well known
+examples of some---very simple---Bayesian networks that violates
+faithfulness. The most famous of which being a simple (stochastic) xor
+Bayesian network for violations involving three variables, and
+(stochastic) parity Bayesian networks for higher order faithfulness
+violations. \Cref{ex:parity} in \Cref{sec:violation} contains an example
+of such a Bayesian network.
+
+That said, even if unfaithful Bayesian networks and Markov random fields
+are truly non-existent in nature, a lack of sufficient samples can still
+cause an empirical faithfulness
+violation~\citep{uhler2013,lemeire2012,boeken2025}. For example, in
+\Cref{fig:intro}, \todo{todo}
+
+one para about relaxations of faithfulness \todo{todo}
+
 %%%% Contributions
-- pointing out gap in existing approaches
-- method to prune subset lattice during exhaustive search based on g-test
+Contributions and outline \todo{todo}
+\begin{enumerate}
+\item new faithfulness relaxation
+\item both theoretical and code implementation of algo that uses this
+assumption
+\item empirically showing the benefits of this relaxation on well known
+benchmark data
+\end{enumerate}
 
 %%% background
 \section{Probabilistic Graphical Models and Independencies}
@@ -482,12 +483,12 @@ Therefore, by assuming both the Global Markov Property in
 \Cref{def:global-markov} and the faithfulness assumption in
 \Cref{def:faith}, the conditional independencies of both $\gr$ and $\pr$
 then coincide, $\indeps{\gr}=\indeps{\pr}$. However faithfulness can be
-violated in many ways and we will explore some of the ways it can be
-violated in the following section.
+violated in many ways and we will explore some of them in the following
+section.
 
 
 %%% Faithfulness
-\section{Faithfulness Violations and Existing Relaxations}
+\section{Faithfulness Violations and Existing Relaxations}\label{sec:violation}
 Probably the most well-known example is xor \todo{todo}
 \begin{figure}
   \centering
@@ -523,7 +524,7 @@ $\rmZ\subseteq\subverts, |\rmZ|\leq k$.
     Y \dep{\pr} X \mid \rmZ \cup \rmS'.
   \end{equation}
   Here we say that $Y$ and $X$ are $|\rmZ|$-order associated
-  w.r.t. $\rmZ$.
+  w.r.t. $\rmZ$ over the ``separating'' set $\rmS$.
   % Under this
   % definition, it follows that 
   % \begin{equation}
@@ -554,11 +555,10 @@ distinct variables $A,B\in\{X_{1},X_{2},X_{3},Y\}$, $\rmZ$ must always
 contain the other two variables for $\kassoc{\emptyset}{A,B}{\rmZ}$ to
 be true.
 
-Further note that when $k=1$, our notion of $k$-order dependence is
-somewhat similar to \emph{$2$-association} in \citet[Definition
-6]{marx2020}---but mainly with respect to being able to capture the
-relationships between \emph{Unfaithful Triples} as defined in
-\citet[Definition 5]{marx2020}.
+Further note that when $k=1$, our notion of $k$-order dependence---
+similar to \emph{$2$-association} in \citet[Definition 6]{marx2020}---is
+able to capture the relationships between \emph{Unfaithful Triples}
+which includes xor-type relationships \citep[Definition 5]{marx2020}.
 
 There are two aspects of \Cref{def:k-dep} whose purpose might not
 immediately jump out. The first being that in \Cref{eq:k-dep-asc}, we
@@ -578,7 +578,7 @@ help us show---later in \Cref{sec:algo}---that our algorithm {\method}
 correctly recovers the Markov boundary of some variable $Y\in\verts$.
 
 Since henceforth we need to reason about subsets of $\subverts$ with a
-restricted cardinality; before continuing we will first define some
+restricted cardinality, before continuing we will first define some
 notational shorthand in \Cref{def:powerset} for dealing with such sets
 of cardinality restricted subsets.
 
@@ -621,48 +621,8 @@ $\rmZ$.
   In other words, $k$-order association w.r.t. $\rmZ$ implies
   some---possibly lower order---dependence w.r.t. $\rmZ'\subseteq\rmZ$.
 \end{restatable}
-\begin{proof}[Proof by induction]
-  When $\rmZ'$ is an empty set, and therefore a subset of $\rmZ$ with
-  cardinality $0$, we know by definition that $X$ and $Y$ being
-  $0$-order dependent is equivalent to them being $0$-order associated,
-  \begin{gather}
-    \label{eq:12}
-    \begin{aligned}
-      &\kdep{\verts}{X,Y}{\emptyset}\\
-      &=\kassoc{\rmS}{Y,X}{\emptyset} \wedge
-      \forall \rmZ^{*} \subset \emptyset
-        : \neg\,\kassoc{\rmS}{Y,X}{\rmZ^{*}}\\
-      &=\kassoc{\rmS}{Y,X}{\emptyset},
-    \end{aligned}
-  \end{gather}
-  since there are no proper subsets of the empty set to begin with.
-  
-  Now assume that $Y$ and $X$ are not $m$-order associated ---where
-  $m \leq k < |\rmZ|$---w.r.t. any subsets in $\powerleq{k}{\rmZ}$,
-  \begin{equation}
-    \label{eq:k-dep-to-assoc-eq1}
-    \forall \rmZ^{*} \in \powerleq{k}{\rmZ} :
-    \neg\,\kassoc{\rmS}{Y,X}{\rmZ^{*}}.
-  \end{equation}
-  Then we know that if $Y$ and $X$ are $(k+1)$-order associated with any
-  subset $\rmZ' \in \powereq{k+1}{\rmZ}$,
-  \begin{equation}
-    \label{eq:k-dep-to-assoc-eq2}
-    \kassoc{\rmS}{Y,X}{\rmZ'},
-  \end{equation}
-  taking the conjunction of \Cref{eq:k-dep-to-assoc-eq1} and
-  \Cref{eq:k-dep-to-assoc-eq2} results in $Y$ and $X$ being
-  $(k+1)$-order dependent w.r.t. $\rmZ'$,
-  \begin{align}
-    &\kassoc{\rmS}{Y,X}{\rmZ'} \wedge
-      \forall \rmZ^{*} \in \powerleq{k}{\rmZ'} :
-      \neg\,\kassoc{\rmS}{Y,X}{\rmZ^{*}}\nonumber\\
-    &\iff \kdep{\rmS}{Y,X}{\rmZ'}, \label{eq:14}
-  \end{align}
-  since $\powerleq{k}{\rmZ'}\subseteq\powerleq{k}{\rmZ}$ and we know
-  that---at the worst---$Y$ and $X$ are $(k+1)$-order associated when
-  $k=|\rmZ|-1$.
-\end{proof}
+The proof of \Cref{lem:k-dep-to-assoc} and all other Lemmas in the paper
+can be found in the appendix under \Cref{apx:proofs}.
 
 With all the preliminary setup out of the way, we now introduce our
 generalisation of the faithfulness assumption in \Cref{def:faith} to
@@ -719,189 +679,244 @@ variable $Y\in\verts$.
 
 %%% Algorithm
 \section{kOMB: k-order Markov Blanket}\label{sec:algo}
-- we need subset lemma
-- but first
-\begin{lemma}[$k$-Order Dependance Implies Inter-Association]\label{lem:k-dep-inter}
+Our algorithm for Markov blanket discovery, {\method}, will basically be
+a proof of concept and is a modified version of the \acrfull{gs}
+algorithm by \citet{margaritis1999}. In the \gls{gs} algorithm, a
+candidate Markov blanket $\rmS$ is iteratively grown by testing the
+conditional independence between $Y$ and variables that are not yet
+$\rmS$, $X\in\verts\setminus(Y\cup\rmS)$, given the current candidate
+Markov blanket $\rmS$. Therefore, the separating set used in the
+conditional independency tests changes as the \gls{gs} algorithm
+progresses.
+
+In {\method}, something similar occurs where we will only consider
+subsets of the candidate Markov blanket $\rmS$ when trying
+to find separating sets that succesfully causes $Y$ and $X$ to be
+conditionally independent. In other words, instead of considering the
+dependence between $Y$ and $X$ over all the variables in
+$\verts$, $\kdep{\subverts}{Y,X}{\rmZ}$; we will instead consider the
+association between $Y$ and $X$ over just the current candidate Markov
+blanket $\rmS$, $\kassoc{\rmS}{Y,X}{\rmZ}$.
+
+The relationship between $\kdep{\subverts}{Y,X}{\rmZ}$ and
+$\kassoc{\rmS}{Y,X}{\rmZ}$ is explored later in
+\Cref{lem:subset}. However before that, we first need to show that a
+$k$-order dependance between $Y$ and $X$ given some subset
+$\rmZ\subseteq\subverts$ imply a $k$-order association between $Y$ and
+all the variables in $\rmZ$ as this result will be useful in proving
+\Cref{lem:subset}.
+
+\begin{restatable}[$k$-Order Dependance Implies Inter-Association]{lemma}{kdepinter}
+  % \begin{lemma}[$k$-Order Dependance Implies Inter-Association]
+  \label{lem:k-dep-inter}
+  Given a \gls{pgm} $\model=(\gr, \pr)$, let $X,Y\in\verts$ be distinct
+  variables and $\rmS,\rmZ\subseteq\subverts$ be disjoint subsets in
+  $\verts$. Then if $Y$ and $X$ are $|\rmZ|$-order dependent
+  w.r.t. $\rmZ$ over the separating set $\rmS$, it implies that $Y$ is
+  also $|\rmZ|$-order associated with all the variables in $\rmZ$,
   \begin{gather}
     \label{eq:13}
     \kdep{\rmS}{Y,X}{\rmZ}
     \implies 
-    \kinter{\rmS}{Y,\rmZ \cup X}
+    \kinter{\rmS}{Y,\rmZ \cup X},
     \intertext{where}
     \begin{aligned}
       \kinter{\rmS}{Y,\rmZ} := \forall Z\in\rmZ :
-      \kassoc{\rmS}{Y,Z}{\rmZ\setminus Z}
-    \end{aligned}
+      \kassoc{\rmS}{Y,Z}{\rmZ\setminus Z},
+    \end{aligned}\label{eq:k-dep-inter-2}
   \end{gather}
-  by contraction
-\end{lemma}
-\begin{proof}
-  First assume that $\kdep{\rmS}{Y,X}{\rmZ}$ which implies,
+  assuming $\gr$ is $k$-order faithful to $\pr$. When
+  \Cref{eq:k-dep-inter-2} is true, we say that $Y$ is $k$-order
+  \emph{inter-associated} with $\rmZ$ over the separating set $\rmS$.
+% \end{lemma}
+\end{restatable}
+
+Using \Cref{lem:k-dep-inter}, we can now show that a $k$-order
+dependancy between $Y$ and $X$ w.r.t. $\rmZ$ over the separating set
+$\rmS$ imply that $Y$ is at least $k$-order inter-associated with
+$X\cup\rmZ$ over any subset of the separating set
+$\rmS'\subseteq\rmS$. This result will be particully useful in reasoning
+about the behaviour of {\method} as the candidate Markov blanket is
+growing.
+
+Intuitively, a reduction of the separating set to
+$\rmS'\subseteq\rmS$ can cause $Y$ and $X$ to be associated w.r.t. some
+subset $\rmZ'\subseteq\rmZ$ that they weren't already associated
+w.r.t. already. This is due to $\rmS'$ potentially no longer containing
+the variables that caused $Y$ and $X$ to be conditionally independent
+w.r.t. $\rmZ'$ in the first place.  With this intuition in mind, we will
+now formalise this result in \Cref{lem:subset}.
+
+
+\begin{restatable}[Dependancy over a Separating
+  Subset]{lemma}{depsubset}
+  % \begin{lemma}[MB Subset]
+  \label{lem:subset}
+  Given a \gls{pgm}, distinct variables $Y,X\in\verts$, and disjoint
+  subsets $\rmZ,\rmS\subseteq\subverts$, the following logical
+  implication holds for all $\rmS'\subseteq\rmS$,
   \begin{gather}
+    \label{eq:subset-res}
+    \kdep{\rmS}{Y,X}{\rmZ}
+    \implies \kinter{\rmS'}{Y,X\cup\rmZ},
+  \end{gather}
+  assuming $\gr$ is $k$-order faithful to $\pr$.
+% \end{lemma}
+\end{restatable}
+
+The last consideration we need to make for {\method} to be remotely
+feasible---especially in cases where the true Markov blanket of
+$Y\in\verts$ in $\gr$ is large---is that, we need to somehow limit the
+size of the conditioning set when conducting the \acrfull{ci} tests in
+{\method}. When testing if $Y$ and $X$ are $k$-order associated, we will
+generally use \gls{ci} tests of the form,
+\begin{equation}
+  \label{eq:2}
+  \forall \rmS' \subseteq \rmS: Y \indep{\pr} X \mid \rmZ \cup \rmS',
+\end{equation}
+where $\rmZ$ is some ``dependence'' set that makes $Y$ and $X$
+conditionally dependent on each other when conditioned on just $\rmZ$.
+Fortunately, assuming $k$-order faithfulness, we know that the size of
+$\rmZ$ is bounded by $k$.
+
+However the same cannot be said for the set $\rmS'$ as it can be as
+large as the candidate Markov blanket $\rmS$--which can be arbitrarily
+large depending on $\gr$. Therefore, the third and last assumption we
+will make is that if $Y$ and $X$ are conditionally independent given
+$\rmZ\cup\rmS$, then there must exists some subset with size less than
+$l$, $\rmS'\in\powerleq{l}{\rmS}$, such that $Y$ and $X$ are still
+conditionally independent given $\rmZ\cup\rmS'$. 
+
+\begin{assumption}[$l$-Bounded Separator
+  Assumption]\label{def:bound-sep}
+  For a \gls{pgm} $\model=(\gr,\pr)$, distinct variables $Y,X\in\verts$,
+  and $\verts'\coloneq \subverts$, let us first recal the $k$-order
+  faithfulness assumption as defined in \Cref{eq:k-faith-indep}
+  $\forall\rmS \subseteq \subverts$,
+  \begin{gather}
+    \tag{\ref{eq:k-faith-indep}}
     \begin{aligned}
-      &\kdep{\rmS}{Y,X}{\rmZ}\\
+      &\forall \rmZ \in \power{\leq k}(\verts')\:\:
+        \exists \rmS' \subseteq \rmS :
+      Y \indep{\pr} X \mid \rmZ \cup \rmS'\\
       &\implies
-      \forall \rmZ' \subset \rmZ \:\: \exists \rmS' \subseteq \rmS :
-      Y \indep{\pr} X \mid \rmZ' \cup \rmS'
+      Y \indep{\gr} X \mid \rmS.
     \end{aligned}
-    .\label{eq:k-dep-inter-eq2}
   \end{gather}
-  Furthermore, assume that
-  \begin{equation}
-    \label{eq:k-dep-inter-eq1}
-    \exists Z \in \rmZ \:\: \exists \rmS' \subseteq \rmS:
-    Y \indep{\pr} Z \mid X \cup \rmS' \cup \rmZ \setminus Z.
-  \end{equation}
-  By the contraction and weak union graphoid axioms we know that for
-  some $\rmS'\subseteq\rmS$,
-  \begin{equation}
-    \label{eq:9}
-    \begin{aligned}
-      &(Y \indep{\pr} Z \mid X \cup \rmS' \cup \rmZ \setminus Z)
-        \wedge (Y \indep{\pr} X \mid \rmS' \cup \rmZ \setminus Z)\\
-      &\implies Y \indep{\pr} \{X, Z\} \mid \rmS' \cup \rmZ \setminus Z\\
-      &\implies Y \indep{\pr} X \mid \rmS' \cup \rmZ
-    \end{aligned}
-  \end{equation}
-  However we know by definition that  
+  Then, for some natural number $l\in\mathbb{N}$, we define an
+  $l$-bounded separator version of the $k$-order faithfulness assumption
+  $\forall\rmS \subseteq \subverts$,
   \begin{gather}
-    \label{eq:k-dep-inter-eq3}
-    \kdep{\rmS}{Y,X}{\rmZ} \implies
-    \forall \rmS' \subseteq \rmS : Y \dep{\pr} X \mid \rmS' \cup \rmZ,
-  \end{gather}
-  which causes a contradiction. Therefore, taking the negation of the
-  conjunction our assumptions we get
-  \begin{align*}
-    &\neg \bigl(
-    \kdep{\rmS}{Y,X}{\rmZ} \wedge\\
-    &\qquad\exists Z \in \rmZ \:\: \exists \rmS' \subseteq \rmS: 
-    Y \indep{\pr} Z \mid X \cup \rmS \cup \rmZ \setminus Z
-    \bigr)\\
-    &=\neg\kdep{\rmS}{Y,X}{\rmZ} \vee\\
-    &\qquad\forall Z \in \rmZ \:\: \forall \rmS' \subseteq \rmS: 
-    Y \dep{\pr} Z \mid X \cup \rmS \cup \rmZ \setminus Z\\
-    &=\kdep{\rmS}{Y,X}{\rmZ} \implies
-    \forall Z \in \rmZ :
-      \kassoc{\rmS}{Y,Z}{X\cup\rmZ\setminus Z}.
-  \end{align*}
-  Which in addition to the implication we know to be true in
-  \Cref{eq:k-dep-inter-eq3} results in
-  \begin{equation}
-    \label{eq:29}
-    \kdep{\rmS}{Y,X}{\rmZ} \implies \kinter{\rmS}{Y, \rmZ \cup X},
-  \end{equation}
-  concluding our proof.
-\end{proof}
-
-\begin{lemma}[MB Subset]\label{lem:subset}
-  Let $\verts' \subseteq \verts$, $X,Y \in \verts$, and $\rmZ \subseteq
-  \verts \setminus (\verts' \cup \{X, Y\})$
-  \begin{gather}
-    \label{eq:22}
     \begin{aligned}
-      \kdep{\rmS}{Y,X}{\rmZ}
-      \implies \kinter{\rmS'}{Y,X\cup\rmZ}
-    \end{aligned}
-  \end{gather}
-\end{lemma}
-\begin{proof}
-  For some $\rmS'\subseteq\rmS$
-  \begin{align*}
-    \kassoc{\rmS}{Y,X}{\rmZ}
-    \iff &\forall \rmS^{*} \subseteq \rmS :
-           Y \dep{\pr} X \mid \rmZ \cup \rmS^{*}\\
-    \implies
-         &\forall \rmS^{*} \subseteq \rmS' :
-           Y \dep{\pr} X \mid \rmZ \cup \rmS^{*}\\
-    \iff &\kassoc{\rmS'}{Y,X}{\rmZ}
-  \end{align*}
-  Using the results from \Cref{lem:k-dep-inter} and let $\rmW = X \cup
-  \rmZ$, 
-  \begin{align*}
-    \kdep{\rmS}{Y,X}{\rmZ}
-    \implies &\forall Z \in\rmZ :
-               \kassoc{\rmS}{Y,Z}{X\cup\rmZ\setminus Z}\\
-    \implies &\forall Z \in\rmZ :
-               \kassoc{\rmS'}{Y,Z}{X\cup\rmZ\setminus Z}
-  \end{align*}
-  Therefore
-  \begin{align*}
-    \kdep{\rmS}{Y,X}{\rmZ}
-    \implies\kinter{\rmS'}{Y,X\cup\rmZ}
-    % &\implies
-    % \kassoc{\verts'}{Y,X}{\rmZ}
-    % \wedge\\
-    % &\qquad
-    %   \forall Z \in \rmZ : \kassoc{\verts'}{Y,Z}{X \cup \rmZ \setminus
-    %   Z'}\\
-    % &=\kinter{\verts'}{Y,X\cup\rmZ}
-  \end{align*}
-\end{proof}
-
-needed for practical algorithm
-\begin{definition}[Bounded Separator Assumption]\label{def:bound-sep}
-  Let $\gr=(\verts,\edges)$, $l\in\mathbb{N}$, and assume $k$-order
-  adjacency faithfulness from \Cref{def:k-faith},
-  $\forall\rmS \subseteq \subverts$
-  \begin{gather*}
-    \begin{aligned}
-      & \forall \rmZ \in \power{\leq k}(\verts\setminus\{Y,X\})\:\:
+      &\forall \rmZ \in \power{\leq k}(\verts')\:\:
         \exists \rmS' \in \powerleq{l}{\rmS}:
         Y \indep{\pr} X \mid \rmZ \cup \rmS'\\
+      &\iff
+        \forall \rmZ \in \power{\leq k}(\verts')\:\:
+        \exists \rmS' \subseteq \rmS :
+      Y \indep{\pr} X \mid \rmZ \cup \rmS'\\
       &\implies
       Y \indep{\gr} X \mid \rmS,
     \end{aligned}
-  \end{gather*}
-  note that reversing the quantifiers here would not work, especially if $l=1$.
-\begin{gather*}
-  \begin{aligned}
-    Y \dep{\gr} X \mid \rmS 
-    &\implies
-      \exists \rmZ \in \power{\leq k}(\verts\setminus\{Y,X\})\:\:
-      \forall \rmS' \in \powerleq{l}{\rmS}: \\
-    &\qquad\qquad Y \dep{\pr} X \mid \rmZ \cup \rmS'\\
-    &\implies \exists \rmZ \in \powereq{k}{\verts\setminus\{Y,X\}}\:\:
-      \forall \rmS' \in \powerleq{l}{\rmS}:\\
-    &\qquad\qquad\kdep{\rmS'}{Y,X}{\rmZ}
-  \end{aligned}
-  \end{gather*}
-  relation to global/local markov?
-  Therefore, 
-\end{definition}
+  \end{gather}
+  which essentially states that as long as $Y$ and $X$ are conditionally
+  independent given $\rmZ$ and every subset of $\rmS$ with cardinality
+  $\leq l$, then $Y$ and $X$ are conditionally independent given $\rmZ$
+  and every possible subset of $\rmS$---regardless of cardinality.
 
-% \begin{algorithm}
-%   \caption{kOMB}
-%   % \DontPrintSemicolon
-%   \KwIn{$\db$, $\rmX$, $Y$, $\mb$, $\alpha$, $k$}
-%   \KwOut{Output result}
-%   $\verts' \gets \verts \setminus Y$\;
-%   $\rmS \gets \emptyset$\tcp{CMB}
-%   \While{$\exists \rmX \in [\verts']^{\leq k} :
-%     Y\strict{|\rmX|}\rmX$}{
-%     $\rmS \gets \rmS \cup \rmX$\;
-%   }
-%     \While{$\exists X \in \rmS : Y \indep{\pr} X \mid \rmS \setminus X$}{
-%     $\rmS \gets \rmS \setminus X$\;
-%   }
-%   \Return{$\rmS$}\;
-% \end{algorithm}
+  The contrapositive of this assumption is then
+\begin{gather}
+  \begin{aligned}
+    &Y \dep{\gr} X \mid \rmS\\
+    &\implies
+      \exists \rmZ \in \power{\leq k}(\verts')\:\:
+      \forall \rmS' \in \powerleq{l}{\rmS}:
+      Y \dep{\pr} X \mid \rmZ \cup \rmS'\\
+    &\iff \exists \rmZ \in \powerleq{k}{\verts'} :
+    \lassoc{\rmS}{Y,X}{\rmZ},
+    % &\implies \exists \rmZ \in \powereq{k}{\verts'} :
+    % \ldep{\rmS'}{Y,X}{\rmZ}
+  \end{aligned}
+\end{gather}
+where
+$\lassoc{\rmS}{Y,X}{\rmZ} \coloneq \forall \rmS' \in
+\powerleq{l}{\rmS}: Y \dep{\pr} X \mid \rmZ \cup \rmS'$.
+\end{assumption}
+
+The concept of bounding the maximum size of the separators in a graph
+has been explored before. For instance, \citet{soh2019} defined an
+undirected graph $\gr$ to be weakly $K$-separable if for any two
+non-adjacent vertices in $\gr$, there exists a set of vertices with
+cardinality less than or equal to $K$ that separates the two vertices in
+$\gr$. However, instead of focusing on separation in the graph $\gr$,
+our $l$-bounded separator assumption focuses on the cardinality of
+``separating'' sets that causes conditional independencies between
+variables in $\verts$.
+
+\subsection{Theoretical Algorithm}
+As a proof of concept, in this section we will propose {\method}---a
+modification of the \acrfull{gs} by
+\citet{margaritis1999} to discover Markov blankets with higher order
+relationships under the following assumptions
+\begin{enumerate}
+\item the Global Markov Property from \Cref{def:global-markov},
+\item $k$-order faithfulness as in \Cref{def:k-faith}, and
+\item the $l$-bounded separator assumption in \Cref{def:bound-sep}.
+\end{enumerate}
+
+The original \gls{gs} algorithm starts with an empty Markov blanket
+$\rmS=\emptyset$ and iteratively adds a variable $X$ into $\rmS$ if the
+\acrfull{ci} test $Y \indep{\pr} X \mid \rmS$ indicates that $Y$ is
+conditionally independent to $X$ given $\rmS$. The main difference
+between {\method} and the \gls{gs} algorithm then is 
+\begin{enumerate}
+\item considering the addition of entire sets of variables
+  $X \cup \rmZ \in \powerleq{k+1}{\verts\setminus Y}$ at each iteration
+  to find higher order parity-type relationships between variables, and
+\item conducting \gls{ci} tests using just subsets of the current
+  candidate Markov blanket $\rmS$ in the condition to ensure that these
+  \gls{ci} tests remain feasible even when the cardinality of $\rmS$ is
+  large.
+\end{enumerate}
+As such, we break up {\method} into 3 sub-algorithms:
+\begin{description}
+\item[\Cref{alg:komb}] is just the entry-point function that implements
+  the overall logic of the \gls{gs} algorithm, with the main
+  modifications and additions located in the other two algorithms,
+\item[\Cref{alg:assoc-mine}] is overall responsible for finding some
+  subset of the variables not already in the candidate Markov blanket,
+  $\rmX\in\powerleq{k}{\verts\setminus(X\cup Y\cup \rmS)}$, that might
+  cause $Y$ and $X$ to be conditionally dependent given $\rmX$ and some
+  subset $\rmX'\in\powerleq{k-|\rmX|}{\rmS}$ of the current candidate
+  Markov blanket, finally,
+\item[\Cref{alg:ci-test}] is then tasked with finding such a
+  $\rmX'\in\powerleq{k-|\rmX|}{\rmS}$ that causes $Y \dep{\pr} Y \mid
+  \rmX \cup \rmX'$ and checking if there are any $l$-bounded subsets of
+  the current candidate Markov blanket, $\rmS'\in\powerleq{l}{\rmS}$,
+  such that $Y \indep{\pr} Y \mid \rmX \cup \rmX' \cup \rmS'$.
+\end{description}
+
+Keeping this outline of {\method} in mind, we will now present the full
+algorithm for {\method} and show that it correctly discovers the Markov
+blanket of some target variable $Y\in\verts$ assuming that 
+\Cref{def:global-markov,def:k-faith,def:bound-sep} hold.
+
 
 \begin{algorithm}
-  \caption{kOMB (Pratical Implementation)}\label{alg:komb}
+  \caption{kOMB}\label{alg:komb}
   % \DontPrintSemicolon
   \SetKwProg{Fn}{Function}{:}{}
-  \KwIn{$\db$, $\rmX$, $Y$, $\mb$, $\alpha$, $k$, $l$}
-  \KwOut{Output result}
+  \KwIn{$\db$, $\model$, $Y$, $\alpha$, $k$, $l$}
+  \KwOut{$\mbs{\gr}(Y)$}
   $\verts' \gets \verts \setminus Y$\;
   $\rmS \gets \emptyset$\tcp*[r]{Candidate Markov Blanket}
   \Repeat
-  % (\tcp*[f]{While $\exists \rmX' \subseteq \rmV' \setminus \rmS : Y
-  %   \strictdep{P} \rmX' \mid \rmS$})
   {$\rmX' = \emptyset$}{
     $\rmX' \gets $ find\_dep($Y$, $\emptyset$, $\rmS$, $\verts'$)\;
     $\rmS \gets \rmS \cup \rmX'$
   }
-  \While{$\exists X \in \rmS : Y \indep{\pr} X \mid \rmS \setminus X$}{
+  \While{$\exists X \in \rmS : \textit{find\_cond}(Y, X,
+    \emptyset, \rmS\setminus X, k, l) = \emptyset$}{
     $\rmS \gets \rmS \setminus X$\;
   }
   \Return{$\rmS$}\;
@@ -913,12 +928,12 @@ needed for practical algorithm
   % \DontPrintSemicolon
   \SetKwProg{Fn}{Function}{:}{}
   \Fn{make\_strict($Y$, $X$, $\rmZ$, $\rmS$, $k$, $l$)}{
-    \Inv{$Y \dep{} X \mid \rmX \cup \rmS$}
+    % \Inv{$Y \dep{} X \mid \rmX \cup \rmS$}
     % \KwOut{$\rmX'\subseteq\rmX$ s.t. $Y \dep{} X \mid \rmX' \cup \rmS$
     %   and $\forall X'\in\rmX' : Y \indep{} X \mid \rmS \cup \rmX'
     %   \setminus X'$}
-    \KwOut{$X\cup\rmX'$ s.t. $\rmX'\subseteq\rmX$ and
-      $\kinter{\rmS}{Y,X\cup\rmX'}$}
+    % \KwOut{$X\cup\rmX'$ s.t. $\rmX'\subseteq\rmX$ and
+    %   $\kinter{\rmS}{Y,X\cup\rmX'}$}
     \For{$Z \in \rmZ$}{
       \If{$\neg$ no\_seps($Y$, $Z$, $X\cup\rmZ
         \setminus Z$, $\rmS$, $k$, $l$)}{
@@ -928,12 +943,12 @@ needed for practical algorithm
     \Return{$X\cup\rmZ$}\;
   }
   \Fn{find\_inter\_dep($Y$, $\rmX$, $\rmS$, $\rmV'$, $k$, $l$)}{
-    \KwOut{$\rmX\subseteq\rmV'\setminus\rmS$
-      s.t. $\kinter{\rmS}{Y,\rmX}$}
+    % \KwOut{$\rmX\subseteq\rmV'\setminus\rmS$
+    %   s.t. $\kinter{\rmS}{Y,\rmX}$}
     \If{$|\rmX| > k$}{
       \Return{$\emptyset$}\;
     }
-    \For{$X \in \rmV\setminus(\rmS \cup \rmX)$}{
+    \For{$X \in \rmV\setminus(Y\cup\rmS \cup \rmX)$}{
       $\rmZ\gets$\textit{find\_cond}
       ($Y$, $X$, $\rmX$, $\rmS$, $k$, $l$)\;
       \If{$\rmZ \neq \emptyset$}{
@@ -942,7 +957,7 @@ needed for practical algorithm
         \Return{make\_strict($Y$, $X$, $\rmZ$, $\rmS$, $k$, $l$)}\;
       }
     }
-    \For{$X\in\rmV'\setminus(\rmS\cup\rmX)$}{
+    \For{$X\in\rmV'\setminus(Y\cup\rmS\cup\rmX)$}{
         $\rmV'\gets \rmV' \setminus X$\;
         $\rmX' \gets $ find\_inter\_dep(
         $Y$, $\rmX\cup X$, $\rmS$, $\rmV'$, $k$, $l$)\;
@@ -961,11 +976,23 @@ needed for practical algorithm
   % \KwIn{$Y$, $X$, $\rmX$, $\rmS$, $k$, $l$, $\alpha$}
   % \KwOut{is $Y \dep{} X \mid \rmX \cup \rmS$?}
   % \Inv{$\rmX \dep{} Y \mid \rmS$}
+  \Fn{no\_seps($Y$, $X$, $\rmZ$, $\rmS$, $l$, $\alpha$)}{
+    % \Inv{$X \dep{} Y \mid \rmZ$}
+    % \KwOut{is $Y \dep{} X \mid \rmZ \cup \rmS$?}
+    % max\_p $\gets 1$\;
+    \For{$\rmS' \in \powerleq{l}{\rmS \setminus \rmZ}$}{
+      % max\_p $\gets \min(\text{min\_p}, p)$\;
+      \If{$Y \indep{} X \mid \rmZ \cup \rmS'$}{
+        \Return{False}\;
+      }
+    }
+    \Return{True}\;
+  }
   \Fn{find\_cond($Y$, $X$, $\rmX$, $\rmS$, $k$, $l$, $\alpha$)}{
     % \KwOut{is $Y \dep{\pr} X \mid \rmX \cup \rmS$}
-    \KwOut{$\exists \rmX' \in \powerleq{k-|\rmX|}{\rmS} : Y \dep{\pr} X
-      \mid \rmX \cup \rmX' \cup \rmS$}
-    \For{$\rmX' \in \powerleq{k'}{\rmS}$}{
+    % \KwOut{$\exists \rmX' \in \powerleq{k-|\rmX|}{\rmS} : Y \dep{\pr} X
+    %   \mid \rmX \cup \rmX' \cup \rmS$}
+    \For{$\rmX' \in \powerleq{k-|\rmX|}{\rmS}$}{
       % +1 allows removing assmuption 1 from marx
       $\rmZ \gets \rmX' \cup \rmX$\;
       % $p \gets$ p-value of test $H_{0}: Y \indep{} X \mid \rmX'$\;
@@ -977,90 +1004,62 @@ needed for practical algorithm
     }
     \Return{$\emptyset$}\;
   }
-  \Fn{no\_seps($Y$, $X$, $\rmZ$, $\rmS$, $l$, $\alpha$)}{
-    \Inv{$X \dep{} Y \mid \rmZ$}
-    \KwOut{is $Y \dep{} X \mid \rmZ \cup \rmS$?}
-    % max\_p $\gets 1$\;
-    \For{$\rmS' \in \powerleq{l}{\rmS \setminus \rmZ}$}{
-      % max\_p $\gets \min(\text{min\_p}, p)$\;
-      \If{$Y \indep{} X \mid \rmZ \cup \rmS'$}{
-        \Return{False}\;
-      }
-    }
-    \Return{True}\;
-  }
-  
 \end{algorithm}
 
 
-\begin{theorem}[Correctness of \Cref{alg:ci-test}]
+\begin{restatable}[Correctness of \Cref{alg:ci-test}]{theorem}{citest}
+  Given an estimated distribution $\pre$, distinct variables
+  $Y,X\in\verts$, disjoint subsets $\rmX,\rmS\subset\subverts$, and the
+  natural numbers $k,l\in\mathbb{N}$; the function \textit{find\_cond}
+  in \Cref{alg:ci-test} returns the set $\rmX'\cup\rmX$ if and only if
+  $\exists \rmX' \in \powerleq{k-|\rmX|}{\rmS}$ where,
   \begin{equation}
     \label{eq:25}
-    \exists \rmX' \in \powerleq{k}{\rmS} \:\:
     \forall \rmS' \in \powerleq{l}{\rmS \setminus \rmX'} :
-    Y \dep{\pr} X \mid \rmX \cup \rmX' \cup \rmS'
+    Y \dep{\pre} X \mid \rmX \cup \rmX' \cup \rmS'.
   \end{equation}
-\end{theorem}
-% \begin{proof}
-%   When called by \textit{find\_assoc}, the function \textit{not\_ci}
-%   receives the subset $\rmX\in\powerleq{k}{\verts'\setminus\rmS}$ and
-%   then further iterates over $\rmX'\in\powerleq{k'}{\rmS}$ where
-%   $k'=\max(k-|\rmX|, 1)$. Therefore the effective search space for
-%   $\rmZ := \rmX \cup \rmX'$ are the sets in $\powerleq{k+1}{\verts'}$.
+  Otherwise \textit{find\_cond} just returns an empty set.
+\end{restatable}
+\begin{proof}
+  The function \textit{find\_cond} first iterates through all the
+  subsets $\rmX'\in\powerleq{k-|\rmX|}{\rmS}$ and for each $\rmX'$ where
+  $Y \dep{\pre} X \mid \rmX'$ (line 9 in \textit{find\_cond}), it passes
+  $\rmX'$ to the function \textit{no\_seps} (line 10 in
+  \textit{find\_cond}) to determine if there are any subsets
+  $\rmS'\in\powerleq{l}{\rmS\setminus\rmX'}$ that results in
+  $Y \dep{\pre} X \mid \rmX'\cup \rmS'$ (line 3 in \textit{no\_seps}).
+  As soon as \textit{no\_seps} finds such a $\rmS'$, it returns
+  \texttt{False} (line 4 in \textit{no\_seps}), and \textit{find\_cond}
+  will need to go to the next iteration. Otherwise, if \textit{no\_seps}
+  is unable to find any such subset $\rmS'$, it returns \texttt{True}
+  (line 5 in \textit{no\_seps}), and \textit{find\_cond} then
+  immediately returns $\rmZ=\rmX'\cup\rmX$ (line 11 in
+  \textit{find\_cond}) as there are no $l$-bounded subsets of $\rmS$
+  that renders $Y$ and $X$ conditionally independent given
+  $\rmZ$. However, if \textit{find\_cond} completes all its iteration
+  without returning early, then we know that all subset $\rmX'$ has some
+  $l$-bounded subset $\rmS'$ that will cause
+  $Y\indep{\pre}X\mid\rmX'\cup\rmX\cup\rmS'$. Therefore
+  \textit{find\_cond} just returns the emptyset in this case (line 12 in
+  \textit{find\_cond}).
+\end{proof}
 
-%   If any of the subsets $\rmZ \in \powerleq{k+1}{\verts'}$ causes $Y$
-%   and $X$ to be dependent, $Y \dep{\pr} X \mid \rmZ$, \textit{not\_ci}
-%   calls \textit{no\_sep} to determine if there are any subsets in
-%   $\rmS' \in \powerleq{l}{\rmS \setminus \rmZ}$ that causes $Y$ and $X$
-%   to be independent, $Y \indep{\pr} X \mid \rmZ \cup \rmS'$.
-
-%   Under the $l$-bounded separator assmuption in \Cref{def:bound-sep}, we
-%   know that for some subset $\verts' \subseteq \verts\setminus\{Y,X\}$
-%   \begin{align*}
-%     \forall \rmS \subseteq \verts
-%     &\setminus\{Y,X\} : Y \dep{\gr} X \mid \rmS\\
-%     \iff
-%      &\exists \rmZ \in \powerleq{k}{\verts\setminus\{Y,X\}} :
-%       \ldep{\verts}{Y,X}{\rmZ}\\
-%     \implies
-%      &\exists \rmZ \in \powerleq{k}{\verts\setminus\{Y,X\}} :
-%       \lassoc{\verts'}{Y,X}{\rmZ},
-%   \end{align*}
-%   which is logically equivalent to its contrapositive
-%   \begin{align*}
-%      &\forall\rmZ \in \powerleq{k}{\verts\setminus\{Y,X\}} \:
-%       \exists \rmS' \in \powerleq{l}{\verts'} :
-%        Y \indep{\pr} X \mid \rmZ \cup \rmS'\\
-%      &\implies 
-%        \exists \rmS^{*} \subseteq \verts
-%        \setminus\{Y,X\} : Y \indep{\gr} X \mid \rmS^{*}\\
-%      &\iff Y \indep{\gr} X \mid \verts \setminus \{Y,X\}
-%        .
-%   \end{align*}
-%   Therefore, since in \Cref{alg:ci-test} $\rmS \subseteq \verts$,
-%   whenever \textit{no\_seps} finds a subset of the candidate Markov
-%   blanket $\rmS'\subseteq\rmS\setminus\rmZ$ that causes
-%   $Y \indep{\pr} X \mid \rmZ \cup \rmS'$, we know for certain that $Y$
-%   and $X$ are separated in the graph $\gr$---but the same
-%   cannot be said in the reverse direction. That is to say
-%   \textit{no\_seps} might not always find a separator
-%   $\rmS'\subseteq\rmS$ even if $Y$ and $X$ are separated in $\gr$.
-
-%   As a result, the function \textit{not\_ci} will only return false
-%   postivies---i.e. it never indicates that $X$ and $Y$ are conditionally
-%   independent when 
-% \end{proof}
-
-\begin{theorem}[Correctness of \Cref{alg:assoc-mine}]
-  Given $Y$, \Cref{alg:assoc-mine}  returns
-  $\rmZ=X\cup\rmX\cup\rmX'$ if
-    \begin{equation*}
-    \exists \rmZ \in \powerleq{k+1}{\verts\setminus Y)}
-    : \linter{\rmS}{Y,\rmZ}.
-  \end{equation*}
-  where $(X\cup\rmX) \subseteq \verts \setminus (Y \cup \rmS)$ and
-  $\rmX' \subseteq \rmS$.
-\end{theorem}
+\begin{restatable}[Correctness of \Cref{alg:assoc-mine}]{theorem}{assocmine}
+  Given an estimated distribution $\pre$, the target variable whose
+  Markov blanket in $\gr$ we want to discover $Y\in\verts$, the current
+  candidate Markov blanket $\rmS\subset\verts\setminus Y$, the remaining
+  variables not already in the candidate Markov blanket
+  $\verts'=\verts\setminus(Y\cup \rmS)$, and the natural numbers
+  $k,l\in\mathbb{N}$; the function \textit{find\_inter\_dep} in
+  \Cref{alg:assoc-mine} returns the set $X\cup\rmZ$ if
+  \begin{equation}
+    \exists \rmZ \in \powerleq{k}{\hat{\verts}} \:\:
+    \exists X \in \hat{\verts}\setminus(\rmX\cup\rmS) :
+    \linter{\rmS}{Y,X\cup\rmZ}.
+  \end{equation}
+  where $\rmZ=\rmX\cup\rmX'$ and $\hat{\verts}=\verts\setminus Y$.
+  Otherwise, \textit{find\_inter\_dep} just returns the empty set.
+\end{restatable}
 \begin{proof}
   % The function \textit{find\_inter\_dep} in \Cref{alg:komb} is a
   % recursive function where for each recursive call of the function, it
@@ -1068,50 +1067,58 @@ needed for practical algorithm
   % length less than or equal to $k$,
   % $\rmX \in \powerleq{k}{\verts' \setminus \rmS}$.
 
-  During each function call, \textit{find\_inter\_dep} iterates through
-  each varible $X$ that has not been included in $\rmX$
-  yet---$X\in\verts\setminus(Y \cup \rmX \cup \rmS)$---and calls
-  \textit{find\_cond} to find a set
+  During each function call, \textit{find\_inter\_dep} is passed
+  some--potentially empty---set $\rmX$ and it then iterates through each
+  varible $X$ that has not been included in $\rmX$ yet,
+  $X\in\verts\setminus(Y \cup \rmX \cup \rmS)$. In each iteration it
+  calls the function \textit{find\_cond} to find a subset
   $\rmX' \in \powerleq{k-|\rmX|}{\rmS}$ such that
   \begin{equation*}
     \forall \rmS' \in \powerleq{l}{\rmS \setminus \rmX'} :
-    Y\dep{\pr}X  \mid \rmX \cup \rmX' \cup \rmS'.
+    Y\dep{\pre}X  \mid \rmX \cup \rmX' \cup \rmS'.
   \end{equation*}
-  When such a subset $\rmX'$ is found, \textit{find\_cond} returns
-  $\rmZ=X\cup\rmX'\cup\rmX$ and $\rmZ$ is then passed on to the function
-  \textit{make\_strict} to remove any superfluous variables resulting in
-  the set $\rmZ'\subseteq\rmZ$ such that 
+  When \textit{find\_cond} fails to find such a set $\rmX'$, it just
+  returns an empty set, causing \textit{find\_inter\_dep} to check the
+  next variable $X$ not already in $\rmX\cup\rmS$. 
+  
+  Otherwise, when a suitable set $\rmX'$ is found, \textit{find\_cond}
+  returns $\rmZ=\rmX'\cup\rmX$ and $\rmZ$ is then passed on to the
+  function \textit{make\_strict} to remove any superfluous variables
+  resulting in the set $\rmZ'\subseteq(\rmZ\cup X)$ such that,
   \begin{align*}
     &\forall Z \in \rmZ'\:\:
-    \forall \rmS' \in \powerleq{l}{\rmS\setminus\rmZ}:
-    Y \dep{\pr} Z \mid \rmZ \cup \rmS' \setminus Z\\
-    &\implies \forall Z \in \rmZ' :
+    \forall \rmS' \in \powerleq{l}{\rmS}:
+    Y \dep{\pre} Z \mid \rmZ \cup \rmS' \setminus Z\\
+    &\iff \forall Z \in \rmZ' :
       \lassoc{\rmS}{Y,Z}{\rmZ\setminus Z}\\
-    &\implies \linter{\rmS}{Y,X\cup\rmX\cup\rmX'}.
+    &\iff \linter{\rmS}{Y,X\cup\rmX\cup\rmX'}.
   \end{align*}
-  Furthermore, since \textit{find\_inter\_dep} explores the
-  enumeration tree of the set $\verts \setminus (Y \cup \rmS)$ up
-  subsets of length $k+1$, we know that every subset
-  $(X\cup\rmX)\in\powerleq{k+1}{\verts \setminus (Y \cup \rmS)}$ will be
+  Furthermore, since \textit{find\_inter\_dep} explores the enumeration
+  tree of the set $\verts \setminus (Y \cup \rmS)$ up to subsets of
+  cardinality $k$ (lines 13 to 17 in \textit{find\_inter\_dep}) , we
+  know that every subset
+  $\rmX\in\powerleq{k}{\verts \setminus (Y \cup \rmS)}$ will be
   explored---barring any early returns. In combination with
-  \textit{find\_cond} exploring the subsets $\rmX' \in
-  \powerleq{k-|\rmX|}{\rmS}$, \textit{find\_inter\_dep} returns
-  $\rmZ=X\cup\rmX\cup\rmX'$ if
-  \begin{equation*}
-    \exists \rmZ \in \powerleq{k+1}{\verts\setminus Y)}
-    : \linter{\rmS}{Y,\rmZ}.
-  \end{equation*}
-  % Finally not that we don't explore every possible
-  % $\powerleq{k}{\subverts\setminus\rmS}$ for each $X\in\verts$. But
-  % this is fine... somehow
+  \textit{find\_cond} exploring the subsets
+  $\rmX' \in \powerleq{k-|\rmX|}{\rmS}$, \textit{find\_inter\_dep}
+  returns $X\cup\rmZ$ where $\rmZ=\rmX\cup\rmX'$ if and only if
+  \begin{align*}
+    \exists \rmZ \in \powerleq{k}{\hat{\verts}} \:\:
+    \exists X \in \hat{\verts}\setminus(\rmX\cup\rmS) :
+    \linter{\rmS}{Y,X\cup\rmZ}.
+  \end{align*}
+  where $\hat{\verts}=\verts\setminus Y$. If no such $X$ and $\rmZ$ can
+  be found, \textit{find\_inter\_dep} will return an empty set when
+  every subset $\rmX\in\powerleq{k}{\verts\setminus (Y\cup\rmS)}$ has
+  been explored.
 \end{proof}
 
-\begin{theorem}[Correctness of Grow Phase in \Cref{alg:komb}]
+\begin{restatable}[Correctness of Grow Phase in \Cref{alg:komb}]{theorem}{algkomb}
   \begin{equation}
     \label{eq:27}
   \mbs{\gr}(Y) \subseteq \rmS 
   \end{equation}
-\end{theorem}
+\end{restatable}
 \begin{proof}
   At each iteration of the grow phase, we obtain
   \begin{equation*}
@@ -1371,6 +1378,7 @@ against the following nine Markov blanket discovery mehtods:
 \item LRH~\citep{liu2016}.
 \item STMB~\citep{gao2017a}.
 \item BAMB~\citep{ling2019}.
+\item MMMB
 \end{itemize}
 For our experiments, we will use the implementation of these methods
 found in the \texttt{pyCausalFS} python library~\citep{yu2020a} with a
@@ -1425,34 +1433,50 @@ We then construct a Bayesian network for each
 
 % \input{./tab/syn}
 
-\begin{table*}
+\begin{table}
   \centering
-  \input{./tab/syn-neat}
   \caption{Synthetic Results}
   \label{tab:syn}
-\end{table*}
+  \input{./tab/syn-neat}
+\end{table}
 
 \subsection{Experiments with Benchmark Bayesian Networks}
 
 
 %%% Post matter
-% \subsubsection*{Author Contributions}
-% If you'd like to, you may include a section for author contributions
-% as is done in many journals. This is optional and at the discretion of
-% the authors.
+\begin{contributions} % will be removed in pdf for initial submission 
+					  % (without ‘accepted’ option in \documentclass)
+                      % so you can already fill it to test with the
+                      % ‘accepted’ class option
+    Briefly list author contributions. 
+    This is a nice way of making clear who did what and to give proper credit.
+    This section is optional.
 
-% \subsubsection*{Acknowledgments}
-% Use unnumbered third level headings for the acknowledgments. All
-% acknowledgments, including those to funding agencies, go at the end of
-% the paper.
+    H.~Q.~Bovik conceived the idea and wrote the paper.
+    Coauthor One created the code.
+    Coauthor Two created the figures.
+\end{contributions}
 
+\begin{acknowledgements} % will be removed in pdf for initial submission,
+						 % (without ‘accepted’ option in \documentclass)
+                         % so you can already fill it to test with the
+                         % ‘accepted’ class option
+    Briefly acknowledge people and organizations here.
+
+    \emph{All} acknowledgements go in this section.
+\end{acknowledgements}
 
 
 \bibliography{ref}
-\bibliographystyle{iclr2026_conference}
 
+\newpage
+
+% \onecolumn
+
+\title{Title in Title Case\\(Supplementary Material)}
+\maketitle
 \appendix
-\section{Appendix}
+
 \input{apx.tex}
 
 \end{document}

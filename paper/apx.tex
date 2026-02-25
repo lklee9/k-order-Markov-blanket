@@ -1,6 +1,173 @@
-\subsection{Proofs}
+% Proofs
+\section{Proofs}\label{apx:proofs}
+%% k dep to assoc
 \kdeptoassoc*
-\subsection{Implementation Details of kOMB}
+\begin{proof}[Proof by induction]
+  When $\rmZ'$ is an empty set, and therefore a subset of $\rmZ$ with
+  cardinality $0$, we know by definition that $X$ and $Y$ being
+  $0$-order dependent is equivalent to them being $0$-order associated,
+  \begin{gather}
+    \label{eq:12}
+    \begin{aligned}
+      &\kdep{\verts}{X,Y}{\emptyset}\\
+      &=\kassoc{\rmS}{Y,X}{\emptyset} \wedge
+      \forall \rmZ^{*} \subset \emptyset
+        : \neg\,\kassoc{\rmS}{Y,X}{\rmZ^{*}}\\
+      &=\kassoc{\rmS}{Y,X}{\emptyset},
+    \end{aligned}
+  \end{gather}
+  since there are no proper subsets of the empty set to begin with.
+  
+  Now assume that $Y$ and $X$ are not $m$-order associated ---where
+  $m \leq k < |\rmZ|$---w.r.t. any subsets in $\powerleq{k}{\rmZ}$,
+  \begin{equation}
+    \label{eq:k-dep-to-assoc-eq1}
+    \forall \rmZ^{*} \in \powerleq{k}{\rmZ} :
+    \neg\,\kassoc{\rmS}{Y,X}{\rmZ^{*}}.
+  \end{equation}
+  Then we know that if $Y$ and $X$ are $(k+1)$-order associated with any
+  subset $\rmZ' \in \powereq{k+1}{\rmZ}$,
+  \begin{equation}
+    \label{eq:k-dep-to-assoc-eq2}
+    \kassoc{\rmS}{Y,X}{\rmZ'},
+  \end{equation}
+  taking the conjunction of \Cref{eq:k-dep-to-assoc-eq1} and
+  \Cref{eq:k-dep-to-assoc-eq2} results in $Y$ and $X$ being
+  $(k+1)$-order dependent w.r.t. $\rmZ'$,
+  \begin{align}
+    &\kassoc{\rmS}{Y,X}{\rmZ'} \wedge
+      \forall \rmZ^{*} \in \powerleq{k}{\rmZ'} :
+      \neg\,\kassoc{\rmS}{Y,X}{\rmZ^{*}}\nonumber\\
+    &\iff \kdep{\rmS}{Y,X}{\rmZ'}, \label{eq:14}
+  \end{align}
+  since $\powerleq{k}{\rmZ'}\subseteq\powerleq{k}{\rmZ}$ and we know
+  that---at the worst---$Y$ and $X$ are $(k+1)$-order associated when
+  $k=|\rmZ|-1$.
+\end{proof}
+
+%% k dep to inter
+\kdepinter*
+\begin{proof}
+  First assume that $\kdep{\rmS}{Y,X}{\rmZ}$ which from its definition
+  in \Cref{def:k-dep} implies that $Y$ and $X$ are not associated given
+  any proper subset of $\rmZ$,
+  \begin{gather}
+    \begin{aligned}
+      &\kdep{\rmS}{Y,X}{\rmZ}\\
+      &\implies
+      \forall \rmZ' \subset \rmZ \:\: \exists \rmS' \subseteq \rmS :
+      Y \indep{\pr} X \mid \rmZ' \cup \rmS'
+    \end{aligned}
+    .\label{eq:k-dep-inter-eq2}
+  \end{gather}
+  Furthermore, assume that for some $Z\in\rmZ$, $Y$ and $Z$ are
+  not associated w.r.t. $X\cup\rmZ\setminus Z$,
+  \begin{equation}
+    \label{eq:k-dep-inter-eq1}
+    \exists Z \in \rmZ \:\: \exists \rmS' \subseteq \rmS:
+    Y \indep{\pr} Z \mid X \cup \rmS' \cup \rmZ \setminus Z.
+  \end{equation}
+  Note that the statement in \Cref{eq:k-dep-inter-eq1} is essentially
+  the opposite of what we wish to prove.
+  
+  By the contraction and weak union graphoid axioms in
+  \Cref{def:graphoid} we know that for some $\rmS'\subseteq\rmS$,
+  \begin{equation}
+    \begin{aligned}
+      &(Y \indep{\pr} Z \mid X \cup \rmS' \cup \rmZ \setminus Z)
+        \wedge (Y \indep{\pr} X \mid \rmS' \cup \rmZ \setminus Z)\\
+      &\implies Y \indep{\pr} \{X, Z\} \mid \rmS' \cup \rmZ \setminus Z\\
+      &\implies Y \indep{\pr} X \mid \rmS' \cup \rmZ
+    \end{aligned}\label{eq:k-dep-inter-eq4}
+  \end{equation}
+  However, referring back to the definition of a $k$-order dependance in
+  \Cref{def:k-dep}, we known that our initial assumption of
+  $\kdep{\rmS}{Y,X}{\rmZ}$ implies that,
+  \begin{gather}
+    \label{eq:k-dep-inter-eq3}
+    \kdep{\rmS}{Y,X}{\rmZ} \implies
+    \forall \rmS' \subseteq \rmS : Y \dep{\pr} X \mid \rmS' \cup \rmZ,
+  \end{gather}
+  which causes a contradiction with the conclusion in
+  \Cref{eq:k-dep-inter-eq4}. Therefore, the conjunction of our initial
+  assumptions must be false. Taking the negation of this conjunction
+  leads to,
+  \begin{align*}
+    &\neg \bigl(
+    \kdep{\rmS}{Y,X}{\rmZ} \wedge\\
+    &\qquad\exists Z \in \rmZ \:\: \exists \rmS' \subseteq \rmS: 
+    Y \indep{\pr} Z \mid X \cup \rmS \cup \rmZ \setminus Z
+    \bigr)\\
+    &=\neg\kdep{\rmS}{Y,X}{\rmZ} \vee\\
+    &\qquad\forall Z \in \rmZ \:\: \forall \rmS' \subseteq \rmS: 
+    Y \dep{\pr} Z \mid X \cup \rmS \cup \rmZ \setminus Z\\
+    &=\kdep{\rmS}{Y,X}{\rmZ} \implies
+    \forall Z \in \rmZ :
+      \kassoc{\rmS}{Y,Z}{X\cup\rmZ\setminus Z}.
+  \end{align*}
+  Which in addition to the implication we know to be true in
+  \Cref{eq:k-dep-inter-eq3} results in,
+  \begin{equation}
+    \label{eq:29}
+    \kdep{\rmS}{Y,X}{\rmZ} \implies \kinter{\rmS}{Y, \rmZ \cup X},
+  \end{equation}
+  concluding our proof.
+\end{proof}
+
+
+%% Dep subset
+\depsubset*
+\begin{proof}
+  Recall that $\kdep{\rmS}{Y,X}{\rmZ}$ is defined in \Cref{def:k-dep} as
+  \begin{equation}
+    \begin{aligned}
+      &\kdep{\rmS}{Y,X}{\rmZ}\\
+      &:= \kassoc{\rmS}{Y,X}{\rmZ} \wedge
+        \forall \rmZ' \subset \rmZ : \neg\,\kassoc{\rmS}{Y,X}{\rmZ'}.
+    \end{aligned}\tag{\ref{eq:k-dep-dep}}
+  \end{equation}
+  Therefore, to prove \Cref{eq:subset-res}, we will first explore how
+  reducing the separating set to $\rmS'\subseteq\rmS$ affects the
+  first term of the conjunction in \Cref{eq:k-dep-dep},
+  \begin{align}
+    \kdep{\rmS}{Y,X}{\rmZ}
+    \implies &\kassoc{\rmS}{Y,X}{\rmZ}\\
+    \iff &\forall \rmS^{*} \subseteq \rmS :
+           Y \dep{\pr} X \mid \rmZ \cup \rmS^{*}\label{eq:subset-0}\\
+    \implies
+         &\forall \rmS^{*} \subseteq \rmS' :
+           Y \dep{\pr} X \mid \rmZ \cup \rmS^{*}\label{eq:subset-1}\\
+    \iff &\kassoc{\rmS'}{Y,X}{\rmZ}\label{eq:subset-2}.
+  \end{align}
+  The implication in \Cref{eq:subset-1} follows from the
+  fact that $\mathcal{P}(\rmS')\subseteq\mathcal{P}(\rmS)$ and therefore
+  the set of conditional dependencies in \Cref{eq:subset-1} is a subset
+  of the conditional dependencies in \Cref{eq:subset-0}.
+
+  Furthermore, using the result from \Cref{lem:k-dep-inter}, we can show
+  that,
+  \begin{align}
+    &\kdep{\rmS}{Y,X}{\rmZ}\implies \kinter{\rmS}{Y,X\cup\rmZ}\\
+    &\implies \forall Z \in\rmZ :
+               \kassoc{\rmS}{Y,Z}{X\cup\rmZ\setminus Z}\\
+    &\implies \forall Z \in\rmZ :
+      \kassoc{\rmS'}{Y,Z}{X\cup\rmZ\setminus Z},
+      \label{eq:subset-3}
+  \end{align}
+  where the implication in \Cref{eq:subset-3} follows from the previous
+  implication between \Cref{eq:subset-0,eq:subset-2}.
+  Therefore, combining the implications in
+  \Cref{eq:subset-2,eq:subset-3} we obtain,
+  \begin{align}
+    \kdep{\rmS}{Y,X}{\rmZ}
+    \implies\kinter{\rmS'}{Y,X\cup\rmZ},
+  \end{align}
+  which concludes this proof.
+\end{proof}
+
+
+% Implementation
+\section{Implementation Details of kOMB}
 The G-test is a statistical test that seeks to reject the hypothesis
 that a set of observed discrete data follows some assumed
 distribution. A common use for the G-test is to test if the dimensions

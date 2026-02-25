@@ -144,7 +144,30 @@
 ** Abstract
 - experiments show that >1 order faithfulness already perform better in small well known benchmarks
 ** Intro
-- crucially "effective unfaithfulness" can appear due to lack of samples
+- What is the MB discovery problem
+  + problem specification
+  + arises in BN and Causal literature
+  + but also discussed and used in feature selection literature
+- Standard assumptions of mehtods
+- however, faithfulness has received many critism over the years
+- Indeed, eventhough theoretically  violations are has measure zero (Spites 1993 Meek 1995, boeken 2025)
+  + alhtough these "typicality" results can depend on arbitary choices
+    boeken 2025
+  + indeed, it is widely known that there are
+    - simple examples of BNs
+    - that violates faithfulness
+  + the most famous of these simple networks is
+    - the xor for 3 vars
+    - and parity for higher order
+    - example 1
+- even if unfaithful BNs are truely non-existent in irl
+  + a lack of samples can cause empirical faithfulness violation
+  + [cite:@uhler2013]
+  + and these do appear quite often
+  + for example in figure 1
+- faithful violations has been studied in the past and
+  + relaxations exists
+- in this work
 ** Probabilistic Graphical Models and Independece
 - no hidden/latent variables
 - no conditioning
@@ -154,20 +177,24 @@
 - global markov condition
 - faithfulness
 ** The Faithfulness Assumption
+** When is Faithfulness Violated
+- most well known is xor
+  + but only involves 3 variables 
+  + but we are interested in higher order relationships
+- parity
+  + what is it
+  + example
+  + how it violates faithfulness
+  + BN are typically faithful [cite:@boeken2025]
+- but are fairly common with limited samples [cite:@uhler2013;@lemeire2012]
+- insufficient samples issue
+*** Previous relaxations 
 - adjacency
   + used by equivalence class methods
   + later extended by [cite:@marx2020] for xor
 - 
-** When is Faithfulness Violated
-*** High order interactions
-- BN are typically faithful [cite:@boeken2025]
-- but are fairly common with limited samples [cite:@uhler2013]
-*** When samples are limited
-*** Previous relaxations
 - we conjecture that we sit between [cite:@marx2020]
   and [cite:@forster2018]
-- our experimental results indicate that for limited samples, looking at
-  higher order relations might be bad anyways
 ** kOMB: An algorithm for high-order markov blanket discovery
 *** What would be nice in theory
 **** Algorithm
