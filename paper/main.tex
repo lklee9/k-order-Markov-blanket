@@ -183,10 +183,10 @@ $\gr$.  Originating from the Bayesian network and Causal learning
 literature~\citep{margaritis1999,tsamardinos2003,ling2021,hu2024}, the
 MB discovery problem has also been discussed and utilised in the feature
 selection literature as well~\citep{tsamardinos2003a,wang2020}. That
-said, we are specifically interested in inferring the Markov blanket of
-$Y$ in the graph $\gr$, both when $\gr$ is a directed or undirected
-graph. Therefore, whenever possible we will try to keep our notation and
-exposition agnostic to the graph type of $\gr$.
+said, we are interested in inferring the Markov blanket of $Y$ for both
+Bayesian networks and Markov random fields. Therefore, whenever possible
+we will try to keep our notation and exposition agnostic to the graph
+type of $\gr$.
 
 
 %%%% Why there is a gap in literature
@@ -240,7 +240,8 @@ exposition agnostic to the graph type of $\gr$.
 \label{fig:intro}
 \caption{ \centering Recovering the Markov blanket (MB) of variable $Y$
   when $Y$ is the output of a stochastic boolean function that returns
-  $1$ when only one of $X_{1}$, $X_{2}$, and $X_{3}$ is $1$.}
+  $1$ when only one of $X_{1}$, $X_{2}$, and $X_{3}$ is $1$. Each parent
+  variable are Bernoulli random variables with parameter $p=0.5$.}
 \end{figure}
 
 %%%% Standard Assumptions
@@ -259,17 +260,21 @@ zero~\citep{meek1995,spirtes2001,boeken2025}, these ``typicality''
 results depend on somewhat arbitrary choices--for instance on the choice
 of $\sigma$-ideal~\citep{boeken2025}. Indeed, there are well known
 examples of some---very simple---Bayesian networks that violates
-faithfulness. The most famous of which being a simple (stochastic) xor
+faithfulness. The most famous of which being the (stochastic) xor
 Bayesian network for violations involving three variables, and
 (stochastic) parity Bayesian networks for higher order faithfulness
 violations. \Cref{ex:parity} in \Cref{sec:violation} contains an example
 of such a Bayesian network.
 
 That said, even if unfaithful Bayesian networks and Markov random fields
-are truly non-existent in nature, a lack of sufficient samples can still
-cause an empirical faithfulness
-violation~\citep{uhler2013,lemeire2012,boeken2025}. For example, in
-\Cref{fig:intro}, \todo{todo}
+are truly almost non-existent in nature, a lack of sufficient samples
+can still cause an empirical faithfulness
+violation~\citep{uhler2013,lemeire2012,boeken2025}. For example, the
+small example in \Cref{fig:intro} is one such case where the true
+Bayesian network is faithful, but due to a finite sample, empirical
+faithfulness violations occur---which can be overcomed by the algorithm
+we will propose later in \Cref{sec:algo}. A full walkthrough of this
+example can be found later in \Cref{ex:exactly-1} under \Cref{sec:violation}.
 
 one para about relaxations of faithfulness \todo{todo}
 
@@ -498,6 +503,22 @@ Probably the most well-known example is xor \todo{todo}
 \end{figure}
 \begin{example}\label{ex:parity}
   
+\end{example}
+\begin{example}\label{ex:exactly-1}
+  variable $Y$ of the Bayesian network in \Cref{fig:intro} represents the
+output of a stochastic boolean function that takes $X_{1}$, $X_{2}$, and
+$X_{3}$ as input; and if only one of the input variables has the value
+$1$, $Y$ has a probability of $0.9$ of being $1$ as well. Otherwise, $Y$
+has a probability of $0.9$ of being $0$.
+
+We know that this Bayesian network as a graph that is faithful to its
+distribution since the only independencies that exist in both the
+distribution and graph are between the parent nodes when $Y$ is
+\emph{not} conditioned on. However 
+
+Since each of the parent variables are just a Bernoulli random variable
+with $p=0.5$, the marginal probabilities of 
+
 \end{example}
 \subsection{Violations due to Finite Samples}
 %%% k-oder
