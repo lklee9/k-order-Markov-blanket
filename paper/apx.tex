@@ -18,7 +18,7 @@
   \end{gather}
   since there are no proper subsets of the empty set to begin with.
   
-  Now assume that $Y$ and $X$ are not $m$-order associated ---where
+  Now assume that $Y$ and $X$ are not $m$-order associated---where
   $m \leq k < |\rmZ|$---w.r.t. any subsets in $\powerleq{k}{\rmZ}$,
   \begin{equation}
     \label{eq:k-dep-to-assoc-eq1}
@@ -166,7 +166,7 @@
 \end{proof}
 
 %%% Proofs of Theorems
-\section{Proofs for Theorems}
+\section{Proofs for Theorems}\label{apx:proofs-thm}
 \citest*
 
 \begin{proof}
@@ -314,56 +314,72 @@
 
 
 %%% Implementation
-\section{Implementation Details of kOMB}\label{apx:impl}
-The G-test is a statistical test that seeks to reject the hypothesis
-that a set of observed discrete data follows some assumed
-distribution. A common use for the G-test is to test if the dimensions
-in some multidimensional data are independent. Conducting this test
-first involves computing the G-statistic,
-\begin{equation}
-  \label{eq:g-stat}
-  G = 2 \sum_{i} O_{i}\cdot \ln\Biggl(\frac{O_{i}}{E_{i}}\Biggr),
-\end{equation}
-where $O_{i}\geq 0$ are the observed counts in the cells and $E_{i} > 0$
-are the expected counts under the distribution assumed in the null
-hypothesis.
+% \section{Implementation Details of kOMB}\label{apx:impl}
+% The main conditional independence test we use in our implementation is
+% the G-test. Conducting this test first involves computing the
+% G-statistic,
+% \begin{equation}
+%   \label{eq:g-stat}
+%   G = 2 \sum_{i} O_{i}\cdot \ln\Biggl(\frac{O_{i}}{E_{i}}\Biggr),
+% \end{equation}
+% where $O_{i}\geq 0$ are the observed counts in the cells and $E_{i} > 0$
+% are the expected counts under the distribution assumed in the null
+% hypothesis.
 
-In this paper, we are specifically interested in using the G-test to
-test the null hypothesis that some subset $\rmS$ of the variables
-$\rmS\subset\rmX \setminus (\{\rvt\} \cup \mb)$ is conditionally
-independent to the variable $\rvt$ given the a candidate Markov blanket
-$\mb$,
-\begin{equation*}
-  H_{0}(\rmS): \rmS \indep \rvt \mid \mb.
-\end{equation*}
-The G-statistic for testing this hypothesis is
-then~\citep{tsamardinos2006}
-\begin{align*}
-  G(\rmS)
-  &= 2 \sum_{\rvx_{\rvs},\rvx_{t},\rvx_{\rvc}}
-    O(\rvx_{\rvs},\rvx_{t},\rvx_{\rvc})\cdot
-    \ln\Biggl(
-    \frac{P(\rvx_{\rvs},\rvx_{t}\mid\rvx_{\rvc}) P(\rvx_{\rvc})}
-    {P(\rvx_{\rvs}\mid\rvx_{\rvc})P(\rvx_{t}\mid\rvx_{\rvc})
-    P(\rvx_{\rvc})}\Biggr)\\
-  &= 2 \sum_{\rvx_{\rvs},\rvx_{t},\rvx_{\rvc}}
-    O(\rvx_{\rvs},\rvx_{t},\rvx_{\rvc})\cdot
-    \ln\Biggl(
-    \frac{O(\rvx_{\rvs},\rvx_{t},\rvx_{\rvc}) O(\rvx_{\rvc})}
-    {O(\rvx_{\rvs},\rvx_{\rvc})O(\rvx_{t},\rvx_{\rvc})}\Biggr).
-\end{align*}
-Under the null hypothesis, the distribution of this statistic $G(\rmS)$
-is then approximately $\chi^{2}(\df(\rmS))$ distributed
-where~\citep{tsamardinos2006}
-\begin{align*}
-  \df(\rmS) &= (|\rvt|-1) \cdot
-              \Biggl(\prod_{\rvs\in\rmS}|\rvs| - 1\Biggr) \cdot
-              \Biggl(\prod_{\rvc\in\mb}|\rvc|\Biggr)
-\end{align*}
-is the degrees of freedomn in the statistical test. 
+% In the implementation of {\method}, we are specifically interested in
+% using the G-test to test the null hypothesis,
+% \begin{equation*}
+%   H_{0}(\rmS): X \indep{\pre} Y \mid \rmS
+% \end{equation*}
+% The G-statistic for testing this hypothesis is
+% then~\citep{tsamardinos2006}
+% \begin{align*}
+%   G(\rmS)
+%   &= 2 \sum_{x,y,\rvs}
+%     O(x,y,\rvs)\cdot
+%     \ln\Biggl(
+%     \frac{P(x,y\mid\rvs) P(\rvs)}
+%     {P(x\mid\rvs)P(y\mid\rvs)
+%     P(\rvs)}\Biggr)\\
+%   &= 2 \sum_{x,y,\rvs}
+%     O(x,y,\rvs)\cdot
+%     \ln\Biggl(
+%     \frac{O(x,y,\rvs) O(\rvs)}
+%     {O(x,\rvs)O(y,\rvs)}\Biggr).
+% \end{align*}
+% Under the null hypothesis, the distribution of this statistic $G(\rmS)$
+% is then approximately $\chi^{2}(\df(\rmS))$ distributed
+% where~\citep{tsamardinos2006}
+% \begin{align*}
+%   \df(\rmS) &= (|Y|-1) \cdot (|X| - 1)\cdot
+%               \Biggl(\prod_{S\in\rmS}|S|\Biggr),
+% \end{align*}
+% is the degrees of freedomn in the statistical test.
+
+% However, the G-test starts to break down when $\rmS$ grows large
+% enough. The common cut-off point to say that the G-test is too weak for
+% a CI test is when $\df(\rmS)\times 5$ is greater than the size of the
+% available samples.
+
+% When this occurs, we switch to using the SCI test proposed by
+% \citet{marx2019}. We defer to the original paper for the details of the
+% SCI test.
 
 
 
+%%% Synthetic Bayesian Networks
+\section{Boolean Functions for the Synthetic Bayesian Networks}\label{apx:bool-func}
+\begin{description}[align=right,labelwidth=7em]
+\item[parity:]     
+  $f(X_{1},\ldots,X_{3}) = (\sum_{i=1}^{3}X_{i}) \pmod{2}$
+\item[ex-$s$:] 
+  $f(X_{1},\ldots,X_{3}; s) = \bigl[(\sum_{i=1}^{3}X_{i}) = s\bigr]$
+\item[and:]       
+  $f(X_{1},\ldots,X_{3}) = \bigl[(\sum_{i=1}^{3}X_{i}) = 3\bigr]$
+\item[or:]         
+  $f(X_{1},\ldots,X_{3}) = \bigl[(\sum_{i=1}^{3}X_{i}) \geq 1\bigr]$
+\end{description}
+where $s\in\{1,2\}$.
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "main"
