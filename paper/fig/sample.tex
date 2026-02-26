@@ -1,0 +1,61 @@
+\begin{tikzpicture}
+  \node[draw, circle, inner sep=2pt] (1) at (-2.5,2.75) {$X_{1}$};
+  \node[draw, circle, inner sep=2pt] (2) at (-1.5,2.75) {$X_{2}$};
+  \node[draw, circle, inner sep=2pt] (3) at (-0.5,2.75) {$X_{3}$};
+  \node[draw, circle, inner sep=3pt] (y) at (-1.5,1.5) {$Y$};
+  \draw[-Stealth] (1) -- (y);
+  \draw[-Stealth] (2) -- (y);
+  \draw[-Stealth] (3) -- (y);
+  \node (Z) at (-1.5, 0.5) {$g(\rmX):=\Bigl[\sum_{X\in\rmX}X=1\Bigr]$};
+  \node (prY) at (-1.5, -0.4) {$\pr\bigl(Y=g(\rmX)\mid \rmX\bigr)=0.9$};
+  % \node (prY2) at (-1.5, -0.25) {$\pr(Y=0\mid Z=0)=0.9$};
+
+
+\node (samp) at (2, 1.4){
+      % \setlength{\tabcolsep}{3pt}
+    \begin{tabular}[t]{|ccc c|}
+      \multicolumn{4}{c}{Pathological $\mathcal{D}$}\\
+      \hline
+      % \midrule
+      $X_{1}$ & $X_{2}$ & $X_{3}$ & $Y$\\
+      \hline
+      0 & 0 & 0 & 0\\
+      0 & 0 & 1 & 1\\
+      0 & 1 & 0 & 1\\
+      0 & 1 & 1 & 0\\
+      1 & 0 & 0 & 1\\
+      1 & 0 & 1 & 0\\
+      1 & 1 & 0 & 0\\
+      1 & 0 & 0 & 1\\
+      \hline
+    \end{tabular}
+};
+
+
+% \node (PrY) at (-1.5, -0.75){
+%       % \setlength{\tabcolsep}{3pt}
+%     \begin{tabular}[t]{|ccc | c|}
+%       % \multicolumn{4}{c}{Logic Table}\\
+%       \hline
+%       % \midrule
+%       $X_{1}$ & $X_{2}$ & $X_{3}$ & $\pr_{Y}(1)$\\
+%       \hline
+%       0 & 0 & 0 & 0.1\\
+%       0 & 0 & 1 & 0.9\\
+%       0 & 1 & 0 & 0.9\\
+%       0 & 1 & 1 & 0.1\\
+%       1 & 0 & 0 & 0.9\\
+%       1 & 0 & 1 & 0.1\\
+%       1 & 1 & 0 & 0.1\\
+%       1 & 1 & 1 & 0.1\\
+%       \hline
+%     \end{tabular}
+% };
+
+
+\end{tikzpicture}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:

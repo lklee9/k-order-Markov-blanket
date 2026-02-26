@@ -33,6 +33,7 @@
 
 % if you use cleveref..
 \usepackage[capitalize,noabbrev]{cleveref}
+\AddToHook{cmd/appendix/before}{\crefalias{section}{appendix}}
 
 \Crefname{assumption}{Assumption}{Assumptions}
 
@@ -110,6 +111,7 @@
 \newacronym{pgm}{PGM}{probabilistic graphical model}
 \newacronym{ci}{CI}{conditional independence}
 \newacronym{gs}{GS}{Grow and Shrink}
+\newacronym{mb}{MB}{Markov blanket}
 
 \hypersetup{hidelinks}
 
@@ -149,25 +151,23 @@
 
 \begin{abstract}
   The problem of learning the graphical Markov blanket (MB) of a
-  variable from data---sampled from the joint distribution over the
-  variables in the graph---has applications in many areas such as
-  structure learning for Bayesian networks and Markov random fields,
-  causal discovery, and feature selection. However, a common assumption
-  most existing mehtods make is that the conditional independencies in
-  the distribution implies the same separation in the graphical
+  variable from data has applications in many areas such as structure
+  learning for Bayesian networks and Markov random fields, causal
+  discovery, and feature selection. However, a common assumption most
+  mehtods make is that the conditional independencies in the
+  distribution implies the same separation in the graphical
   structure---also known as the faithfulness assmuption. Unfortunately,
   this assumption can be violated due to higher-order conditional
   dependencies in the distribution---like those in xor and parity-type
   relations. Furthermore, even having a finite sample can cause
-  empirical violations of faithfulness---which can be quite common in
-  real life scenarios. Therefore, in this paper we propose a ``k-order''
-  relaxation of the faithfulness assumption that captures xor-type and
-  parity type relationships between k+2 variables. We then propose a
-  theoretically complete proof of concept algorithm that uses this
-  relaxation of faithfulness for Markov blanket discovery called:
-  k-order markov blanket (kOMB). Finally, we empirically show how kOMB
-  can recover the Markov blanket of a variable under both true and
-  empirical violations of faithfulness.
+  empirical violations of faithfulness---which is quite common in real
+  world scenarios. Therefore, in this paper we propose a ``k-order''
+  relaxation of the faithfulness assumption that captures parity type
+  relationships between k+2 variables. We then propose a proof of
+  concept algorithm called k-order markov blanket (kOMB) that uses this
+  relaxation for Markov blanket discovery. Finally, we empirically show
+  how kOMB can recover the Markov blanket of a variable under both true
+  and empirical violations of faithfulness.
 \end{abstract}
 
 %%% Intro
@@ -199,11 +199,10 @@ type of $\gr$.
   \draw[-Stealth] (2) -- (y);
   \draw[-Stealth] (3) -- (y);
   \node (Z) at (-1.5, 1) {$Z:=\Bigl[\sum_{i=1}^{3}X_{i}=1\Bigr]$};
-  \node (prY) at (-1.5, 0.3) {$\pr(Y=1\mid Z=1)=0.9$};
-  \node (prY2) at (-1.5, -0.25) {$\pr(Y=0\mid Z=0)=0.9$};
+  \node (prY) at (-1.5, 0.25) {$\pr(Y=Z\mid \rmX)=0.9$};
 
 
-\node (PrY) at (2.75, 1.4){
+\node (PrY) at (2.75, 1.75){
       % \setlength{\tabcolsep}{3pt}
     \begin{tabular}[t]{lcc}
       \multicolumn{3}{c}{Recall (\%)}\\
@@ -220,11 +219,11 @@ type of $\gr$.
       % STMB~\citep{gao2017a} & 0.0\\
       % BAMB\citep{ling2019} & 0.0\\
       GS & 28.33 & 100\\
-      IAMB & 23.33 & 100\\
+      % IAMB & 23.33 & 100\\
       % HITON\_MB & 0.0\\
       % MMMB & 0.0\\
       % PCMB & 20.00\\
-      LRH & 23.33 & 100\\
+      % LRH & 23.33 & 100\\
       % STMB & 0.0\\
       % BAMB & 15.0 & 100\\
       0-OMB (ours)& 28.33 & 100\\
@@ -269,8 +268,8 @@ small example in \Cref{fig:intro} is one such case where the true
 Bayesian network is faithful, but due to a finite sample, empirical
 faithfulness violations occur---which can be overcomed by the algorithm
 we will propose later in \Cref{sec:algo}. A full walkthrough of this
-example can be found later in \Cref{ex:exactly-1} under
-\Cref{sec:violation}.\todo{maybe add more explaination here?}
+example can be found later in \Cref{ex:sample} under
+\Cref{sec:violation}.%\todo{maybe add more explaination here?}
 
 There are several weaker assumptions compared to faithfulness one can
 employ to assist in MB discovery; such as adjacency and orientation
@@ -288,19 +287,22 @@ find higher order parity relationships between more than $3$ varibles.
 
 %%%% Contributions
 \paragraph{Contributions}
-Therefore, motivated by the considerations above, we will propose a
-direct relaxation of the faithfulness assumption for higher order
-relations between $k+2$ variables which we will call: the $k$-order
-faithfulness assumption. This new relaxation of faithfulness will allow
-us to infer---from sample data---the graphical Markov blanket of a
-variable under some certain mild conditions. We will show
-this by implementing a---theorectically complete---proof of concept
-algorithm called $k$-order Markov blanket (kOMB). We then empirically
-show that kOMB can overcome empirical faithfulness violations and that
-it performs similarly---if not better---than some existing
-constraint-based mehtod on well known benchmark datasets.
+Therefore, motivated by the considerations above, in \Cref{sec:relax} we
+will propose a direct relaxation of the faithfulness assumption for
+higher order relations between $k+2$ variables which we will call: the
+$k$-order faithfulness assumption. This new relaxation of faithfulness
+will allow us to infer---from sample data---the graphical Markov blanket
+of a variable under some certain mild conditions. We will show this in
+\Cref{sec:algo} by implementing a---theorectically complete---proof of
+concept algorithm called $k$-order Markov blanket (kOMB). We then
+empirically show in \Cref{sec:exp} that kOMB can overcome empirical
+faithfulness violations and that it performs similarly---if not
+better---than some existing constraint-based mehtod on well known
+benchmark datasets. More interestingly, we find that, even for these
+small scale benchmark dataset, there seems to be a merit for exploring
+relationships between $4$ variables at a time---and not just $3$.
 
-Our paper will be structured as follows: \todo{todo}
+% Our paper will be structured as follows: \todo{todo}
 
 %%% background
 \section{Probabilistic Graphical Models and Independencies}
@@ -308,7 +310,8 @@ Consider the set of $n$ variables $\verts=\{V_{1},\ldots,V_{n}\}$ with
 no other hidden or latent variables in our setting. The conditional
 independencies between these variables---$\rmY \indep{} \rmX \mid \rmZ$
 for disjoint variables sets $\rmY,\rmX,\rmZ\subseteq\verts$---can be
-represented by either a \acrfull{dag} or an \acrfull{ug}.
+represented by either a \acrfull{dag}~\citep{pearl1988} or an
+\acrfull{ug}~\cite{lauritzen1996}.
 % , which we denote as
 % $\overrightarrow{\gr}=(\verts,\overrightarrow{\edges})$ and
 % $\overline{\gr}=(\verts,\overline{\edges})$ respectively. Here
@@ -325,18 +328,18 @@ $\indeps{\gr}$.
 % graphs with the tuple $\gr=(\verts,\edges)$, where $\edges$ are the
 % directed or undirected edges between the variables in $\verts$.
 
-\paragraph{\acrfullpl{dag}} For \glspl{dag}~\citep{pearl1988}, $\edges$ consists of ordered pairs
-$(V_{i},V_{j})\in\edges$ that represent the directed edges between
-variables $V_{i}\rightarrow V_{j}$. The graphical conditional
-independencies in a \gls{dag} are then characterised by the notion of
-\emph{d-separation}~\citep{pearl1988,geiger1989}. Specifically, the
-distinct variables $Y,X\in\verts$ are \emph{d-seperated} by
-$\rmS\subseteq\subverts$ if all paths between $X$ and $Y$... \todo{to complete}
+% \paragraph{\acrfullpl{dag}} For \glspl{dag}~\citep{pearl1988}, $\edges$ consists of ordered pairs
+% $(V_{i},V_{j})\in\edges$ that represent the directed edges between
+% variables $V_{i}\rightarrow V_{j}$. The graphical conditional
+% independencies in a \gls{dag} are then characterised by the notion of
+% \emph{d-separation}~\citep{pearl1988,geiger1989}. Specifically, the
+% distinct variables $Y,X\in\verts$ are \emph{d-seperated} by
+% $\rmS\subseteq\subverts$ if all paths between $X$ and $Y$... \todo{to complete}
 
-The vertices $Y,X\in\verts$ are
-separated by $\rmS\subseteq\subverts$ in the \gls{dag} $\gr$ when 
+% The vertices $Y,X\in\verts$ are
+% separated by $\rmS\subseteq\subverts$ in the \gls{dag} $\gr$ when 
 
-\paragraph{\acrfullpl{ug}} On the other hand, for \glspl{ug}~\citep{lauritzen1996},
+% \paragraph{\acrfullpl{ug}} On the other hand, for \glspl{ug}~\citep{lauritzen1996},
 
 Regardless of the type of graph $\gr$ is, for disjoint subsets
 $\rmX,\rmY,\rmS\subseteq\verts$, we will denote that $\rmX$ and $\rmY$
@@ -508,7 +511,15 @@ section.
 
 %%% Faithfulness
 \section{Faithfulness Violations and Existing Relaxations}\label{sec:violation}
-Probably the most well-known example is xor \todo{todo}
+Probably the most well-known example of a faithfulness violation is the
+(noisy) xor function $Y\coloneq X_{1}\oplus X_{2}$ with the graphical
+structure
+$X_{1}\rightarrow Y \leftarrow
+X_{2}$~\citep{inazumi2011,marx2021}. However these type of relations
+only involve three variables. Since we are interested in higher order
+unfaithful relationships between variables, we will discuss the noisy
+parity function in \Cref{ex:parity}---which is essentially just a noisy
+xor function involving more variables.
 \begin{figure}
   \centering
   \input{fig/parity}
@@ -516,27 +527,100 @@ Probably the most well-known example is xor \todo{todo}
   \label{fig:parity}
 \end{figure}
 \begin{example}\label{ex:parity}
+  Let $\model=(\gr,\pr)$ be a \gls{pgm} where
+  $\rmX=\{X_{1},X_{2},X_{3}\}$, $\verts=Y\cup\rmX$, and $\gr$ has the
+  structure of the \gls{dag} in \Cref{fig:parity}. Each $X\in\rmX$ are
+  independent of each other and has the distribution of a fair coin. The
+  distribution of $Y$ conditioned on $\rmX$ is then
+  $\pr(Y=f(\rvx)\mid\rmX=\rvx) = 0.9$, where,
+  $f(\rvx) \equiv \sum_{i=1}^{n}x_{n}\pmod{2}$. Therefore $\pr_{Y}$ is
+  just the distribution of a noisy parity function.
+
+  For any random variable $X\in\rmX$, we know that
+  $\pr(Y,X)=0.25=0.5\times 0.5=\pr(Y)\pr(X)$ for any value $Y$ and $X$
+  takes. Therefore it must the case that $Y \indep{\pr} X$, but since
+  $Y$ and $X$ are not separable in $\gr$, $Y\dep{\gr} X$; $\gr$ is not
+  faithful to $\pr$.
+
+  Additionally for any distinct random varibales $X_{i},X_{j}\in\rmX$,
+  $\pr(Y,X_{i},X_{j})=1/8=0.5^{3}=\pr(Y)\pr(X_{i})\pr(X_{j})$ for any
+  values of $Y,X_{i},X_{j}$. Therefore we know that
+  $Y\indep{\pr}\{X_{i},X_{j}\}$, $X_{i}\indep{\pr}\{Y,X_{j}\}$, and
+  $X_{j}\indep{\pr}\{X_{i},Y\}$. Since $Y$ is adjacent to all
+  $X\in\rmX$, but there is no $2$-cardinality subsets $\rmX'\subset\rmX$
+  that makes $Y\dep{\pr}\rmX'$; $\gr$ is not $2$-adjacent faithful to
+  $\pr$ following the definition in \citet[Definition 7]{marx2021}.
+\end{example}
+
+Although we now know of a Bayesian network that violates both
+faithfulness and $2$-adjacency faithfulness, these types of
+relationships between variables might very well not be common in
+nature. In fact, it has been shown that \emph{unfaithful} Bayesian
+networks has Lebesgue measure
+zero~\citep{meek1995,spirtes2001,boeken2025}. However, empirical
+violations of faithfulness can be quite
+common~\citep{uhler2013,lemeire2012,boeken2025}, therefore in
+\Cref{ex:sample}, we will present a scenario where, even though the true
+Bayesian network is faithful; due to sampling error, the \gls{dag} of
+the Bayesian network is not faithful to the empirical distribution
+obtained from the sample.
   
+\begin{example}\label{ex:sample}
+  Similar to \Cref{ex:parity}, let $\model=(\gr,\pr)$ be a \gls{pgm}
+  with random variables $\rmX$ and $Y$ with the \gls{dag} structure in
+  \Cref{fig:sample}. The distribution of $Y$ conditioned on $\rmX$ is
+  then
+  $ \pr\bigl(Y=\bigl[\sum_{X\in\rmX}X=1\bigr] \bigm| \rmX \bigr)
+    = 0.9,
+$
+  % \begin{equation}
+  %   \label{eq:8}
+  %   \pr\Biggl(Y=\Biggl[\sum_{X\in\rmX}X=1\Biggr] \Biggm| \rmX \Biggr)
+  %   = 0.9,
+  % \end{equation}
+  where $[\cdot]$ is the Iverson bracket notation for the indicator
+  function. In other words, $Y=1$ has a probability of $0.9$ when only
+  one of the variables in $\rmX$ is $1$. Other, $Y=0$ has a probability
+  of $0.9$. We call this function the ``noisy exactly-1 function''.
+
+  The marginal distribution of $Y$ is $\pr(Y=1)=3/8$ since only 3
+  value-combinations of $\rmX$ has just a single $1$ among them. We then
+  know that
+  $\forall X \in \rmX : \pr(Y=1,X=1)=1/8\neq
+  (3/8)\times(4/8)=\pr(Y=1)\pr(X=1)$. Therefore, $\forall X\in\rmX : Y
+  \dep{\pr} X$ and consequently, $\gr$ \emph{is} faithful to $\pr$.
+
+  However, it is possible for a sample $\db$ of $\pr$ to be pathological
+  in the sense that, the empirical distribution from $\db$ induces a
+  independency between $Y$ and one of the variables in $\rmX$. For
+  example, the sample in \Cref{fig:sample} causes the marginal
+  distribution of $Y$ to be $\pre(Y)=1/2$ and the marginal distribution
+  over $Y$ and $X_{1}$ to be
+  $\pre(Y,X_{1})=1/4=(1/2)\times(1/2)=\pre(Y)\pre(X_{1})$ for all
+  possible values of $Y$ and $X_{1}$. Therefore under the empirical
+  distribution from the pathological sample,
+  $Y\indep{\pre}X_{1}$---which empirically violates the fatihfulness
+  assumption.
 \end{example}
-\begin{example}\label{ex:exactly-1}
-  variable $Y$ of the Bayesian network in \Cref{fig:intro} represents the
-output of a stochastic boolean function that takes $X_{1}$, $X_{2}$, and
-$X_{3}$ as input; and if only one of the input variables has the value
-$1$, $Y$ has a probability of $0.9$ of being $1$ as well. Otherwise, $Y$
-has a probability of $0.9$ of being $0$.
 
-We know that this Bayesian network as a graph that is faithful to its
-distribution since the only independencies that exist in both the
-distribution and graph are between the parent nodes when $Y$ is
-\emph{not} conditioned on. However 
+Fortunately \Cref{ex:sample}, the \gls{dag} in \Cref{fig:sample} is
+still $2$-adjacent faithful to the empirical distribution, therefore the
+full Markov blanket is still recoverable by the algorithm outlined in
+\citep{marx2021}. However, this is not always the case and as we will
+see in \Cref{sec:exp-syn}, sometimes considering higher order
+relationships between variable can help better overcome empirical
+faithfulness violations.
 
-Since each of the parent variables are just a Bernoulli random variable
-with $p=0.5$, the marginal probabilities of 
+\begin{figure}
+  \centering
+  \input{fig/sample}
+  \caption{$[\cdot]$ is the Iverson bracket notation for the indicator
+    function}
+  \label{fig:sample}
+\end{figure}
 
-\end{example}
-\subsection{Violations due to Finite Samples}
 %%% k-oder
-\section{The k-Order Faithfulness Relaxation}
+\section{The k-Order Faithfulness Relaxation}\label{sec:relax}
 In this section we will introduce our generalisation of the faithfulness
 assumption in \Cref{def:faith} for finding conditional dependancies
 between two variables in $\verts$ that require considering $k$
@@ -580,7 +664,6 @@ $\rmZ\subseteq\subverts, |\rmZ|\leq k$.
     \end{aligned}
     \label{eq:k-dep-dep}
   \end{gather}
-  \todo{maybe add some closing lines to the def here}
 \end{definition}
 With the definition of $k$-order dependance in \Cref{def:k-dep}, we are
 able to capture parity-like relations over $k+2$ variables---such as the
@@ -657,7 +740,7 @@ $\rmZ$.
   some---possibly lower order---dependence w.r.t. $\rmZ'\subseteq\rmZ$.
 \end{restatable}
 The proof of \Cref{lem:k-dep-to-assoc} and all other Lemmas in the paper
-can be found in the appendix under \Cref{apx:proofs}.
+can be found in \Cref{apx:proofs}.
 
 With all the preliminary setup out of the way, we now introduce our
 generalisation of the faithfulness assumption in \Cref{def:faith} to
@@ -893,29 +976,25 @@ variables in $\verts$.
 
 \subsection{Theoretical Algorithm}
 As a proof of concept, in this section we will propose {\method}---a
-modification of the \acrfull{gs} by
-\citet{margaritis1999} to discover Markov blankets with higher order
-relationships under the following assumptions
-\begin{enumerate}
-\item the Global Markov Property from \Cref{def:global-markov},
-\item $k$-order faithfulness as in \Cref{def:k-faith}, and
-\item the $l$-bounded separator assumption in \Cref{def:bound-sep}.
-\end{enumerate}
+modification of the \acrfull{gs} by \citet{margaritis1999} to discover
+Markov blankets with higher order relationships under the following
+assumptions: 1) the Global Markov Property from
+\Cref{def:global-markov}, 2) $k$-order faithfulness as in
+\Cref{def:k-faith}, and 3) the $l$-bounded separator assumption in
+\Cref{def:bound-sep}.
 
 The original \gls{gs} algorithm starts with an empty Markov blanket
 $\rmS=\emptyset$ and iteratively adds a variable $X$ into $\rmS$ if the
 \acrfull{ci} test $Y \indep{\pr} X \mid \rmS$ indicates that $Y$ is
 conditionally independent to $X$ given $\rmS$. The main difference
-between {\method} and the \gls{gs} algorithm then is 
-\begin{enumerate}
-\item considering the addition of entire sets of variables
-  $X \cup \rmZ \in \powerleq{k+1}{\verts\setminus Y}$ at each iteration
-  to find higher order parity-type relationships between variables, and
-\item conducting \gls{ci} tests using just subsets of the current
-  candidate Markov blanket $\rmS$ in the condition to ensure that these
-  \gls{ci} tests remain feasible even when the cardinality of $\rmS$ is
-  large.
-\end{enumerate}
+between {\method} and the \gls{gs} algorithm then is: 1) considering the
+addition of entire sets of variables
+$X \cup \rmZ \in \powerleq{k+1}{\verts\setminus Y}$ at each iteration to
+find higher order parity-type relationships between variables, and 2)
+conducting \gls{ci} tests using just subsets of the current candidate
+Markov blanket $\rmS$ in the condition to ensure that these \gls{ci}
+tests remain feasible even when the cardinality of $\rmS$ is large.
+  
 As such, we break up {\method} into 3 sub-algorithms:
 \begin{description}
 \item[\Cref{alg:komb}] is just the entry-point function that implements
@@ -1098,299 +1177,82 @@ blanket of some target variable $Y\in\verts$ assuming that
   where it subsequently terminates and returns $\rmS$.
 \end{restatable}
 
-%%%% Complexity
-\subsection{Complexity of \method}
-\todo{todo}
+% \paragraph{Complexity of {\method}} Since in the worst case \todo{todo}
 
-% \section{Lattice Incremental Association Mining for Markov Blankets
-%   (LIAM-MB)}
-
-% % \begin{figure}
-% %   \centering
-% %   \begin{subfigure}{0.275\linewidth}
-% %     \centering
-% %     \input{./fig/lattice.tex}
-% %     \caption{Subset Lattice}
-% %     \label{fig:lattice}    
-% %   \end{subfigure}
-% %   \hspace{5em}
-% %   \begin{subfigure}{0.325\linewidth}
-% %     \centering
-% %     \input{./fig/enum-tree.tex}
-% %     \caption{Enumeration tree}
-% %     \label{fig:tree}    
-% %   \end{subfigure}
-% %   \caption{Comparison between lattice and tree}
-% %   \label{fig:comparison}
-% % \end{figure}  
-% % \begin{figure}  
-% %   \begin{subfigure}{0.325\linewidth}
-% %     \centering
-% %     \input{./fig/enum-tree-one.tex}
-% %     % \caption{$\cdf(G_{a};\df(a)) \leq \alpha$\\therefore $a$ should
-% %     % be in $\mb$}
-% %     \caption{\centering\\
-% %       $\cdf(G_{a};\df(a)) \leq \alpha$\\ $\implies a \not\indep t
-% %       \mid \mb$}
-% %     \label{fig:tree}    
-% %   \end{subfigure}
-% %   \hfill
-% %   \begin{subfigure}{0.325\linewidth}
-% %     \centering
-% %     \input{./fig/enum-tree-two.tex}
-% %     \caption{\centering\\
-% %       $\cdf(G_{\{a,b\}};\df(\{a,b\})) > \alpha$\\
-% %       $\implies \{a,b\} \indep t \mid \mb$ not rejected}
-% %     \label{fig:tree}    
-% %   \end{subfigure}
-% %   \hfill
-% %   \begin{subfigure}{0.325\linewidth}
-% %     \centering
-% %     \input{./fig/enum-tree-three.tex}
-% %     \caption{\centering\\
-% %       Prune nodes that have $\geq$ degrees of freedom than
-% %       $\df(\{a,b\})$.
-% %     }
-% %     \label{fig:tree}    
-% %   \end{subfigure}
-% %   \caption{Comparison between lattice and tree}
-% %   \label{fig:comparison}
-% % \end{figure}
-
-% \begin{proposition}[Maximum Testable Degrees of Freedom given a Dataset]
-%   The  over all the variables of 
-% \end{proposition}
-
-% As we have discussed, our approach builds upon the two-phase approach of
-% IAMB. Specifically, we want to find the variables that should be in the
-% MB of $t$ that Phase \romannum{1} of IAMB did not find before the last
-% pruning step.  Therefore, after the first phase IAMB, our approach will
-% conduct a theorectically exhaustive search over all possible subsets
-% $S \in \mathcal{P}(\rmX \setminus (\mb \cup \{t\}))$. For each subest
-% $S$, our approach will test the null hypothesis
-% $H_{0}(S): S \indep t \mid \mb$. The rejection of $H_{0}(S)$ implies
-% that $S$---or at least a subset of $S$---belongs in the MB of $t$.  The
-% total number of subsets in
-% $\mathcal{P}(\rmX \setminus (\mb \cup \{t\}))$ is exponential in the
-% size of $\rmR \coloneqq \rmX \setminus (\mb \cup \{t\})$. Therefore, by
-% carrying out Phase \Romannum{1} of IAMB first, we can increase the size
-% of $\mb$ and decrease the search space of the exhaustive search.
-
-% % \begin{wrapfigure}{l}{0.5\linewidth}
-% %   \begin{minipage}[t]{\linewidth}
-% % \begin{algorithm}[H]
-% %   \caption{Lattice Mining (\texttt{lattice})}
-% %   % \DontPrintSemicolon
-% %   \KwIn{$\db$, $\rmX$, $t$, $\mb$, $\alpha$}
-% %   \KwOut{Output result}
-% %   $\rmS \gets [\emptyset]$\;
-% %   $\rmA \gets [\rmX]$\;
-% %   $\df_{\max} \gets \infty$\; 
-% %   \For{each $\rvx\in\mb$}{
-% %     $S \gets \pop(\rmS)$\;
-% %     $A \gets \pop(\rmA)$\;
-% %     $\df_{\cur} \gets \df(\rvs)$\;
-% %     \If{$|S| > 0$}{
-% %       \If{$S \not\indep t \mid \mb$}{
-% %         \Return{$S$}\;
-% %       }
-% %       \If{$1 - \cdf(G_{S\cup A}; \df(S)) > \alpha$}{
-% %         $\df_{\max} \gets \df_{\cur}$\;
-% %         \Comment{Pruning of supersets according to
-% %           \Cref{thm:prune-superset}.}
-% %         continue\; 
-% %       }
-% %     }
-% %     \Comment{Don't explore subsets that exceed the current maximum degrees
-% %       of freedom via \Cref{thm:prune}.}
-% %     $A' \gets \{a \mid a\in A, \df(S \cup \{a\}) < \df_{\max}\}$\;
-% %     \For{$i \in [1, |A'|]$}{
-% %       $a \gets A'_{i}$\;
-% %       push $S \cup \{a\}$ on to $\rmS$\;
-% %       push $A'[1,\ldots,i-1]$ on to $\rmA$\;
-% %     }
-% %     \Return{$\emptyset$};
-% %   }
-% % \end{algorithm}
-% % \begin{algorithm}[H]
-% %   \caption{LIAM-MB}
-% %   % \DontPrintSemicolon
-% %   \KwIn{$\db$, $\rmX$, $t$, $\alpha$}
-% %   \KwOut{Output result}
-% %   $\mb \gets \texttt{forward}(\db, \rmX, t, \alpha)$\;
-% %   \While{$|\rmX| > 0$}{
-% %     $S \gets \texttt{lattice}(\db, \rmX, t, \mb, \alpha)$\;
-% %     \If{$S==\emptyset$}{
-% %       break\;
-% %     }
-% %     \For{$a \in S$}{
-% %       Remove $a$ from $\rmX$\;
-% %       Insert $a$ into $\mb$\;
-% %     }
-% %   }
-% %   $\mb \gets \texttt{backward}(\db, \mb, t, \alpha)$\;
-% %   \Return{$\mb$}\;
-% % \end{algorithm}
-% % \end{minipage}  
-% % \end{wrapfigure}
-
-% Since the search space is the powerset $\mathcal{P}(\rmR)$, it can be
-% naturally represented as a subset lattice---see \Cref{fig:lattice} for
-% an example over three variables. When traversing the subset lattice in a
-% depth-first order, the resulting search order can be represented as an
-% enumeration tree as seen in \Cref{fig:tree}.
-
-% \begin{definition}[Enumeration Tree]
-%   An enumeration tree $\tree$ has nodes for each subset in the powerset
-%   $V(\tree)=\mathcal{P}(\rmR)$. Let $A(S)$ for some $S\in V(\tree)$ be
-%   the variables in its descendants not in $S$. Let $S_{i}$ be the $i$-th
-%   node visited during a depth-wise traversal of the corresponding
-%   lattice. Then by definition:
-%   \begin{equation}
-%     \label{eq:set-enum}
-%     S_{i}\cup A(S_{i}) \supseteq S_{j}\cup A(S_{j})
-%   \end{equation}
-%   where $j > i$.
-% \end{definition}
-
-% The property in \Cref{eq:set-enum} will allow us to prune chunks of the
-% search space based on properties of $S_{i}$. Specifically we desire a
-% way to determine at subset $S_{i}$ which proceeding subsets
-% $j>i : S_{j}$ will not be capable of rejecting the conditional
-% independence test.
-
-% \begin{theorem}[Pruning based on maximum degrees of freedom]
-%   \label{thm:prune}
-%   At some node in the enumeration tree $(S_{i}, A_{i})$, if
-%   \begin{equation}
-%     \label{eq:df-max-reject}
-%     1 - F(G_{S_{i}\cup A_{i}}; \df(S_{i})) > \alpha
-%   \end{equation}
-%   then for every subsequent node in the enumeration tree $S_{j}, j > i$
-%   \begin{equation}
-%     \label{eq:df-max-reject}
-%     \df(S_{j}) \geq \df(S_{i}) \implies
-%     1 - F(G_{S_{j}\cup A_{i}}; \df(S_{j})) > \alpha
-%   \end{equation}
-% \end{theorem}
-% \begin{proof}
-%   First recall from the definition of enumeration trees that
-%   \begin{equation*}
-%     S_{i} \cup A(S_{i}) \supseteq S_{j} \cup A(S_{j})
-%   \end{equation*}
-%   for all $i \geq j$. Therefore, by using \Cref{thm:chi2-ineq,thm:dpi}
-%   with the assumption that $\df(S_{j}) \geq \df(S_{i})$,
-%   we can establish the following inequality:
-%   \begin{gather*}
-%     F(G_{S_{i}\cup A(S_{i})}; \df(S_{i}))
-%     \underset{\text{\Cref{thm:dpi}}}{\geq}
-%     F(G_{S_{j}\cup A(S_{j})}; \df(S_{i}))
-%     \underset{\text{\Cref{thm:chi2-ineq}}}{\geq}
-%     F(G_{S_{j}\cup A(S_{j})}; \df(S_{j}))\\
-%     \implies 1 - F(G_{S_{i}\cup A(S_{i})}; \df(S_{i}))
-%     \leq 1 - F(G_{S_{j}\cup A(S_{j})}; \df(S_{j}))
-%   \end{gather*}
-%   Therefore the following holds
-%   \begin{align*}
-%     \alpha < 1 - \cdf(G_{S_{i}\cup A(S_{i})}; \df(S_{i}))
-%     \implies 
-%     \alpha <  1 - \cdf(G_{S_{j}\cup A(S_{j})}; \df(S_{j}))
-%   \end{align*}
-%   whenever $\df(S_{j}) \geq \df(S_{i})$.
-% \end{proof}
-% \begin{corollary}[Pruning Supersets]
-%   \label{thm:prune-superset}
-%   At some node in the enumeration tree $S_{i}$, if
-%   \begin{equation}
-%     \label{eq:max-reject}
-%     1 - F(G_{S_{i}\cup A(S_{i})}; \df(S_{i})) > \alpha
-%   \end{equation}
-%   where $\alpha$ is some prescribed significance level, then it follows
-%   directly from \Cref{thm:prune} that
-%   \begin{equation}
-%     \label{eq:max-pruned}
-%     \forall S' \supseteq S : 1 - \cdf(G_{S'}; \df(S')) > \alpha
-%   \end{equation}
-%   since $S' \supseteq S \implies \df(S') \geq \df(S)$.
-%   % therefore, when \Cref{eq:max-reject} is true, no superset of $S$ can
-%   % have their conditional independence hypothesis be
-%   % rejected. Consequently, we cannont definitively accept the hypothesis
-%   % that any superset of $S$ is in the MB of $t$.
-% \end{corollary}
-
-% This implies that at $S_{i}$, we can prune entire branch.
-
-% - conjecture same result as IAMB
-% - Complexity?
-% - 
 
 %%% Experiments
 \section{Experiments}\label{sec:exp}
-Throughout this section we will compare our approach against existing
+In order to empirically test {\method} we implemented the algorithm as a
+\texttt{Python} package written in \texttt{Rust}. The implementation
+uses the G-Test with $\alpha=0.01$ as its conditional independence test
+of choice when possible and falls back to the the SCI
+test~\citep{marx2019} when the G-Test is too weak for the test being
+conducted---i.e. when the average frequency for each cell is $<5$. For
+further details about the implementation, please refer to
+\Cref{apx:impl}.
+
+
+Throughout this section we will compare {\method} against existing
 methods for Markov blanket discovery. Specifically we will compare
-against the following nine Markov blanket discovery mehtods:
-\begin{itemize}
-\item GS~\citep{margaritis1999}. 
-\item IAMB~\citep{tsamardinos2003}.
-\item HITON~\citep{aliferis2003}.
-\item PCMB~\citep{pena2007}.
-\item LRH~\citep{liu2016}.
-\item STMB~\citep{gao2017a}.
-\item BAMB~\citep{ling2019}.
-\item MMMB
-\end{itemize}
-For our experiments, we will use the implementation of these methods
+against the following eight Markov blanket discovery mehtods:
+GS~\citep{margaritis1999}, IAMB~\citep{tsamardinos2003},
+HITON~\citep{aliferis2003}, MMMB~\citep{tsamardinos2003b},
+PCMB~\citep{pena2007}, LRH~\citep{liu2016}, STMB~\citep{gao2017a},
+BAMB~\citep{ling2019}. We will use the implementation of these methods
 found in the \texttt{pyCausalFS} python library~\citep{yu2020a} with a
-significance level of $0.01$ for any statistical tests. When comparing
-the methods above we will use the metric \emph{recall}---the percentage
-of the variables in the true Markov blanket recovered by the Markov
-blanket discovery method.
+significance level of $0.01$ for any statistical tests as well.
 
+When comparing between different Markov blanket discovery methods, we
+will use the F1 score defined as: $F1 = 2 \times \mathit{precision}
+\times \mathit{recall} / (\mathit{precision}+\mathit{recall})$, which is
+the harmonic maen of \emph{precision} and \emph{recall}. Here
+\emph{precision} denotes the ratio between the number of true positives
+in the inferred \gls{mb} and the size of the inferred \gls{mb}. On the
+other hand, \emph{Recall} denotes the ratio between the number of true
+positives in the inferred \gls{mb} and the size of the true
+\gls{mb}. Therefore $F1=1$ represents the perfect precision and recall.
 
-\subsection{Experiments with Synthetic Bayesian Networks}
-\begin{figure}
-  \centering
-  \begin{tikzpicture}[every node/.style={draw, circle, inner sep=2pt}]
-  \node[inner sep=3.5pt] (y) at (0,0) {$Y$};
-  \node (x1) at (-3,1.5) {$X_{1}$};
-  \node (x2) at (-1.5,1.5) {$X_{2}$};
-  \node (x3) at (0,1.5) {$X_{3}$};
-  \node (x4) at (1.5,1.5) {$X_{4}$};
-  \node (x5) at (3,1.5) {$X_{5}$};
-
-  \node (x6) at (-3,0) {$X_{6}$};
-  \node (x7) at (-1.5,0) {$X_{7}$};
-  \node (x8) at (1.5,0) {$X_{8}$};
-  \node (x9) at (3,0) {$X_{9}$};
-
-  \draw (x1) -- (y);
-  \draw (x2) -- (y);
-  \draw (x3) -- (y);
-  \draw (x4) -- (y);
-  \draw (x5) -- (y);
-  \end{tikzpicture}
-\end{figure}
-In order to empirically determine situations where non-exhaustive
-heuristic approaches might have difficulty discovering the Markov
-blanket of a variable, in this section we will keep it simple focus on
-discovering the Markov blanket of variables that are the output of some
-Boolean function. Specifically, we will use following Boolean functions:
+%%%% Syn
+\subsection{Experiments with Synthetic Bayesian
+  Networks}\label{sec:exp-syn}
+To systematically test how {\method} behaves in the face of true and
+empirical faithfulness violations, we will task {\method} at learning
+the \gls{mb} of every variable for five different basic toy Bayesian
+networks. These problems will have $4$
+variables---$\rmX=\{X_{1},X_{2},X_{3}\}$ and $Y$---with a \gls{dag} that
+has edges $\forall i\in[3] : X_{i}\rightarrow Y$. Each variable
+$X\in\rmX$ are indepedent Bernoulli random variables with $p=0.5$. The
+conditional distribution of $Y$ is then $\pr(Y=f(\rmX)\mid\rmX)=0.9$
+where $f(\rmX)$ is one out of $5$ different boolean functions, one for
+each toy problem:
 \begin{description}[align=right,labelwidth=7em]
 \item[parity:]     
-  $f(X_{1},\ldots,X_{5}) = (\sum_{i=1}^{5}X_{i}) \mod 2$
-\item[prime:]      
-  $f(X_{1},\ldots,X_{5}) = \bigl[(\sum_{i=1}^{5}X_{i}) \text{ is prime}\bigr]$
-\item[exactly-$k$:] 
-  $f(X_{1},\ldots,X_{5}; k) = \bigl[(\sum_{i=1}^{5}X_{i}) = k\bigr]$
-\item[and:]        
-  $f(X_{1},\ldots,X_{5}) = \bigl[(\sum_{i=1}^{5}X_{i}) = 5\bigr]$
+  $f(X_{1},\ldots,X_{3}) = (\sum_{i=1}^{3}X_{i}) \pmod{2}$
+\item[ex-$s$:] 
+  $f(X_{1},\ldots,X_{3}; s) = \bigl[(\sum_{i=1}^{3}X_{i}) = s\bigr]$
+\item[and:]       
+  $f(X_{1},\ldots,X_{3}) = \bigl[(\sum_{i=1}^{3}X_{i}) = 3\bigr]$
 \item[or:]         
-  $f(X_{1},\ldots,X_{5}) = \bigl[(\sum_{i=1}^{5}X_{i}) \geq 1\bigr]$
+  $f(X_{1},\ldots,X_{3}) = \bigl[(\sum_{i=1}^{3}X_{i}) \geq 1\bigr]$
 \end{description}
-We then construct a Bayesian network for each 
+where $s\in\{1,2\}$. We then sample $100$ samples from the $5$ Bayesian
+networks $10$ different times---leading to $10\times 5$ samples of size
+$100$. We then tasked all the methods we wish to compare at
+inferring---for each toy Bayesian network---the \gls{mb} of all $4$
+variables from the $10$ different samples separately. We then averaged
+the F1 score over the $4\times 10$ runs for each Bayesian network,
+resulting in \Cref{tab:syn}. Note that we only include the results for
+{\method} and \acrfull{gs} because \gls{gs} was the best performing
+method out of all the previous methods mentioned in \Cref{sec:exp}.
 
-
-% \input{./tab/syn}
+From the results in \Cref{tab:syn}, we can observe that {\method}
+consistently outperforms the other approaches at \gls{mb}
+discovery. More interestingly---even for the problems whose
+Bayesian networks are faithful---as we incease $k$ and look at higher
+order relationships, {\method} is able to better overcome empirical
+unfaithfulness. Furthermore the Markov blanket for the parity problem is
+only recoverable when $k=2$, which confirms {\method}'s ability to find
+these higher order parity-like relations.
 
 \begin{table}
   \centering
@@ -1399,8 +1261,37 @@ We then construct a Bayesian network for each
   \input{./tab/syn-neat}
 \end{table}
 
+%%%% real
 \subsection{Experiments with Benchmark Bayesian Networks}
+To further explore how {\method} behaves in more realistic scenarios, we
+then repeated the same procedure as \Cref{sec:exp-syn}, but with some
+well known benchmark datasets in the \gls{mb} discovery
+literature\footnote{The datasets can be accessed at:
+  \url{https://pages.mtu.edu/~lebrown/supplements/mmhc_paper/mmhc_index.html}}. The
+main difference in the experiments in this section is that we used
+samples of $5000$ and we only tasked each method at finding the \gls{mb}
+for the $10$ variables with the largest neighborhoods in the Bayesian
+network. Furthermore, we also omit some of the poorer performing methods
+in \Cref{tab:real} to conserve space.
 
+From the results in \Cref{tab:real} we can observe that {\method} does
+generally outperform the other existing approaches to \gls{mb}
+discovery. Furthermore, it seems that for the Alarm1 and Insurance
+networks---which has $37$ and $27$ variables respectively---{\method}
+with an order of $2$ outperforms itself when given an order of
+$1$. Therefore, this result substantiates the idea that using \gls{mb}
+discovery methods that assumes a higher order relaxation of faithfulness
+can be beneficial even on smaller networks.
+
+\begin{table}
+  \centering
+  \caption{Benchmark Results}
+  \label{tab:real}
+  \input{./tab/real-neat}
+\end{table}
+
+%%% Conclusion
+\section{Conclusion}
 
 %%% Post matter
 \begin{contributions} % will be removed in pdf for initial submission 

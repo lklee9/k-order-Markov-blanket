@@ -1,0 +1,64 @@
+% \begin{table}[t]
+% \centering
+% \caption{Performance comparison. Means shown first; standard deviations in the row below (\scriptsize). Best mean per dataset in bold.}
+% \label{tab:results}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lcccc}
+\toprule
+Method & Alarm1 & Barley & Insurance & Mildew \\
+\midrule
+
+BAMB 
+& 0.6742 & 0.3385 & 0.6588 & 0.4945 \\
+& {\scriptsize 0.1771} & {\scriptsize 0.1226} & {\scriptsize 0.0797} & {\scriptsize 0.1084} \\
+
+% GSMB 
+% & 0.3434 & 0.2113 & 0.4615 & 0.2867 \\
+% & {\scriptsize 0.1503} & {\scriptsize 0.0807} & {\scriptsize 0.1477} & {\scriptsize 0.1581} \\
+
+HITON\_MB 
+& 0.7636 & 0.3400 & 0.6746 & 0.4918 \\
+& {\scriptsize 0.1861} & {\scriptsize 0.1284} & {\scriptsize 0.1594} & {\scriptsize 0.1487} \\
+
+% IAMB 
+% & 0.6931 & 0.3373 & 0.6293 & 0.4677 \\
+% & {\scriptsize 0.1827} & {\scriptsize 0.1223} & {\scriptsize 0.0778} & {\scriptsize 0.1224} \\
+
+% LRH 
+% & 0.6813 & 0.3373 & 0.6281 & 0.4674 \\
+% & {\scriptsize 0.1777} & {\scriptsize 0.1223} & {\scriptsize 0.0782} & {\scriptsize 0.1230} \\
+
+MMMB 
+& 0.7692 & 0.3298 & 0.6978 & 0.4861 \\
+& {\scriptsize 0.1874} & {\scriptsize 0.1274} & {\scriptsize 0.1405} & {\scriptsize 0.1810} \\
+
+% PCMB 
+% & 0.7372 & 0.2284 & 0.6299 & 0.4156 \\
+% & {\scriptsize 0.2127} & {\scriptsize 0.1199} & {\scriptsize 0.1291} & {\scriptsize 0.1445} \\
+
+% STMB 
+% & 0.6598 & 0.2145 & 0.5648 & 0.2734 \\
+% & {\scriptsize 0.1627} & {\scriptsize 0.1281} & {\scriptsize 0.1324} & {\scriptsize 0.1765} \\
+
+kOMB-1-1 
+& 0.7725 & \textbf{0.4856} & 0.7049 & \textbf{0.6220} \\
+{\scriptsize $(k=1,l=1)$}& {\scriptsize 0.1164} & {\scriptsize 0.1679} & {\scriptsize 0.1339} & {\scriptsize 0.1592} \\
+
+kOMB-1-2 
+& 0.7710 & 0.4048 & 0.7339 & 0.5304 \\
+{\scriptsize $(k=1,l=2)$}& {\scriptsize 0.1932} & {\scriptsize 0.1155} & {\scriptsize 0.1343} & {\scriptsize 0.1227} \\
+
+kOMB-2-1 
+& 0.7229 & -- & 0.6967 & 0.4214 \\
+{\scriptsize $(k=2,l=1)$}& {\scriptsize 0.1458} & -- & {\scriptsize 0.1539} & {\scriptsize 0.2144} \\
+
+kOMB-2-2 
+& \textbf{0.8175} & 0.3993 & \textbf{0.7478} & 0.5304 \\
+{\scriptsize $(k=2,l=2)$}& {\scriptsize 0.1943} & {\scriptsize 0.1166} & {\scriptsize 0.1505} & {\scriptsize 0.1227} \\
+\bottomrule
+\end{tabular}
+% \end{table}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../main"
+%%% End:
