@@ -1,5 +1,5 @@
-\documentclass{uai2026} % for initial submission
-%\documentclass[accepted]{uai2026} % after acceptance, for a revised version; 
+% \documentclass{uai2026} % for initial submission
+\documentclass[accepted]{uai2026} % after acceptance, for a revised version; 
 % also before submission to see how the non-anonymous paper would look like 
                         
 %% There is a class option to choose the math font
@@ -17,8 +17,8 @@
 
 %% Some suggested packages, as needed:
 \usepackage{natbib} % has a nice set of citation styles and commands
-    \bibliographystyle{plainnat}
-    \renewcommand{\bibsection}{\subsubsection*{References}}
+\bibliographystyle{plainnat}
+\renewcommand{\bibsection}{\subsubsection*{References}}
 \usepackage{mathtools} % amsmath with fixes and additions
 % \usepackage{siunitx} % for proper typesetting of numbers and units
 \usepackage{booktabs} % commands to create good-looking tables
@@ -37,6 +37,7 @@
 
 \Crefname{assumption}{Assumption}{Assumptions}
 
+\usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{url}
 \usepackage{multirow}
@@ -97,7 +98,7 @@
 \usepackage{wrapfig}
 \usepackage{braket}
 
-\usepackage{romannum}
+% \usepackage{romannum}
 
 \newcommand{\cmark}{\ding{51}}%
 \newcommand{\xmark}{\ding{55}}%
@@ -154,16 +155,18 @@
   distribution imply the same separation in the graphical
   structure---also known as the faithfulness assumption. Unfortunately,
   this assumption can be violated due to higher-order conditional
-  dependencies in the distribution---like those in XOR and parity-type
-  relations. Furthermore, even having a finite sample can cause
-  empirical violations of faithfulness---which is quite common in real
-  world scenarios. Therefore, in this paper we propose a ``k-order''
-  relaxation of the faithfulness assumption that captures parity type
-  relationships between k+2 variables. We then propose a proof of
-  concept algorithm called k-order Markov blanket (kOMB) that uses this
-  relaxation for MB discovery. Finally, we empirically show
-  how kOMB can recover the MB of a variable under both true
-  and empirical violations of faithfulness.
+  dependencies in the distribution, like those in XOR and parity-type
+  relations. Moreover, having finite samples---a common situation in
+  real world scenarios---can also cause empirical violations of
+  faithfulness due to insufficient statistical power to detect
+  dependencies and, in extreme cases, cause spurious dependencies absent
+  from the true distribution to be falsely detected. Therefore, in this
+  paper we propose a ``k-order'' relaxation of the faithfulness
+  assumption that captures parity type relationships between k+2
+  variables. We then propose a proof of concept algorithm called k-order
+  Markov blanket (kOMB) that uses this relaxation for MB
+  discovery. Finally, we empirically show how kOMB can recover the MB of
+  a variable under both true and empirical violations of faithfulness.
 \end{abstract}
 
 %%% Intro
@@ -263,9 +266,15 @@ violation~\citep{uhler2013,lemeire2012,boeken2025}. For example, the
 small example in \Cref{fig:intro} is one such case where the true
 \gls{bn} is faithful, but due to a finite sample, empirical
 faithfulness violations occur---which can be overcome by the algorithm
-we will propose later in \Cref{sec:algo}. A full walkthrough of this
+we will propose later in \Cref{sec:algo}.  A full walkthrough of this
 example can be found later in \Cref{ex:sample} under
-\Cref{sec:violation}.%\todo{maybe add more explaination here?}
+\Cref{sec:violation}.  Furthermore, in extreme cases, a limited sample
+size can cause \gls{mb} discovery algorithms to falsely discover
+spurious dependecies absent from the true distribution. We later observe
+this phenomena in \Cref{fig:syn-metrics} under \Cref{sec:exp-syn} with
+the low precision exhibited by the different \gls{mb} discovery methods
+at low sample sizes.
+
 
 There are several weaker assumptions compared to faithfulness such as
 adjacency faithfulness~\citep{spirtes2001},
@@ -609,7 +618,7 @@ between two variables in $\verts$ that require considering $k$
 additional variables to be found. But before that, we first define in
 \Cref{def:k-dep} what it means for two distinct variables $Y,X\in\verts$
 to only be conditionally dependent given some $k$-cardinality subset
-$\rmZ\subseteq\subverts, |\rmZ|\leq k$.
+$\rmZ\subseteq\subverts, |\rmZ| = k$.
 
 
 \begin{definition}[$k$-Order Dependence]\label{def:k-dep}
@@ -1226,6 +1235,23 @@ these higher-order parity-like relations.
   \label{tab:syn}
   \input{./tab/syn-neat}
 \end{table}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{fig/syn_metrics/syn_metrics_grid.pdf}
+  \caption{\todo{fix this}Precision, recall, and F1 score of Grow-Shrink (GSMB) and our
+    $k$-order method ({\method}-$k$-$l$) when recovering the \glspl{mb}
+    of the five synthetic Bayesian networks in \Cref{sec:exp-syn}, as a
+    function of the sample size. The \emph{parity} network is the only
+    one that is truly unfaithful, and its \glspl{mb} are recovered only
+    once higher-order dependencies are considered ({\method}-2-2). The
+    remaining four networks are faithful, yet at small sample sizes GSMB
+    still suffers from both low recall (missed dependencies) and low
+    precision (spurious dependencies)---empirical faithfulness
+    violations that the higher-order {\method} variants overcome with
+    far fewer samples.}
+  \label{fig:syn-metrics}
+\end{figure*}
 
 %%%% real
 \subsection{Experiments with Benchmark Bayesian Networks}
