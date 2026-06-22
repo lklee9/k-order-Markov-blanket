@@ -1239,17 +1239,18 @@ these higher-order parity-like relations.
 \begin{figure*}[t]
   \centering
   \includegraphics[width=\textwidth]{fig/syn_metrics/syn_metrics_grid.pdf}
-  \caption{\todo{fix this}Precision, recall, and F1 score of Grow-Shrink (GSMB) and our
+  \caption{Precision, recall, and F1 score of Grow-Shrink (GSMB) and our
     $k$-order method ({\method}-$k$-$l$) when recovering the \glspl{mb}
     of the five synthetic Bayesian networks in \Cref{sec:exp-syn}, as a
-    function of the sample size. The \emph{parity} network is the only
-    one that is truly unfaithful, and its \glspl{mb} are recovered only
-    once higher-order dependencies are considered ({\method}-2-2). The
-    remaining four networks are faithful, yet at small sample sizes GSMB
-    still suffers from both low recall (missed dependencies) and low
-    precision (spurious dependencies)---empirical faithfulness
-    violations that the higher-order {\method} variants overcome with
-    far fewer samples.}
+    function of the sample size. Each row corresponds to a metric and
+    each column to one of the synthetic networks. The \emph{parity}
+    network is the only one that is truly unfaithful, and its \glspl{mb}
+    are recovered only once higher-order dependencies are considered
+    ({\method}-2-2). The remaining four networks are faithful, yet at
+    small sample sizes GSMB still suffers from both low recall (missed
+    dependencies) and low precision (spurious dependencies)---empirical
+    faithfulness violations that the higher-order {\method} variants
+    overcome with far fewer samples.}
   \label{fig:syn-metrics}
 \end{figure*}
 
