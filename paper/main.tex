@@ -1160,7 +1160,48 @@ any subsequent Theorems can be found in \Cref{apx:proofs-thm}.
   where it subsequently terminates and returns $\rmS$.
 \end{restatable}
 
-% \paragraph{Complexity of {\method}} Since in the worst case \todo{todo}
+\subsection{Computational Complexity of {\method}}\label{sec:complexity}
+As {\method} is a proof-of-concept, we prioritised correctness and
+clarity over efficiency. It is nonetheless instructive to characterise
+its worst-case time complexity, which we state in
+\Cref{cor:complexity}. The proof, given in \Cref{apx:proofs-thm},
+accumulates the cost of the nested enumerations performed by the three
+sub-algorithms in \Cref{sec:algo}.
+
+\begin{restatable}[Computational Complexity of {\method}]{corollary}{kombcomplexity}
+  \label{cor:complexity}
+  Let $n=|\verts|$ denote the number of variables, $N$ the sample size,
+  and $K$ the maximum size of any candidate \gls{mb} $\rmS$
+  \Cref{alg:komb} encountered during execution. Furthermore assume each
+  \gls{ci} test runs in $O(N)$ time. Then, for a given order $k$ and
+  separator bound $l$, {\method} (\Cref{alg:komb}) terminates in
+  worst-case time
+  \begin{equation}
+    \label{eq:complexity}
+    O\!\left(
+      K\, n \sum_{i=0}^{k}\binom{n}{i}
+      \left[
+        \sum_{i'=0}^{k-i}\binom{K}{i'}
+        \sum_{j=0}^{l}\binom{K-i'-i}{j}\, N
+      \right]
+    \right),
+  \end{equation}
+  where we adopt the convention that $\binom{n}{m}=0$ whenever $n<m$.
+\end{restatable}
+
+Treating $k$ and $l$ as constants, \Cref{eq:complexity} is bounded by
+$O(n^{k+1}\,K^{k+l+1}\,N)$---polynomial in $n$, $K$, and $N$, and for
+$k=0$ it reduces to a scan that is linear in $n$, recovering the
+original \gls{gs} algorithm. Crucially, the search for a
+dependence-exposing subset and its separator is governed by $K$ rather
+than $n$, a direct consequence of the $l$-bounded separator assumption
+(\Cref{def:bound-sep}). The remaining exponential dependence on $k$ and
+$l$ motivates keeping them small. The abalation study in
+\Cref{apx:ablation} showcases how differing values of $k$ and $l$
+affects \Cref{alg:komb} runtime and its its ability to find high-order
+dependencies. Generally, for the benchmark datasets used, we found that
+setting $k=l$ and having $k\leq 2$ provides a decent trade-off between
+runtime and finding high-order dependencies. 
 
 
 %%% Experiments
@@ -1255,7 +1296,7 @@ these higher-order parity-like relations.
 \end{figure*}
 
 %%%% real
-\subsection{Experiments with Benchmark Bayesian Networks}
+\subsection{Experiments with Benchmark Bayesian Networks}\label{sec:exp-real}
 To further explore how {\method} behaves in more realistic scenarios, we
 then repeated the same procedure as \Cref{sec:exp-syn}, but with some
 well-known benchmark datasets\footnote{The datasets can be accessed at:

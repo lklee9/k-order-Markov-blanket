@@ -310,7 +310,67 @@
   of $Y$, \textit{find\_cond} returns an empty set and $X$ is removed
   from $\rmS$. As such, after the shrink phase, the subset $\rmS$ is
   exactly the graphical Markov blanket of $Y$, $\rmS=\mbs{\gr}(Y)$.
-\end{proof} 
+\end{proof}
+
+\kombcomplexity*
+\begin{proof}
+  We charge $O(N)$ to each \gls{ci} test and bound the running time by
+  analysing the three sub-algorithms of \Cref{sec:algo} from the
+  innermost outwards.
+
+  First consider \textit{find\_cond} (\Cref{alg:ci-test}) for a fixed
+  candidate variable $X$ and external dependence set $\rmX$ with
+  $|\rmX|=i$. It iterates over every subset
+  $\rmX'\in\powerleq{k-i}{\rmS}$, of which there are at most
+  $\sum_{i'=0}^{k-i}\binom{K}{i'}$ since $|\rmS|\leq K$. For each $\rmX'$
+  it performs one \gls{ci} test and, whenever that test indicates a
+  dependence, calls \textit{no\_seps}, which iterates over every
+  separator $\rmS'\in\powerleq{l}{\rmS\setminus\rmX'}$ and performs one
+  further \gls{ci} test per separator. Writing $|\rmX'|=i'$, there are at
+  most $\sum_{j=0}^{l}\binom{K-i'-i}{j}$ such separators, so a single
+  call to \textit{find\_cond} costs
+  \begin{equation}
+    \label{eq:cost-findcond}
+    O\!\left(
+      \sum_{i'=0}^{k-i}\binom{K}{i'}
+      \sum_{j=0}^{l}\binom{K-i'-i}{j}\, N
+    \right),
+  \end{equation}
+  where the convention $\binom{n}{m}=0$ for $n<m$ accounts for the
+  separator set $\rmS\setminus\rmX'$ being exhausted.
+
+  Next consider \textit{find\_inter\_dep} (\Cref{alg:assoc-mine}). It
+  explores the enumeration tree of $\verts\setminus Y$ up to subsets of
+  cardinality $k$ (lines 13--17 of \textit{find\_inter\_dep}), and hence
+  visits each of the $\sum_{i=0}^{k}\binom{n}{i}$ dependence sets
+  $\rmX\in\powerleq{k}{\verts\setminus Y}$. For every such $\rmX$ it
+  loops over the $O(n)$ candidate variables
+  $X\in\verts\setminus(Y\cup\rmS\cup\rmX)$ and invokes
+  \textit{find\_cond}. Multiplying these two factors by
+  \Cref{eq:cost-findcond} bounds the cost of a single association-mining
+  sweep by
+  \begin{equation}
+    \label{eq:cost-sweep}
+    O\!\left(
+      n \sum_{i=0}^{k}\binom{n}{i}
+      \left[
+        \sum_{i'=0}^{k-i}\binom{K}{i'}
+        \sum_{j=0}^{l}\binom{K-i'-i}{j}\, N
+      \right]
+    \right).
+  \end{equation}
+
+  Finally, consider {\method} itself (\Cref{alg:komb}). Each successful
+  call to \textit{find\_inter\_dep} in the grow phase returns a
+  non-empty set $X\cup\rmZ$ that is added to $\rmS$, so the candidate
+  Markov blanket grows by at least one variable per successful call; as
+  $|\rmS|\leq K$ throughout, the grow phase performs at most $O(K)$
+  association-mining sweeps. The shrink phase calls \textit{find\_cond}
+  for each of the at most $K$ variables in $\rmS$, the cost of which is
+  dominated by that of the grow phase. Multiplying \Cref{eq:cost-sweep}
+  by these $O(K)$ sweeps yields the bound in \Cref{eq:complexity},
+  completing the proof.
+\end{proof}
 
 
 %%% Implementation
@@ -380,6 +440,29 @@
   $f(X_{1},\ldots,X_{3}) = \bigl[(\sum_{i=1}^{3}X_{i}) \geq 1\bigr]$
 \end{description}
 where $s\in\{1,2\}$.
+
+%%% Full benchmark results
+\section{Full Benchmark Results}\label{apx:full-results}
+For completeness, we report the full results of the experiments in
+\Cref{sec:exp-real} for every method and every $(k,l)$ configuration of
+{\method}. \Cref{tab:real-full} gives the performance of all methods,
+while \Cref{tab:runtime-full} gives their runtimes in seconds. In both
+tables, ``--'' denotes a configuration that failed to complete within the
+allotted time budget.
+
+\begin{table}[h]
+  \centering
+  \caption{Full results on benchmark datasets.}
+  \label{tab:real-full}
+  \input{./tab/real-neat-auto}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \caption{Full runtimes (in seconds) on benchmark datasets.}
+  \label{tab:runtime-full}
+  \input{./tab/runtime}
+\end{table}
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "main"
