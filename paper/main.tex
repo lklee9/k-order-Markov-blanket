@@ -368,10 +368,12 @@ conditional independencies between the variables in $\verts$,
 where $\rmX \indep{\pr} \rmY \mid \rmS$ denotes $\rmX$ and
 $\rmY$ are probabilistically conditionally independent given $\rmS$.
 
-Our base assumption throughout this paper is that any
-conditional independencies encoded by the graph $\gr$ imply the same
-conditional independence in $\pr$---more formally known as the Global
-Markov property and is a common assumption in the Markov blanket
+So far, $\indeps{\gr}$ and $\indeps{\pr}$ are two separate collections
+of conditional independencies in the graph $\gr$ and distribution $\pr$
+respectively. Our base assumption throughout this paper, the
+\emph{Global Markov Property}, links the two by requiring that every
+conditional independence encoded by the graph $\gr$ also hold in the
+distribution $\pr$. This is a common assumption in the Markov blanket
 discovery literature~\cite{schluter2014,yu2020a,marx2021}.
 
 \begin{assumption}[Global Markov Property]\label{def:global-markov}
@@ -381,16 +383,11 @@ discovery literature~\cite{schluter2014,yu2020a,marx2021}.
   $\rmX,\rmY,\rmS\subseteq\verts$~\citep{hammersley1971,lauritzen2018},
   \begin{equation}
     \label{eq:5}
-    \begin{aligned}
-      &(\rmX \indep{\gr} \rmY \mid \rmS \implies
-        \rmX \indep{\pr} \rmY\mid \rmS)\\
-      &\iff
-        \indeps{\gr} \subseteq \indeps{\pr}.
-    \end{aligned}
+    \rmX \indep{\gr} \rmY \mid \rmS \implies
+    \rmX \indep{\pr} \rmY \mid \rmS.
   \end{equation}
-  where
-  $\braket{\rmX,\rmY\mid\rmS} \in \indeps{\pr} \iff \rmX \indep{\pr}
-  \rmY \mid \rmS$.
+  Furthermore, by \Cref{eq:g-indeps,eq:4}, the relation in \Cref{eq:5}
+  is equivalent to $\indeps{\gr} \subseteq \indeps{\pr}$.
 \end{assumption}
 
 Despite their differences, the independence models of $\gr$ and $\pr$
@@ -437,14 +434,14 @@ As mentioned in \Cref{sec:intro}, we are interested in learning the
 graphical \acrlong{mb} of some $Y\in\verts$ defined as follows.
 \begin{definition}[Markov Blanket and Boundary] \label{def:mb} For a
   variable $Y\in\verts$, the \gls{mb} of $Y$ in $\gr$ is any subset
-  $\rmM \subseteq \rmV\setminus Y$\footnote{We allow set operations
+  $\rmS \subseteq \rmV\setminus Y$\footnote{We allow set operations
     between variable sets and single variables to implicitly mean the
     operation between the set and the atomic set of the single
     variable---for example:
     $\rmV \setminus Y \coloneq \rmV \setminus \{Y\}$.}  s.t.
   \begin{equation}
     \label{eq:def-mb}
-    Y \indep{\gr} \verts \setminus (Y \cup \rmM) \mid \rmM,
+    Y \indep{\gr} \verts \setminus (Y \cup \rmS) \mid \rmS,
   \end{equation}
   or in other words, every other variable in
   $\verts \setminus (Y \cup \rmS)$ is graphically separated from $Y$ by
