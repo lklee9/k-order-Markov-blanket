@@ -1324,6 +1324,21 @@ can be beneficial even on smaller networks.
   \input{./tab/real-neat}
 \end{table}
 
+We also report the runtime of these methods on the benchmark datasets in
+\Cref{tab:runtime}. As expected, the cost of relaxing faithfulness shows
+up in the runtime. {\method} becomes more expensive as the order $k$
+increases. The full results and runtimes for every method and every
+$(k,l)$ configuration---including those that fail to complete within the
+time budget of 1800 seconds---are given in
+\Cref{tab:real-full,tab:runtime-full} under \Cref{apx:ablation}.
+
+\begin{table}
+  \centering
+  \caption{Runtime (in seconds) on Benchmark Datasets}
+  \label{tab:runtime}
+  \input{./tab/runtime-neat}
+\end{table}
+
 %%% Conclusion
 \section{Conclusion}
 We introduced a $k$-order relaxation of faithfulness that explicitly
