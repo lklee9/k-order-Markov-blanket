@@ -167,6 +167,8 @@
   Markov blanket (kOMB) that uses this relaxation for MB
   discovery. Finally, we empirically show how kOMB can recover the MB of
   a variable under both true and empirical violations of faithfulness.
+  Code available at:
+  \url{https://gitlab.com/lklee/k-order-markov-blanket}.
 \end{abstract}
 
 %%% Intro
@@ -247,15 +249,15 @@ same conditional independence in $\pr$. The second assumption---known as
 the faithfulness assumption---goes the opposite direction, that is any
 conditional independencies in $\pr$ imply the same separation in $\gr$.
 
-Theoretically, \glspl{bn} with faithfulness violations have
-Lebesgue measure zero~\citep{meek1995,spirtes2001,boeken2025}; however
-these ``typicality'' results depend on somewhat arbitrary choices, like
-the choice of $\sigma$-ideal~\citep{boeken2025}. There are well-known
+Theoretically, \glspl{bn} with faithfulness violations have Lebesgue
+measure zero~\citep{meek1995,spirtes2001,boeken2025}; however these
+``typicality'' results depend on somewhat arbitrary choices, like the
+choice of $\sigma$-ideal~\citep{boeken2025}. There are well-known
 examples of some---very simple---relations that violate
-faithfulness. The most famous of which is the (noisy) XOR function
-for violations involving three variables~\citep{inazumi2011,marx2021},
-and (noisy) parity functions for higher-order faithfulness
-violations---see \Cref{ex:parity}.
+faithfulness. The most famous of which is the (noisy) XOR function for
+violations involving three variables~\citep{inazumi2011,marx2021}; which
+is a special case of the (noisy) parity function whose higher-order
+faithfulness violations we detail in \Cref{ex:parity}.
 % in \Cref{sec:violation} contains an example
 % of such a \gls{bn}.
 
@@ -264,10 +266,10 @@ almost non-existent in nature, a lack of sufficient samples can still
 cause an empirical faithfulness
 violation~\citep{uhler2013,lemeire2012,boeken2025}. For example, the
 small example in \Cref{fig:intro} is one such case where the true
-\gls{bn} is faithful, but due to a finite sample, empirical
-faithfulness violations occur---which can be overcome by the algorithm
-we will propose later in \Cref{sec:algo}.  A full walkthrough of this
-example can be found later in \Cref{ex:sample} under
+\gls{bn} is faithful, but due to a finite sample, empirical faithfulness
+violations occur---which can be overcome by the algorithm we will
+propose later in \Cref{sec:algo}.  A full walkthrough of empirical
+faithfulness violation can be found later in \Cref{ex:sample} under
 \Cref{sec:violation}.  Furthermore, in extreme cases, a limited sample
 size can cause \gls{mb} discovery algorithms to falsely discover
 spurious dependecies absent from the true distribution. We later observe
@@ -507,7 +509,11 @@ many ways and we will explore some of them in the following section.
 Probably the most well-known example of a faithfulness violation is the
 (noisy) XOR function $Y\coloneq X_{1}\oplus X_{2}$ with the graphical
 structure
-$X_{1}\rightarrow Y \leftarrow X_{2}$~\citep{inazumi2011,marx2021}. A
+$X_{1}\rightarrow Y \leftarrow
+X_{2}$~\citep{inazumi2011,marx2021}\footnote{The (noisy) XOR function is
+a special case of the (noisy) parity function whose faithfulness
+violation we detail in \Cref{ex:parity}.}.
+A
 recent faithfulness relaxation for tackling XOR-type relations that is
 of particular interest to us is $2$-adjacency
 faithfulness~\citep{marx2021}.
@@ -1209,7 +1215,10 @@ In order to empirically test {\method} we implemented the algorithm as a
 uses the G-Test with $\alpha=0.01$ as its conditional independence test
 of choice when possible and falls back to the SCI
 test~\citep{marx2019} when G-test is too weak for the test being
-conducted---i.e. when the average frequency for each cell is $<5$.
+conducted---i.e. when the average frequency for each cell is $<5$. A
+public repo for our implementation of {\method} and code for the
+experiments can be found at
+\url{https://gitlab.com/lklee/k-order-markov-blanket}.
 % For
 % further details about the implementation, please refer to
 % \Cref{apx:impl}.
