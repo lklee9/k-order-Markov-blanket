@@ -1,3 +1,39 @@
+%%% Graphoid Axioms
+\section{Graphoid Axioms}\label{apx:graphoid}
+\begin{definition}[Graphoid Axioms]\label{def:graphoid}
+  For disjoint subsets $\rmX,\rmY,\rmZ,\rmW\subseteq\verts$, a
+  semi-graphoid independence model $\indeps{\cdot}$ obeys the following
+  properties~\citep{dawid1979,pearl1987}:
+  \begin{enumerate}
+  \item Symmetry:
+    $\rmX \indep{} \rmY \mid \rmZ \implies \rmY\indep{}\rmX\mid\rmZ$
+  \item Decomposition:
+    $\rmX \indep{} \rmY \cup \rmW \mid \rmZ \implies
+    \rmX\indep{}\rmY\mid\rmZ$
+  \item Weak Union:
+    $\rmX\indep{}\rmY\cup\rmW\mid\rmZ \implies \rmX\indep{}\rmY \mid
+    \rmW\cup\rmZ$
+  \item Contraction:
+    $(\rmX\indep{}\rmY \mid \rmW\cup\rmZ) \wedge
+    (\rmX\indep{}\rmW\mid\rmZ)\implies \rmX\indep{}\rmY\cup\rmW\mid\rmZ$
+  \end{enumerate}
+  The independence model is called a graphoid if it also obeys the
+  following additional property~\citep{pearl1985}:
+  \begin{enumerate}[resume]
+  \item Intersection:
+    $(\rmX \indep{} \rmY \mid \rmZ \cup \rmW) \wedge
+    (\rmX \indep{} \rmW \mid \rmZ \cup \rmY)
+    \implies \rmX \indep{} \rmY \cup \rmW \mid
+    \rmZ$
+  \end{enumerate}
+  All graph independence models $\indeps{\gr}$ are guaranteed to
+  obey all the graphoid axioms~\citep{lauritzen2018}. However,
+  probabilistic independence models $\indeps{\pr}$ are only guaranteed to
+  obey the semi-graphoid axioms. However if the joint distribution is
+  strictly positive, then $\indeps{\pr}$ is guaranteed to be a
+  graphoid as well~\citep{pearl1988,pearl1989}.
+\end{definition}
+
 %%% Proofs
 \section{Proofs}\label{apx:proofs}
 %%%% k dep to assoc

@@ -391,49 +391,11 @@ discovery literature~\cite{schluter2014,yu2020a,marx2021}.
   Furthermore, by \Cref{eq:g-indeps,eq:4}, the relation in \Cref{eq:5}
   is equivalent to $\indeps{\gr} \subseteq \indeps{\pr}$.
 \end{assumption}
-
 Despite their differences, the independence models of $\gr$ and $\pr$
 are both known to obey a set of axioms called the (semi)-graphoid
-axioms~\citep{pearl1989}.
-% These axioms are particully useful when attempting to prove various
-% theorems relating to probabilistic graphical models.
-
-\begin{definition}[Graphoid Axioms]\label{def:graphoid}
-  For disjoint subsets $\rmX,\rmY,\rmZ,\rmW\subseteq\verts$, a
-  semi-graphoid independence model $\indeps{\cdot}$ obeys the following
-  properties~\citep{dawid1979,pearl1987}:
-  \begin{enumerate}
-  \item Symmetry:
-    $\rmX \indep{} \rmY \mid \rmZ \implies \rmY\indep{}\rmX\mid\rmZ$
-  \item Decomposition:
-    $\rmX \indep{} \rmY \cup \rmW \mid \rmZ \implies
-    \rmX\indep{}\rmY\mid\rmZ$
-  \item Weak Union:
-    $\rmX\indep{}\rmY\cup\rmW\mid\rmZ \implies \rmX\indep{}\rmY \mid
-    \rmW\cup\rmZ$
-  \item Contraction:
-    $(\rmX\indep{}\rmY \mid \rmW\cup\rmZ) \wedge
-    (\rmX\indep{}\rmW\mid\rmZ)\implies \rmX\indep{}\rmY\cup\rmW\mid\rmZ$
-  \end{enumerate}
-  The independence model is called a graphoid if it also obeys the
-  following additional property~\citep{pearl1985}:
-  \begin{enumerate}[resume]
-  \item Intersection:
-    $(\rmX \indep{} \rmY \mid \rmZ \cup \rmW) \wedge
-    (\rmX \indep{} \rmW \mid \rmZ \cup \rmY)
-    \implies \rmX \indep{} \rmY \cup \rmW \mid
-    \rmZ$
-  \end{enumerate}
-  All graph independence models $\indeps{\gr}$ are guaranteed to
-  obey all the graphoid axioms~\citep{lauritzen2018}. However,
-  probabilistic independence models $\indeps{\pr}$ are only guaranteed to
-  obey the semi-graphoid axioms. However if the joint distribution is
-  strictly positive, then $\indeps{\pr}$ is guaranteed to be a
-  graphoid as well~\citep{pearl1988,pearl1989}.
-\end{definition}
-
-As mentioned in \Cref{sec:intro}, we are interested in learning the
-graphical \acrlong{mb} of some $Y\in\verts$ defined as follows.
+axioms~\citep{pearl1989} (see \Cref{def:graphoid}). As mentioned in
+\Cref{sec:intro}, we are interested in learning the graphical
+\acrlong{mb} of some $Y\in\verts$ defined as follows.
 \begin{definition}[Markov Blanket and Boundary] \label{def:mb} For a
   variable $Y\in\verts$, the \gls{mb} of $Y$ in $\gr$ is any subset
   $\rmS \subseteq \rmV\setminus Y$\footnote{We allow set operations
