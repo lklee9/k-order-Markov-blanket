@@ -180,11 +180,13 @@ from the joint distribution $\pr$.  Originating from the Bayesian
 network and causal learning
 literature~\citep{margaritis1999,tsamardinos2003,ling2021,hu2024}, the
 MB discovery problem has also been discussed and utilised in the feature
-selection literature as well~\citep{tsamardinos2003a,wang2020}. That
-said, we are interested in inferring \glspl{mb} in both
-\acrfull{bn} and \acrfull{mrf}. Therefore, whenever possible
-we will try to keep our notation and exposition agnostic to the graph
-type of $\gr$.
+selection literature as well~\citep{tsamardinos2003a,wang2020}. More
+recently, \gls{mb} discovery has also been employed as a subroutine
+within distributed, divide-and-conquer approaches to large-scale
+\gls{bn} structure learning~\citep{dong2025a}. That said, we are
+interested in inferring \glspl{mb} in both \acrfull{bn} and
+\acrfull{mrf}. Therefore, whenever possible we will try to keep our
+notation and exposition agnostic to the graph type of $\gr$.
 
 
 %%%% Why there is a gap in literature
@@ -1176,12 +1178,12 @@ runtime and finding high-order dependencies.
 In order to empirically test {\method} we implemented the algorithm as a
 \texttt{Python} package written in \texttt{Rust}. The implementation
 uses the G-Test with $\alpha=0.01$ as its conditional independence test
-of choice when possible and falls back to the SCI
-test~\citep{marx2019} when G-test is too weak for the test being
-conducted---i.e. when the average frequency for each cell is $<5$. A
-public repo for our implementation of {\method} and code for the
-experiments can be found at
-\url{https://gitlab.com/lklee/k-order-markov-blanket}.
+of choice when possible and falls back to the SCI test~\citep{marx2019}
+when G-test is too weak for the test being conducted---i.e. when the
+average frequency for each cell is $<5$. A public repo for our
+implementation of {\method} and code for the experiments can be found at
+\url{https://gitlab.com/lklee/k-order-markov-blanket}. All experiments
+were run on an Apple M4 Mac~mini.
 % For
 % further details about the implementation, please refer to
 % \Cref{apx:impl}.
@@ -1317,12 +1319,17 @@ can be beneficial even on smaller networks.
 % \end{table}
 
 We also report the runtime of these methods on the benchmark datasets in
-\Cref{tab:real}. As expected, the cost of relaxing faithfulness shows
-up in the runtime. {\method} becomes more expensive as the order $k$
-increases. The full results and runtimes for every method and every
-$(k,l)$ configuration---including those that fail to complete within the
-time budget of 1800 seconds---are given in
-\Cref{tab:real-full,tab:runtime-full} under \Cref{apx:ablation}.
+\Cref{tab:real}. As expected, {\method} becomes more expensive as the
+order $k$ increases. Whereas the existing methods all complete within
+roughly $1$--$11$ seconds per dataset, {\method}-1-1 runs between
+roughly $2\times$ and $68\times$ slower, and {\method}-2-2 between
+roughly $9\times$ and $53\times$ slower, than these methods. The largest
+absolute cost is incurred on Barley for {\method}-1-1 ($\approx 135$s)
+and on Alarm1 for {\method}-2-2 ($\approx 207$s). The full results and
+runtimes for every method and every $(k,l)$ configuration---including
+those that fail to complete within a time budget of 1800 seconds---are
+given in \Cref{tab:real-full,tab:runtime-full} under
+\Cref{apx:ablation}.
 
 % --- old single-column runtime table (Table 3); merged into the table* above ---
 % \begin{table}
@@ -1343,8 +1350,12 @@ Empirically, {\method} overcomes both true and empirical
 faithfulness violations on synthetic problems, and it performs
 competitively on commonly used benchmark datasets.
 
-One direction for future work would be finding more intricate pruning
-rules to make {\method} scale better with larger values of
+As {\method} is a proof-of-concept demonstrating that exploiting
+higher-order dependencies can improve \gls{mb} discovery, an important
+direction for future work is the development of \emph{approximate}
+algorithms that uncover these higher-order dependencies without
+{\method}'s worst-case cost---for example, through more intricate
+pruning rules that make {\method} scale better with larger values of
 $k$. Secondly, although our ablation (\Cref{apx:ablation}) shows that
 $l=k$ with $k\leq 2$ is a robust default, principled \emph{a priori}
 selection of $k$ and $l$ without expert knowledge remains open. A
