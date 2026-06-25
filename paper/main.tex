@@ -925,6 +925,19 @@ our $l$-bounded separator assumption focuses on the cardinality of
 ``separating'' sets that causes conditional independencies between
 variables in $\verts$.
 
+The $l$-bounded separator assumption is also analogous to assumptions
+that existing constraint-based \gls{mb} discovery methods make about the
+size of the conditioning sets needed to decide conditional independence
+reliably from finite samples~\citep{
+  margaritis1999,tsamardinos2003,aliferis2003,tsamardinos2003b}.
+\Cref{def:bound-sep} simply makes such a bound explicit.  Furthermore,
+as shown later in \Cref{apx:dsep}, the bound is mild on the networks
+used in \Cref{sec:exp-real}. Using every variable as a target and
+computing minimal d-separators restricted to the true \gls{mb} to every
+other variable not in its \gls{mb}, the mean separator size ranges from
+$0.62$ (Alarm1) to $2.19$ (Insurance), and separators of size at most
+three cover between $83\%$ and $100\%$ of target--non-\gls{mb} pairs.
+
 \subsection{Theoretical Algorithm}
 \begin{algorithm}[t]
   \caption{kOMB}\label{alg:komb}
@@ -1038,6 +1051,7 @@ any subsequent Theorems can be found in \Cref{apx:proofs-thm}.
 
 
 \begin{restatable}[Correctness of \Cref{alg:ci-test}]{theorem}{citest}
+  \label{thm:citest}
   Given an estimated distribution $\pre$, distinct variables
   $Y,X\in\verts$, disjoint subsets $\rmX,\rmS\subset\subverts$, and the
   natural numbers $k,l\in\mathbb{N}$; the function
@@ -1053,6 +1067,7 @@ any subsequent Theorems can be found in \Cref{apx:proofs-thm}.
 \end{restatable}
 
 \begin{restatable}[Correctness of \Cref{alg:assoc-mine}]{theorem}{assocmine}
+  \label{thm:assocmine}
   Given an estimated distribution $\pre$, the target variable whose
   Markov blanket in $\gr$ we want to discover $Y\in\verts$, the current
   candidate \gls{mb} $\rmS\subset\verts\setminus Y$, the remaining
@@ -1111,6 +1126,7 @@ any subsequent Theorems can be found in \Cref{apx:proofs-thm}.
 
 
 \begin{restatable}[Correctness of \Cref{alg:komb}]{theorem}{algkomb}
+  \label{thm:algkomb}
   Given an estimated distribution $\pre$ over variables $\verts$, the
   target variable whose graphical Markov blanket we want to discover
   $Y\in\verts$,
@@ -1128,6 +1144,11 @@ any subsequent Theorems can be found in \Cref{apx:proofs-thm}.
   \end{equation}
   where it subsequently terminates and returns $\rmS$.
 \end{restatable}
+
+Beyond \Cref{def:global-markov,def:k-faith,def:bound-sep}, the recovery
+guarantee of \Cref{thm:algkomb} assumes the \gls{ci} decisions are
+\emph{sufficiently accurate}---i.e.\ they reflect the true conditional
+independencies of $\pr$.
 
 \subsection{Computational Complexity of {\method}}\label{sec:complexity}
 As {\method} is a proof-of-concept, we prioritised correctness and
@@ -1172,6 +1193,13 @@ dependencies. Generally, for the benchmark datasets used, we found that
 setting $k=l$ and having $k\leq 2$ provides a decent trade-off between
 runtime and finding high-order dependencies. 
 
+\begin{table}
+  \centering
+  \caption{Results on Synthetically Generated Data}
+  \label{tab:syn}
+  \input{./tab/syn-neat}
+\end{table}
+
 
 %%% Experiments
 \section{Experiments}\label{sec:exp}
@@ -1210,12 +1238,6 @@ positives in the inferred \gls{mb} and the size of the true
 \gls{mb}. Therefore $F1=1$ represents the perfect precision and recall.
 
 
-\begin{table}
-  \centering
-  \caption{Results on Synthetically Generated Data}
-  \label{tab:syn}
-  \input{./tab/syn-neat}
-\end{table}
 
 \begin{figure}[t]
   \centering
@@ -1227,6 +1249,15 @@ positives in the inferred \gls{mb} and the size of the true
     each column to one of the synthetic networks.}
   \label{fig:syn-metrics}
 \end{figure}
+
+\begin{table*}[t]
+  \centering
+  \caption{F1 score and runtime (in seconds) on benchmark datasets. Best F1
+    and fastest runtime per dataset in bold.}
+  \label{tab:real}
+  \input{./tab/real-runtime-neat-auto}
+\end{table*}
+
 
 %%%% Syn
 \subsection{Experiments with Synthetic Bayesian
@@ -1264,14 +1295,6 @@ capable of better overcoming empirical unfaithfulness. Furthermore the
 confirms {\method}'s ability to find these higher-order parity-like
 relations.
 
-\begin{table*}[t]
-  \centering
-  \caption{F1 score and runtime (in seconds) on benchmark datasets. Best F1
-    and fastest runtime per dataset in bold.}
-  \label{tab:real}
-  \input{./tab/real-runtime-neat-auto}
-\end{table*}
-
 In order to better understand the source of these empirical
 unfaithfulness in the low sample size regime, \Cref{fig:syn-metrics}
 traces the precision, recall, and F1 score as the sample size grows from
@@ -1284,6 +1307,7 @@ spurious dependencies erroneously detected by said methods respectively.
 That said, we can also obsevre that for {\method}, the higher the value
 of $k$ used, the greater its performance in the low sample regime and
 the quicker it recovers the true \glspl{mb} for all variables.
+
 
 
 %%%% real

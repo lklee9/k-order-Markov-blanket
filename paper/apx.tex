@@ -477,6 +477,40 @@
 \end{description}
 where $s\in\{1,2\}$.
 
+%%% Separator sizes: empirical support for the l-bounded separator assumption
+\section{Separator Sizes in the Benchmark Datasets}\label{apx:dsep}
+To gauge how restrictive the $l$-bounded separator assumption
+(\Cref{def:bound-sep}) is in practice, we examine the benchmark networks
+of \Cref{sec:exp-real}. We use every variable in turn as a target and,
+for every pair formed by a target and a variable outside its Markov
+blanket, compute a minimal d-separator drawn from the true Markov
+blanket. \Cref{tab:dsep} reports the mean and worst-case (maximum)
+separator size and the fraction of pairs whose separator has size at
+most three. Separators are small across all four networks---the mean
+never exceeds $2.19$ and size-$\leq\!3$ separators cover at least $83\%$
+of pairs---and no pair had to be skipped, i.e.\ a separator within the
+true Markov blanket always existed. The bound is loosest on Barley,
+where the largest separator reaches size $9$; this is also the network
+on which {\method} is the most expensive and least accurate
+(\Cref{sec:exp-real}), illustrating that the difficulty of \gls{mb}
+discovery tracks the separator sizes the assumption must accommodate.
+Overall, a modest separator bound $l$ already suffices to capture most
+of the conditional independencies needed to recover the Markov blanket
+on these networks.
+
+\begin{table}[h]
+  \centering
+  \caption{Minimal d-separator sizes restricted to the true Markov
+    blanket, computed using every variable of each benchmark network as
+    a target. ``Targets'' is the number of targets (all variables) and
+    ``Pairs'' the number of target--non-blanket pairs; ``Mean sep.\ size''
+    and ``Max'' are the mean and maximum separator size; and
+    ``Cover $\leq 3$'' is the fraction whose minimal separator has size
+    at most three.}
+  \label{tab:dsep}
+  \resizebox{\columnwidth}{!}{\input{./tab/dsep}}
+\end{table}
+
 %%% Full benchmark results / Ablation study
 \section{Ablation}\label{apx:ablation}
 For completeness, we report the full results of the experiments in
@@ -493,7 +527,9 @@ dependencies that lower orders miss---but the gains flatten or reverse
 beyond $k=2$ as the larger conditioning sets incur both higher runtime
 (\Cref{tab:runtime-full}) and more error-prone \gls{ci} tests. Setting
 $l=k$ with $k\leq 2$ therefore offers a robust default, the heuristic we
-adopt in \Cref{sec:complexity}.
+adopt in \Cref{sec:complexity}. For a fixed $k$, raising $l$ beyond $k$
+does not consistently improve F1 (\Cref{tab:kl-ablation}), which
+motivates simply setting $l=k$ rather than tuning $l$ separately.
 
 \begin{table*}[h]
   \centering
