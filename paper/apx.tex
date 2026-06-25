@@ -486,6 +486,22 @@ while \Cref{tab:runtime-full} gives their runtimes in seconds. In both
 tables, ``--'' denotes a configuration that failed to complete within the
 allotted time budget.
 
+\Cref{tab:kl-ablation} summarises the F1 score of {\method} across all
+synthetic and benchmark datasets for every $(k,l)$ configuration. F1
+generally improves from $k=0$ to $k=2$---higher orders expose
+dependencies that lower orders miss---but the gains flatten or reverse
+beyond $k=2$ as the larger conditioning sets incur both higher runtime
+(\Cref{tab:runtime-full}) and more error-prone \gls{ci} tests. Setting
+$l=k$ with $k\leq 2$ therefore offers a robust default, the heuristic we
+adopt in \Cref{sec:complexity}.
+
+\begin{table*}[h]
+  \centering
+  \caption{F1 score across datasets for each $(k,l)$ configuration of {\method}.}
+  \label{tab:kl-ablation}
+  \input{./tab/kl-ablation}
+\end{table*}
+
 \begin{table}[h]
   \centering
   \caption{Full results on benchmark datasets.}

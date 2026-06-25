@@ -1207,6 +1207,25 @@ other hand, \emph{Recall} denotes the ratio between the number of true
 positives in the inferred \gls{mb} and the size of the true
 \gls{mb}. Therefore $F1=1$ represents the perfect precision and recall.
 
+
+\begin{table}
+  \centering
+  \caption{Results on Synthetically Generated Data}
+  \label{tab:syn}
+  \input{./tab/syn-neat}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{fig/syn_metrics/syn_metrics_grid.pdf}
+  \caption{Precision, recall, and F1 score of Grow-Shrink (GSMB) and our
+    $k$-order method ({\method}-$k$-$l$) when recovering the \glspl{mb}
+    of three of the five synthetic Bayesian networks in \Cref{sec:exp-syn}, as a
+    function of the sample size. Each row corresponds to a metric and
+    each column to one of the synthetic networks.}
+  \label{fig:syn-metrics}
+\end{figure}
+
 %%%% Syn
 \subsection{Experiments with Synthetic Bayesian
   Networks}\label{sec:exp-syn}
@@ -1218,55 +1237,57 @@ variables---$\rmX=\{X_{1},X_{2},X_{3}\}$ and $Y$---with a \gls{dag} that
 has edges $\forall i\in[3] : X_{i}\rightarrow Y$. Each variable
 $X\in\rmX$ is an independent Bernoulli random variable with $p=0.5$. The
 conditional distribution of $Y$ is then $\pr(Y=f(\rmX)\mid\rmX)=0.9$
-where $f(\rmX)$ is one of $5$ different Boolean functions, one for
-each toy problem which we describe in \Cref{apx:bool-func}.
+where $f(\rmX)$ is one of $5$ different Boolean functions, one for each
+toy problem which we describe in \Cref{apx:bool-func}.
 
 We then sample $100$ samples from the $5$ Bayesian networks $10$
-different times---leading to $10\times 5$ samples of size $100$. We then
-tasked each method to infer---for each Bayesian network---the
-\gls{mb} of all $4$ variables from the $10$ different samples
-separately. We then averaged the F1 score over the $4\times 10$ runs for
-each Bayesian network, resulting in \Cref{tab:syn}. Note that we only
-include the results for {\method} and \acrfull{gs} because \gls{gs} was
-the best performing method out of all the previous methods mentioned in
-\Cref{sec:exp}.
+different times, leading to $10\times 5$ samples of size $100$---hence
+the size of each sample is much larger than the cardinality of the
+domain over all variables, $100 >> 2^{4}$. We then tasked each method to
+infer---for each Bayesian network---the \gls{mb} of all $4$ variables
+from the $10$ different samples separately. We then averaged the F1
+score over the $10\times 4$ runs and variables for each Bayesian
+network, resulting in \Cref{tab:syn}. Note that we only include the
+results for {\method} and \acrfull{gs} because \gls{gs} was the best
+performing method out of all the previous methods mentioned in
+\Cref{sec:exp} for these synthetic datasets.
 
 From the results in \Cref{tab:syn}, we can observe that {\method}
 consistently outperforms the other approaches at \gls{mb}
-discovery. More interestingly---even for the problems whose
-Bayesian networks are faithful---as we increase $k$ and look at higher
-order relationships, {\method} is able to better overcome empirical
-unfaithfulness. Furthermore the \gls{mb} for the parity problem is
-only recoverable when $k=2$, which confirms {\method}'s ability to find
-these higher-order parity-like relations.
+discovery. More interestingly---even for the problems whose Bayesian
+networks are faithful---as we increase $k$ and look at higher order
+relationships, {\method} acheives a better F1 score and therefore is
+capable of better overcoming empirical unfaithfulness. Furthermore the
+\gls{mb} for the parity problem is only recoverable when $k=2$, which
+confirms {\method}'s ability to find these higher-order parity-like
+relations.
 
-\begin{table}
+\begin{table*}[t]
   \centering
-  \caption{Results on Synthetically Generated Data}
-  \label{tab:syn}
-  \input{./tab/syn-neat}
-\end{table}
+  \caption{F1 score and runtime (in seconds) on benchmark datasets. Best F1
+    and fastest runtime per dataset in bold.}
+  \label{tab:real}
+  \input{./tab/real-runtime-neat-auto}
+\end{table*}
 
-\begin{figure*}[t]
-  \centering
-  \includegraphics[width=\textwidth]{fig/syn_metrics/syn_metrics_grid.pdf}
-  \caption{Precision, recall, and F1 score of Grow-Shrink (GSMB) and our
-    $k$-order method ({\method}-$k$-$l$) when recovering the \glspl{mb}
-    of the five synthetic Bayesian networks in \Cref{sec:exp-syn}, as a
-    function of the sample size. Each row corresponds to a metric and
-    each column to one of the synthetic networks. The \emph{parity}
-    network is the only one that is truly unfaithful, and its \glspl{mb}
-    are recovered only once higher-order dependencies are considered
-    ({\method}-2-2). The remaining four networks are faithful, yet at
-    small sample sizes GSMB still suffers from both low recall (missed
-    dependencies) and low precision (spurious dependencies)---empirical
-    faithfulness violations that the higher-order {\method} variants
-    overcome with far fewer samples.}
-  \label{fig:syn-metrics}
-\end{figure*}
+In order to better understand the source of these empirical
+unfaithfulness in the low sample size regime, \Cref{fig:syn-metrics}
+traces the precision, recall, and F1 score as the sample size grows from
+$50$ to $100$. As expected only {\method}-2-2 is capable of recovering
+the higher-order dependece of the parity network regardless of sample
+size. From the other faithful networks, we can observe that at small
+sample size, all methods exhibit lower recall and precision which
+indicates dependencies missed by the \gls{mb} discovery methods and
+spurious dependencies erroneously detected by said methods respectively.
+That said, we can also obsevre that for {\method}, the higher the value
+of $k$ used, the greater its performance in the low sample regime and
+the quicker it recovers the true \glspl{mb} for all variables.
+
 
 %%%% real
-\subsection{Experiments with Benchmark Bayesian Networks}\label{sec:exp-real}
+\subsection{Experiments with Benchmark Bayesian
+  Networks}\label{sec:exp-real}
+
 To further explore how {\method} behaves in more realistic scenarios, we
 then repeated the same procedure as \Cref{sec:exp-syn}, but with some
 well-known benchmark datasets\footnote{The datasets can be accessed at:
@@ -1287,27 +1308,29 @@ $1$. Therefore, this result substantiates the idea that using \gls{mb}
 discovery methods that assume a higher-order relaxation of faithfulness
 can be beneficial even on smaller networks.
 
-\begin{table}
-  \centering
-  \caption{Results on Benchmark Datasets}
-  \label{tab:real}
-  \input{./tab/real-neat}
-\end{table}
+% --- old single-column F1 table (Table 2); merged into the table* below ---
+% \begin{table}
+%   \centering
+%   \caption{Results on Benchmark Datasets}
+%   \label{tab:real}
+%   \input{./tab/real-neat}
+% \end{table}
 
 We also report the runtime of these methods on the benchmark datasets in
-\Cref{tab:runtime}. As expected, the cost of relaxing faithfulness shows
+\Cref{tab:real}. As expected, the cost of relaxing faithfulness shows
 up in the runtime. {\method} becomes more expensive as the order $k$
 increases. The full results and runtimes for every method and every
 $(k,l)$ configuration---including those that fail to complete within the
 time budget of 1800 seconds---are given in
 \Cref{tab:real-full,tab:runtime-full} under \Cref{apx:ablation}.
 
-\begin{table}
-  \centering
-  \caption{Runtime (in seconds) on Benchmark Datasets}
-  \label{tab:runtime}
-  \input{./tab/runtime-neat}
-\end{table}
+% --- old single-column runtime table (Table 3); merged into the table* above ---
+% \begin{table}
+%   \centering
+%   \caption{Runtime (in seconds) on Benchmark Datasets}
+%   \label{tab:runtime}
+%   \input{./tab/runtime-neat}
+% \end{table}
 
 %%% Conclusion
 \section{Conclusion}
@@ -1322,12 +1345,15 @@ competitively on commonly used benchmark datasets.
 
 One direction for future work would be finding more intricate pruning
 rules to make {\method} scale better with larger values of
-$k$. Secondly, it is still unclear how one might choose the values for
-$k$ and $l$. But if choosing them a priori is not really feasible
-without expert knowledge, then it might be useful to come up with an
-implementation that carries out {\method} for multiple values of $k$ and
-$l$; while using memoisation from previous runs to speed up the runtime
-of {\method}.
+$k$. Secondly, although our ablation (\Cref{apx:ablation}) shows that
+$l=k$ with $k\leq 2$ is a robust default, principled \emph{a priori}
+selection of $k$ and $l$ without expert knowledge remains open. A
+practical alternative is to run {\method} for several values of $k$ and
+$l$ while memoising results across runs to speed up the total
+runtime. Finally, our evaluation compares against established
+constraint-based \gls{mb} discovery methods using the G-test (with an
+SCI fallback) for conditional independence. Therefore, utilising more
+recent alternative \gls{ci} tests is a further avenue for future work.
 
 %%% Post matter
 % \begin{contributions} % will be removed in pdf for initial submission 

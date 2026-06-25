@@ -1,0 +1,37 @@
+% NOTE: currently holds the PUBLISHED Table 2/3 numbers (copied from the legacy
+% real-neat.tex + runtime-neat.tex) because res/ is a stale/regressed run. Format matches
+% analyse.py:write_combined_latex, so re-running `cd experiments && ../.venv/bin/python
+% analyse.py` after refreshing res/ regenerates this file as a drop-in replacement.
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcccccccc}
+\toprule
+ & \multicolumn{4}{c}{F1 Score} & \multicolumn{4}{c}{Runtime (s)} \\
+\cmidrule(lr){2-5}\cmidrule(lr){6-9}
+Method & Alarm1 & Barley & Insurance & Mildew & Alarm1 & Barley & Insurance & Mildew \\
+\midrule
+
+BAMB
+& 0.6742 & 0.3385 & 0.6588 & 0.4945 & 7.439 & 2.232 & 10.930 & 1.604 \\
+& {\scriptsize $\pm$0.1771} & {\scriptsize $\pm$0.1226} & {\scriptsize $\pm$0.0797} & {\scriptsize $\pm$0.1084} & {\scriptsize $\pm$9.063} & {\scriptsize $\pm$1.347} & {\scriptsize $\pm$10.543} & {\scriptsize $\pm$0.821} \\
+
+GS
+& 0.3434 & 0.2113 & 0.4615 & 0.2867 & 10.077 & 3.078 & 9.066 & 2.136 \\
+& {\scriptsize $\pm$0.1503} & {\scriptsize $\pm$0.0807} & {\scriptsize $\pm$0.1477} & {\scriptsize $\pm$0.1581} & {\scriptsize $\pm$10.783} & {\scriptsize $\pm$1.195} & {\scriptsize $\pm$7.876} & {\scriptsize $\pm$0.700} \\
+
+HITON\_MB
+& 0.7636 & 0.3400 & 0.6746 & 0.4918 & \textbf{5.471} & \textbf{1.972} & 8.424 & 1.325 \\
+& {\scriptsize $\pm$0.1861} & {\scriptsize $\pm$0.1284} & {\scriptsize $\pm$0.1594} & {\scriptsize $\pm$0.1487} & {\scriptsize $\pm$2.768} & {\scriptsize $\pm$0.561} & {\scriptsize $\pm$6.076} & {\scriptsize $\pm$0.483} \\
+
+MMMB
+& 0.7692 & 0.3298 & 0.6978 & 0.4861 & 5.608 & 2.048 & \textbf{6.750} & \textbf{1.228} \\
+& {\scriptsize $\pm$0.1874} & {\scriptsize $\pm$0.1274} & {\scriptsize $\pm$0.1405} & {\scriptsize $\pm$0.1810} & {\scriptsize $\pm$2.573} & {\scriptsize $\pm$0.697} & {\scriptsize $\pm$4.911} & {\scriptsize $\pm$0.294} \\
+
+kOMB
+& 0.7725 & \textbf{0.4856} & 0.7049 & \textbf{0.6220} & 39.762 & 134.674 & 23.411 & 30.449 \\
+{\scriptsize $(k=1,l=1)$} & {\scriptsize $\pm$0.1164} & {\scriptsize $\pm$0.1679} & {\scriptsize $\pm$0.1339} & {\scriptsize $\pm$0.1592} & {\scriptsize $\pm$28.094} & {\scriptsize $\pm$68.199} & {\scriptsize $\pm$13.446} & {\scriptsize $\pm$18.624} \\
+
+kOMB
+& \textbf{0.8175} & 0.3993 & \textbf{0.7478} & 0.5304 & 206.537 & 104.350 & 102.564 & 46.457 \\
+{\scriptsize $(k=2,l=2)$} & {\scriptsize $\pm$0.1943} & {\scriptsize $\pm$0.1166} & {\scriptsize $\pm$0.1505} & {\scriptsize $\pm$0.1227} & {\scriptsize $\pm$54.885} & {\scriptsize $\pm$94.693} & {\scriptsize $\pm$44.411} & {\scriptsize $\pm$76.392} \\
+\bottomrule
+\end{tabular}
