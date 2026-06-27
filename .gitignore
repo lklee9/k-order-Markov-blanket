@@ -1,14 +1,20 @@
-# Python-generated files
+# ---- Python ----
 __pycache__/
 *.py[oc]
 build/
 dist/
 wheels/
 *.egg-info
-
-# Virtual environments
 .venv
+.mypy_cache/
+.ropeproject/
+
+# ---- Editor / OS cruft ----
+.DS_Store
+.emacs.desktop*
 .~
+
+# ---- LaTeX build artifacts ----
 /paper/template/
 /paper/auto/
 /paper/main.aux
@@ -16,8 +22,35 @@ wheels/
 /paper/main.out
 /paper/main.pdf
 /paper/main.synctex.gz
-*.lock
 /paper/main.bbl
 /paper/main.blg
 /paper/_region_.tex
+*.fdb_latexmk
+*.fls
 *.log
+*.lock
+
+# ---- Datasets (fetch/generate with experiments/get_data.py; never committed) ----
+/data/
+/experiments/data/
+*.pkl
+
+# ---- Generated experiment outputs (regenerate with the runners + analyse.py) ----
+/experiments/res/
+/experiments/output/
+/experiments/profile.svg
+/experiments/log.txt
+# Generated paper outputs not used by the build (the paper uses the .pdf figure + *-neat tables)
+/paper/fig/syn_f1/
+/paper/fig/syn_metrics/*.png
+/paper/tab/syn-neat-auto.tex
+
+# ---- Local-only, not for public release (kept on disk, excluded from the repo) ----
+/paper/reviews/
+/paper/outline.org
+/experiments/run_server.sh
+# Obsolete / superseded helper scripts (kept locally, not part of the released workflow)
+/experiments/run.py
+/experiments/syn.py
+/experiments/data_load.py
+/experiments/data_sample.py

@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this software or its results, please cite the paper below."
+title: "High-Order Markov Blanket Discovery"
+abstract: >-
+  Code accompanying the paper "High-Order Markov Blanket Discovery via a
+  k-Order Relaxation of the Faithfulness Assumption" (UAI 2026): the kOMB
+  algorithm and the LIMMB Rust/PyO3 discovery engine.
+type: software
+license: MIT
+authors:
+  - family-names: Lee
+    given-names: "Loong Kuan"
+    affiliation: "Fraunhofer IAIS"
+  - family-names: Krishnamoorthy
+    given-names: Ragavi
+    affiliation: "Fraunhofer IAIS"
+  - family-names: Piatkowski
+    given-names: Nico
+    affiliation: "Fraunhofer IAIS"
+repository-code: "https://gitlab.com/lklee/k-order-markov-blanket"
+preferred-citation:
+  type: conference-paper
+  title: "High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption"
+  year: 2026
+  collection-title: "Proceedings of the Conference on Uncertainty in Artificial Intelligence (UAI)"
+  authors:
+    - family-names: Lee
+      given-names: "Loong Kuan"
+    - family-names: Krishnamoorthy
+      given-names: Ragavi
+    - family-names: Piatkowski
+      given-names: Nico
