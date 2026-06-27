@@ -40,6 +40,7 @@
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{url}
+\usepackage{xurl} % allow long URLs (e.g. the code link) to break across lines
 \usepackage{multirow}
 \usepackage{enumitem}
 \usepackage{pifont} % Required for \ding
@@ -271,8 +272,8 @@ propose later in \Cref{sec:algo}.  A full walkthrough of empirical
 faithfulness violation can be found later in \Cref{ex:sample} under
 \Cref{sec:violation}.  Furthermore, in extreme cases, a limited sample
 size can cause \gls{mb} discovery algorithms to falsely discover
-spurious dependecies absent from the true distribution. We later observe
-this phenomena in \Cref{fig:syn-metrics} under \Cref{sec:exp-syn} with
+spurious dependencies absent from the true distribution. We later observe
+this phenomenon in \Cref{fig:syn-metrics} under \Cref{sec:exp-syn} with
 the low precision exhibited by the different \gls{mb} discovery methods
 at low sample sizes.
 
@@ -817,7 +818,7 @@ growing.
 % independent w.r.t. $\rmZ'$ in the first place.  With this intuition in
 % mind, we will now formalise this result in \Cref{lem:subset}.
 
-\begin{restatable}[Dependancy over a Separating
+\begin{restatable}[Dependence over a Separating
   Subset]{lemma}{depsubset}
   % \begin{lemma}[MB Subset]
   \label{lem:subset}
@@ -1146,18 +1147,15 @@ independencies of $\pr$.
 As {\method} is a proof-of-concept, we prioritised correctness and
 clarity over efficiency. It is nonetheless instructive to characterise
 its worst-case time complexity, which we state in
-\Cref{cor:complexity}. The proof, given in \Cref{apx:proofs-thm},
-accumulates the cost of the nested enumerations performed by the three
-sub-algorithms in \Cref{sec:algo}.
+\Cref{cor:complexity} with proof given in \Cref{apx:proof-complex}.
 
 \begin{restatable}[Computational Complexity of {\method}]{corollary}{kombcomplexity}
   \label{cor:complexity}
   Let $n=|\verts|$ denote the number of variables, $N$ the sample size,
-  and $K$ the maximum size of any candidate \gls{mb} $\rmS$
-  \Cref{alg:komb} encountered during execution. Furthermore assume each
-  \gls{ci} test runs in $O(N)$ time. Then, for a given order $k$ and
-  separator bound $l$, {\method} (\Cref{alg:komb}) terminates in
-  worst-case time
+  and $K$ the maximum size of any candidate \gls{mb} $\rmS$ encountered
+  by \Cref{alg:komb} during execution. Furthermore assume each \gls{ci}
+  test runs in $O(N)$ time. Then, for a given order $k$ and separator
+  bound $l$, {\method} (\Cref{alg:komb}) terminates in worst-case time
   \begin{equation}
     \label{eq:complexity}
     O\!\left(
@@ -1178,12 +1176,13 @@ original \gls{gs} algorithm. Crucially, the search for a
 dependence-exposing subset and its separator is governed by $K$ rather
 than $n$, a direct consequence of the $l$-bounded separator assumption
 (\Cref{def:bound-sep}). The remaining exponential dependence on $k$ and
-$l$ motivates keeping them small. The abalation study in
+$l$ motivates keeping them small. The ablation study in
 \Cref{apx:ablation} showcases how differing values of $k$ and $l$
-affects \Cref{alg:komb} runtime and its its ability to find high-order
-dependencies. Generally, for the benchmark datasets used, we found that
-setting $k=l$ and having $k\leq 2$ provides a decent trade-off between
-runtime and finding high-order dependencies. 
+affects \Cref{alg:komb} runtime and its ability to find high-order
+dependencies. Generally, from the results in \Cref{apx:ablation} for
+the benchmark datasets used, we found that setting $k=l$ and having
+$k\leq 2$ provides a decent trade-off between runtime and finding
+high-order dependencies.
 
 \begin{table}
   \centering
@@ -1281,7 +1280,7 @@ From the results in \Cref{tab:syn}, we can observe that {\method}
 consistently outperforms the other approaches at \gls{mb}
 discovery. More interestingly---even for the problems whose Bayesian
 networks are faithful---as we increase $k$ and look at higher order
-relationships, {\method} acheives a better F1 score and therefore is
+relationships, {\method} achieves a better F1 score and therefore is
 capable of better overcoming empirical unfaithfulness. Furthermore the
 \gls{mb} for the parity problem is only recoverable when $k=2$, which
 confirms {\method}'s ability to find these higher-order parity-like
@@ -1291,12 +1290,12 @@ In order to better understand the source of these empirical
 unfaithfulness in the low sample size regime, \Cref{fig:syn-metrics}
 traces the precision, recall, and F1 score as the sample size grows from
 $50$ to $100$. As expected only {\method}-2-2 is capable of recovering
-the higher-order dependece of the parity network regardless of sample
+the higher-order dependence of the parity network regardless of sample
 size. From the other faithful networks, we can observe that at small
 sample size, all methods exhibit lower recall and precision which
 indicates dependencies missed by the \gls{mb} discovery methods and
 spurious dependencies erroneously detected by said methods respectively.
-That said, we can also obsevre that for {\method}, the higher the value
+That said, we can also observe that for {\method}, the higher the value
 of $k$ used, the greater its performance in the low sample regime and
 the quicker it recovers the true \glspl{mb} for all variables.
 
@@ -1319,11 +1318,13 @@ conserve space.
 
 From the results in \Cref{tab:real} we can observe that {\method} does
 generally outperform the other existing approaches to \gls{mb}
-discovery. Furthermore, for the Alarm1 and Insurance networks, {\method}
-with an order of $2$ outperforms itself when given an order of
-$1$---suggesting that a higher-order relaxation of faithfulness can be
-beneficial even on smaller networks. On the other hand, Runtime grows
-with both the order $k$ and the cardinality of the
+discovery. Whether a higher order helps, however, depends on the network's
+cardinality. On the lower-cardinality Alarm1 and Insurance networks
+{\method} with order $2$ improves on order $1$, whereas on the
+high-cardinality Barley and Mildew networks order $1$ is best and order
+$2$ is substantially worse---there the larger conditioning sets leave the
+higher-order \gls{ci} tests underpowered at this sample size. Runtime, in
+turn, grows with both the order $k$ and the cardinality of the
 network. Specifically, the baselines finish within roughly $6$\,s per
 dataset, while {\method} ranges from comparable at order $1$ on the
 lower-cardinality networks (Alarm1, Insurance) to a few hundred times
@@ -1374,6 +1375,8 @@ runtime. Finally, our evaluation compares against established
 constraint-based \gls{mb} discovery methods using the G-test (with an
 SCI fallback) for conditional independence. Therefore, utilising more
 recent alternative \gls{ci} tests is a further avenue for future work.
+
+\newpage
 
 %%% Post matter
 % \begin{contributions} % will be removed in pdf for initial submission 
