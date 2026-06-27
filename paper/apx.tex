@@ -116,8 +116,8 @@
       &\implies Y \indep{\pr} X \mid \rmS' \cup \rmZ
     \end{aligned}\label{eq:k-dep-inter-eq4}
   \end{equation}
-  However, referring back to the definition of a $k$-order dependance in
-  \Cref{def:k-dep}, we known that our initial assumption of
+  However, referring back to the definition of a $k$-order dependence in
+  \Cref{def:k-dep}, we know that our initial assumption of
   $\kdep{\rmS}{Y,X}{\rmZ}$ implies that,
   \begin{gather}
     \label{eq:k-dep-inter-eq3}
@@ -232,8 +232,8 @@
 \assocmine*
 \begin{proof}
   During each function call, \textit{find\_inter\_dep} is passed
-  some--potentially empty---set $\rmX$ and it then iterates through each
-  varible $X$ that has not been included in $\rmX$ yet,
+  some---potentially empty---set $\rmX$ and it then iterates through each
+  variable $X$ that has not been included in $\rmX$ yet,
   $X\in\verts\setminus(Y \cup \rmX \cup \rmS)$. In each iteration it
   calls the function \textit{find\_cond} to find a subset
   $\rmX' \in \powerleq{k-|\rmX|}{\rmS}$ such that
@@ -312,11 +312,11 @@
   true Markov blanket of $Y$ but not yet included in the candidate
   Markov blanket $\rmS$, thanks to the implication in \Cref{eq:komb-4},
   we know that \textit{find\_inter\_dep} will be able to find and
-  approapiate $\rmZ$ such that $\linter{\rmS}{Y,X\cup\rmZ}$ is true and
+  appropriate $\rmZ$ such that $\linter{\rmS}{Y,X\cup\rmZ}$ is true and
   the set $X\cup\rmZ$ will be added into $\rmS$.
 
   Therefore once \textit{find\_inter\_dep} starts to return empty sets,
-  we know that there is no more varibles left in
+  we know that there are no more variables left in
   $\hat{\verts}\setminus\rmS$ that are in the true Markov blanket of
   $Y$,
   \begin{equation*}
@@ -347,6 +347,8 @@
   from $\rmS$. As such, after the shrink phase, the subset $\rmS$ is
   exactly the graphical Markov blanket of $Y$, $\rmS=\mbs{\gr}(Y)$.
 \end{proof}
+
+\section{Complexity of {\method}}\label{apx:proof-complex}
 
 \kombcomplexity*
 \begin{proof}
