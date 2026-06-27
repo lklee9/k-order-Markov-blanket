@@ -29,6 +29,9 @@ wheels/
 *.fls
 *.log
 *.lock
+# ...but pin the dependency lockfiles for reproducible builds
+!uv.lock
+!LIMMB/Cargo.lock
 
 # ---- Datasets (fetch/generate with experiments/get_data.py; never committed) ----
 /data/
