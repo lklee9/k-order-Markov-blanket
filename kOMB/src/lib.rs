@@ -210,7 +210,7 @@ fn IAMB(
 
 /// A Python module implemented in Rust.
 #[pymodule]
-fn LIMMB(m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn kOMB(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(learn_mbs, m)?)?;
     m.add_function(wrap_pyfunction!(run_nested_assoc_mine, m)?)?;
     m.add_function(wrap_pyfunction!(run_komb, m)?)?;
