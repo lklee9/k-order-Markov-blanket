@@ -154,13 +154,10 @@
   methods make is that the conditional independencies in the
   distribution imply the same separation in the graphical
   structure---also known as the faithfulness assumption. Unfortunately,
-  this assumption can be violated due to higher-order conditional
-  dependencies in the distribution, like those in XOR and parity-type
-  relations. Moreover, having finite samples---a common situation in
-  real world scenarios---can also cause empirical violations of
-  faithfulness due to insufficient statistical power to detect
-  dependencies and, in extreme cases, cause spurious dependencies absent
-  from the true distribution to be falsely detected. Therefore, in this
+  this assumption can be violated by higher-order dependencies such as
+  XOR and parity-type relations, and---on finite samples---by empirical
+  violations that, in extreme cases, even induce spurious dependencies
+  absent from the true distribution. Therefore, in this
   paper we propose a ``k-order'' relaxation of the faithfulness
   assumption that captures parity type relationships between k+2
   variables. We then propose a proof of concept algorithm called k-order
@@ -305,9 +302,8 @@ proof-of-concept algorithm called the $k$-order Markov blanket
 (kOMB). We then empirically show in \Cref{sec:exp} that kOMB can
 overcome both true and empirical faithfulness violations and that it
 outperforms some existing constraint-based methods on well-known
-benchmark datasets. More interestingly, we find that, even for these
-small-scale benchmark datasets, there seems to be merit in exploring
-relationships between $4$ variables at a time---and not just $3$.
+benchmark datasets---where we find merit in exploring relationships
+between $4$ variables at a time, and not just $3$.
 
 % Our paper will be structured as follows: \todo{todo}
 
@@ -932,11 +928,7 @@ reliably from finite samples~\citep{
   margaritis1999,tsamardinos2003,aliferis2003,tsamardinos2003b}.
 \Cref{def:bound-sep} simply makes such a bound explicit.  Furthermore,
 as shown later in \Cref{apx:dsep}, the bound is mild on the networks
-used in \Cref{sec:exp-real}. Using every variable as a target and
-computing minimal d-separators restricted to the true \gls{mb} to every
-other variable not in its \gls{mb}, the mean separator size ranges from
-$0.62$ (Alarm1) to $2.19$ (Insurance), and separators of size at most
-three cover between $83\%$ and $100\%$ of target--non-\gls{mb} pairs.
+used in \Cref{sec:exp-real}.
 
 \subsection{Theoretical Algorithm}
 \begin{algorithm}[t]
@@ -1242,9 +1234,9 @@ positives in the inferred \gls{mb} and the size of the true
 \begin{figure}[t]
   \centering
   \includegraphics[width=\columnwidth]{fig/syn_metrics/syn_metrics_grid.pdf}
-  \caption{Precision, recall, and F1 score of Grow-Shrink (GSMB) and our
+  \caption{Precision, recall, and F1 score of Grow-Shrink (GS) and our
     $k$-order method ({\method}-$k$-$l$) when recovering the \glspl{mb}
-    of three of the five synthetic Bayesian networks in \Cref{sec:exp-syn}, as a
+    of the synthetic Bayesian networks in \Cref{sec:exp-syn}, as a
     function of the sample size. Each row corresponds to a metric and
     each column to one of the synthetic networks.}
   \label{fig:syn-metrics}
@@ -1327,12 +1319,18 @@ conserve space.
 
 From the results in \Cref{tab:real} we can observe that {\method} does
 generally outperform the other existing approaches to \gls{mb}
-discovery. Furthermore, it seems that for the Alarm1 and Insurance
-networks---which have $37$ and $27$ variables respectively---{\method}
+discovery. Furthermore, for the Alarm1 and Insurance networks, {\method}
 with an order of $2$ outperforms itself when given an order of
-$1$. Therefore, this result substantiates the idea that using \gls{mb}
-discovery methods that assume a higher-order relaxation of faithfulness
-can be beneficial even on smaller networks.
+$1$---suggesting that a higher-order relaxation of faithfulness can be
+beneficial even on smaller networks. On the other hand, Runtime grows
+with both the order $k$ and the cardinality of the
+network. Specifically, the baselines finish within roughly $6$\,s per
+dataset, while {\method} ranges from comparable at order $1$ on the
+lower-cardinality networks (Alarm1, Insurance) to a few hundred times
+slower at order $2$ on the high-cardinality networks (Barley,
+Mildew). The full results and runtimes for every method and every
+$(k,l)$ configuration are given in \Cref{tab:real-full,tab:runtime-full}
+under \Cref{apx:ablation}.
 
 % --- old single-column F1 table (Table 2); merged into the table* below ---
 % \begin{table}
@@ -1341,19 +1339,6 @@ can be beneficial even on smaller networks.
 %   \label{tab:real}
 %   \input{./tab/real-neat}
 % \end{table}
-
-We also report the runtime of these methods on the benchmark datasets in
-\Cref{tab:real}. As expected, {\method} becomes more expensive as the
-order $k$ increases. Whereas the existing methods all complete within
-roughly $1$--$11$ seconds per dataset, {\method}-1-1 runs between
-roughly $2\times$ and $68\times$ slower, and {\method}-2-2 between
-roughly $9\times$ and $53\times$ slower, than these methods. The largest
-absolute cost is incurred on Barley for {\method}-1-1 ($\approx 135$s)
-and on Alarm1 for {\method}-2-2 ($\approx 207$s). The full results and
-runtimes for every method and every $(k,l)$ configuration---including
-those that fail to complete within a time budget of 1800 seconds---are
-given in \Cref{tab:real-full,tab:runtime-full} under
-\Cref{apx:ablation}.
 
 % --- old single-column runtime table (Table 3); merged into the table* above ---
 % \begin{table}
