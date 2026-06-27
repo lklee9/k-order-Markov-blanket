@@ -41,7 +41,7 @@ sys.path.append("../pyCausalFS/pyCausalFS/")
 
 from CBD.MBs.IAMB import IAMB
 
-import LIMMB
+import kOMB
 
 from run_common import (
     DATA, RES, REAL_DATASETS, ALPHA, SIZE, NRUN, Task,
@@ -83,7 +83,7 @@ def _worker(dataset, k, l, run, target, alpha, size, out_path):
     data = load_samples(fp)
     t0 = time.process_time()
     seed = set(IAMB(data, target, alpha, True)[0])
-    mb, n_ci = LIMMB.run_komb(data.to_numpy(), target, seed, k, l, alpha, USE_GTEST)
+    mb, n_ci = kOMB.run_komb(data.to_numpy(), target, seed, k, l, alpha, USE_GTEST)
     dt = time.process_time() - t0
     rec = {"method": f"kOMB-{k}-{l}", "target": target, "run": run, "time": dt,
            "n_ci": n_ci, "mb": list(mb), "timeout": False}

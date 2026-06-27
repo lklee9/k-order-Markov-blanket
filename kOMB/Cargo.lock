@@ -3,20 +3,6 @@
 version = 4
 
 [[package]]
-name = "LIMMB"
-version = "0.1.0"
-dependencies = [
- "bit-set",
- "itertools",
- "log",
- "num",
- "pyo3",
- "pyo3-log",
- "rand 0.9.4",
- "statrs",
-]
-
-[[package]]
 name = "approx"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -118,6 +104,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ba291022dbbd398a455acf126c1e341954079855bc60dfdda641363bd6922569"
 dependencies = [
  "either",
+]
+
+[[package]]
+name = "kOMB"
+version = "0.1.0"
+dependencies = [
+ "bit-set",
+ "itertools",
+ "log",
+ "num",
+ "pyo3",
+ "pyo3-log",
+ "rand 0.9.4",
+ "statrs",
 ]
 
 [[package]]

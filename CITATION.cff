@@ -4,7 +4,7 @@ title: "High-Order Markov Blanket Discovery"
 abstract: >-
   Code accompanying the paper "High-Order Markov Blanket Discovery via a
   k-Order Relaxation of the Faithfulness Assumption" (UAI 2026): the kOMB
-  algorithm and the LIMMB Rust/PyO3 discovery engine.
+  algorithm and its Rust/PyO3 discovery engine.
 type: software
 license: MIT
 authors:
@@ -17,7 +17,7 @@ authors:
   - family-names: Piatkowski
     given-names: Nico
     affiliation: "Fraunhofer IAIS"
-repository-code: "https://gitlab.com/lklee/k-order-markov-blanket"
+repository-code: "https://github.com/lklee9/k-order-Markov-blanket"
 preferred-citation:
   type: conference-paper
   title: "High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption"

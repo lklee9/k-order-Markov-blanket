@@ -3,4 +3,4 @@ pandas
 pgmpy
 matplotlib
 graphviz
--e ./LIMMB/
+-e ./kOMB/

@@ -3,7 +3,7 @@
 sizes, with the full kOMB grid + baselines, into res/{func}_{size}/.
 
 Synthetic problems are tiny (4 variables): each method runs in milliseconds and NO synthetic
-table reports runtime, so the F1 results depend only on the LIMMB build, not the machine. Hence
+table reports runtime, so the F1 results depend only on the kOMB build, not the machine. Hence
 this runs locally, and batches each (func, size, method) cell into one process (40 runs =
 4 targets x 10 versions) rather than using the per-target hard-kill scheduler that the real
 datasets need -- synthetic never times out, and 27k one-task processes would just be slow.
@@ -28,7 +28,7 @@ sys.path.append("../pyCausalFS/pyCausalFS/")
 
 from CBD.MBs.IAMB import IAMB
 
-import LIMMB
+import kOMB
 
 from run_common import (
     DATA, RES, ALPHA, NRUN, silence_native_output, load_samples, target_list,
@@ -53,7 +53,7 @@ def _run_one(data, method, target, alpha):
     if m:
         k, l = int(m.group(1)), int(m.group(2))
         seed = set(IAMB(data, target, alpha, True)[0])
-        return LIMMB.run_komb(data.to_numpy(), target, seed, k, l, alpha, USE_GTEST)
+        return kOMB.run_komb(data.to_numpy(), target, seed, k, l, alpha, USE_GTEST)
     return BASELINES[method](data, target, alpha)
 
 

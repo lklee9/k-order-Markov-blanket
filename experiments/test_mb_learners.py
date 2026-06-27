@@ -30,7 +30,7 @@ from SSD.MBs.SLLMB import SLL
 from SSD.MBs.S2TMB import S2TMB
 from SSD.MBs.S2TMB import S2TMB_p
 
-import LIMMB
+import kOMB
 
 
 name_to_learner = {
@@ -56,7 +56,7 @@ name_to_learner = {
     # "SLL": lambda d, t, a, k: (SLL(d, t)[1], None),
     # "S2TMB":lambda d, t, a, k: (S2TMB(d, t)[1], None),
     # "S2TMB_p":lambda d, t, a, k: (S2TMB_p(d, t)[1], None),
-    # "LIMMB": lambda d, t, a, k: LIMMB.learn_mbs(d.to_numpy(), t, a, len(d.columns))
+    # "kOMB": lambda d, t, a, k: kOMB.learn_mbs(d.to_numpy(), t, a, len(d.columns))
 }
 
 def eval_learner(method, data, target, alpha=0.05, k=0.5):
@@ -88,7 +88,7 @@ def eval_learner(method, data, target, alpha=0.05, k=0.5):
 
 
 # start_time = time.process_time()
-# mb, n_ci = LIMMB.learn_mbs(sample.to_numpy(), 0, 0.05)
+# mb, n_ci = kOMB.learn_mbs(sample.to_numpy(), 0, 0.05)
 # end_time = time.process_time()
 # print(mb, "\n\t num ci: ", n_ci, "\n\t time taken:", end_time - start_time)
 
@@ -118,12 +118,12 @@ def eval_learner(method, data, target, alpha=0.05, k=0.5):
 
 
 # start_time = time.process_time()
-# mb, n_ci = LIMMB.IAMB(sample.to_numpy(), 0, 0.05)
+# mb, n_ci = kOMB.IAMB(sample.to_numpy(), 0, 0.05)
 # end_time = time.process_time()
 # print(mb, "\n\t num ci: ", n_ci, "\n\t time taken:", end_time - start_time)
 
 # start_time = time.process_time()
-# mb, n_ci = LIMMB.learn_mbs(sample.to_numpy(), 0, 0.05)
+# mb, n_ci = kOMB.learn_mbs(sample.to_numpy(), 0, 0.05)
 # end_time = time.process_time()
 # print(mb, "\n\t num ci: ", n_ci, "\n\t time taken:", end_time - start_time)
 
@@ -185,25 +185,25 @@ sample = load_samples(f"./data/{dataname}/{dataname}_s5000_v1.txt")
 
 
 # start_time = time.process_time()
-# mb, n_ci = LIMMB.IAMB(sample.to_numpy(), target, 0.01)
+# mb, n_ci = kOMB.IAMB(sample.to_numpy(), target, 0.01)
 # end_time = time.process_time()
 # print(mb, "\n\t num ci: ", n_ci, "\n\t time taken:", end_time - start_time)
 
 
 
 # start_time = time.process_time()
-# mb, n_ci = LIMMB.learn_mbs(sample.to_numpy(), 1, 0.01, len(sample.columns) -1, False)
+# mb, n_ci = kOMB.learn_mbs(sample.to_numpy(), 1, 0.01, len(sample.columns) -1, False)
 # end_time = time.process_time()
 # print(mb, "\n\t num ci: ", n_ci, "\n\t time taken:", end_time - start_time)
 
 
 # start_time = time.process_time()
-# mb, n_ci = LIMMB.learn_mbs(sample.to_numpy(), target, 0.01, len(sample.columns) -1, True)
+# mb, n_ci = kOMB.learn_mbs(sample.to_numpy(), target, 0.01, len(sample.columns) -1, True)
 # end_time = time.process_time()
 # print(mb, "\n\t num ci: ", n_ci, "\n\t time taken:", end_time - start_time)
 
 # sci_start_time = time.process_time()
-# sci_mb, sci_n_ci = LIMMB.run_nested_assoc_mine(
+# sci_mb, sci_n_ci = kOMB.run_nested_assoc_mine(
 #     sample.to_numpy(), target, set([]), 0.01, False)
 # sci_end_time = time.process_time()
 
@@ -225,22 +225,22 @@ logging.basicConfig(
 
 
 start_time_old = time.process_time()
-mb_old, n_ci_old = LIMMB.run_nested_assoc_mine(
+mb_old, n_ci_old = kOMB.run_nested_assoc_mine(
     sample.to_numpy(), target, set(mb_iamb), order, 0.01, True)
 end_time_old = time.process_time()
 
 start_time_1 = time.process_time()
-mb_1, n_ci_1 = LIMMB.run_komb(
+mb_1, n_ci_1 = kOMB.run_komb(
     sample.to_numpy(), target, set(mb_iamb), 1, 2, 0.01, True)
 end_time_1 = time.process_time()
 
 start_time = time.process_time()
-mb, n_ci = LIMMB.run_komb(
+mb, n_ci = kOMB.run_komb(
     sample.to_numpy(), target, set(mb_iamb), order, order, 0.01, True)
 end_time = time.process_time()
 
 start_time_21 = time.process_time()
-mb_21, n_ci_21 = LIMMB.run_komb(
+mb_21, n_ci_21 = kOMB.run_komb(
     sample.to_numpy(), target, set(mb_iamb), order, 1, 0.01, True)
 end_time_21 = time.process_time()
 
@@ -261,7 +261,7 @@ print("="*60)
 
 
 # start_time = time.process_time()
-# res = LIMMB.run_mine(
+# res = kOMB.run_mine(
 #     sample.to_numpy(), target, set(mb_iamb), 0.01, len(sample.columns) -1)
 # end_time = time.process_time()
 # print("time taken:", end_time - start_time)
