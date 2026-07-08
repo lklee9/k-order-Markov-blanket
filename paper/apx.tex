@@ -38,167 +38,51 @@
 \section{Proofs}\label{apx:proofs}
 %%%% k dep to assoc
 \kdeptoassoc*
-\begin{proof}[Proof by induction]
-  When $\rmZ'$ is an empty set, and therefore a subset of $\rmZ$ with
-  cardinality $0$, we know by definition that $X$ and $Y$ being
-  $0$-order dependent is equivalent to them being $0$-order associated,
-  \begin{gather}
-    \label{eq:12}
-    \begin{aligned}
-      &\kdep{\verts}{X,Y}{\emptyset}\\
-      &=\kassoc{\rmS}{Y,X}{\emptyset} \wedge
-      \forall \rmZ^{*} \subset \emptyset
-        : \neg\,\kassoc{\rmS}{Y,X}{\rmZ^{*}}\\
-      &=\kassoc{\rmS}{Y,X}{\emptyset},
-    \end{aligned}
-  \end{gather}
-  since there are no proper subsets of the empty set to begin with.
-  
-  Now assume that $Y$ and $X$ are not $m$-order associated---where
-  $m \leq k < |\rmZ|$---w.r.t. any subsets in $\powerleq{k}{\rmZ}$,
-  \begin{equation}
-    \label{eq:k-dep-to-assoc-eq1}
-    \forall \rmZ^{*} \in \powerleq{k}{\rmZ} :
-    \neg\,\kassoc{\rmS}{Y,X}{\rmZ^{*}}.
-  \end{equation}
-  Then we know that if $Y$ and $X$ are $(k+1)$-order associated with any
-  subset $\rmZ' \in \powereq{k+1}{\rmZ}$,
-  \begin{equation}
-    \label{eq:k-dep-to-assoc-eq2}
-    \kassoc{\rmS}{Y,X}{\rmZ'},
-  \end{equation}
-  taking the conjunction of \Cref{eq:k-dep-to-assoc-eq1} and
-  \Cref{eq:k-dep-to-assoc-eq2} results in $Y$ and $X$ being
-  $(k+1)$-order dependent w.r.t. $\rmZ'$,
-  \begin{align}
-    &\kassoc{\rmS}{Y,X}{\rmZ'} \wedge
-      \forall \rmZ^{*} \in \powerleq{k}{\rmZ'} :
-      \neg\,\kassoc{\rmS}{Y,X}{\rmZ^{*}}\nonumber\\
-    &\iff \kdep{\rmS}{Y,X}{\rmZ'}, \label{eq:14}
-  \end{align}
-  since $\powerleq{k}{\rmZ'}\subseteq\powerleq{k}{\rmZ}$ and we know
-  that---at the worst---$Y$ and $X$ are $(k+1)$-order associated when
-  $k=|\rmZ|-1$.
+\begin{proof}
+  Consider the family of association witnesses contained in $\rmZ$,
+  \begin{equation*}
+    \mathcal{W} \coloneq
+    \{\rmW \subseteq \rmZ : \kassoc{\rmS}{Y,X}{\rmW}\}.
+  \end{equation*}
+  By the hypothesis $\kassoc{\rmS}{Y,X}{\rmZ}$ we have $\rmZ\in\mathcal{W}$,
+  so $\mathcal{W}$ is nonempty; and since $\rmZ$ is finite, so is
+  $\mathcal{W}$. Hence $\mathcal{W}$ contains an element $\rmZ'$ of minimum
+  cardinality. Every proper subset $\rmZ^{*}\subsetneq\rmZ'$ satisfies
+  $|\rmZ^{*}|<|\rmZ'|$ and $\rmZ^{*}\subseteq\rmZ$, so by the minimality of
+  $\rmZ'$ we have $\rmZ^{*}\notin\mathcal{W}$, i.e.\
+  $\neg\,\kassoc{\rmS}{Y,X}{\rmZ^{*}}$. Together with
+  $\kassoc{\rmS}{Y,X}{\rmZ'}$, this is by \Cref{eq:k-dep-dep} exactly
+  $\kdep{\rmS}{Y,X}{\rmZ'}$. As $\rmZ'\subseteq\rmZ$, this establishes
+  \Cref{eq:11}.
 \end{proof}
 
 %%%% k dep to inter
 \kdepinter*
 \begin{proof}
-  First assume that $\kdep{\rmS}{Y,X}{\rmZ}$ which from its definition
-  in \Cref{def:k-dep} implies that $Y$ and $X$ are not associated given
-  any proper subset of $\rmZ$,
-  \begin{gather}
-    \begin{aligned}
-      &\kdep{\rmS}{Y,X}{\rmZ}\\
-      &\implies
-      \forall \rmZ' \subset \rmZ \:\: \exists \rmS' \subseteq \rmS :
-      Y \indep{\pr} X \mid \rmZ' \cup \rmS'
-    \end{aligned}
-    .\label{eq:k-dep-inter-eq2}
-  \end{gather}
-  Furthermore, assume that for some $Z\in\rmZ$, $Y$ and $Z$ are
-  not associated w.r.t. $X\cup\rmZ\setminus Z$,
-  \begin{equation}
-    \label{eq:k-dep-inter-eq1}
-    \exists Z \in \rmZ \:\: \exists \rmS' \subseteq \rmS:
-    Y \indep{\pr} Z \mid X \cup \rmS' \cup \rmZ \setminus Z.
-  \end{equation}
-  Note that the statement in \Cref{eq:k-dep-inter-eq1} is essentially
-  the opposite of what we wish to prove.
-  
-  By the contraction and weak union graphoid axioms in
-  \Cref{def:graphoid} we know that for some $\rmS'\subseteq\rmS$,
+  Assume $\kdep{\emptyset}{Y,X}{\rmZ}$. For the variable $X$, the
+  inter-association clause is $\kassoc{\emptyset}{Y,X}{\rmZ}$, i.e.\
+  $Y\dep{\pr}X\mid\rmZ$, which is exactly the first conjunct of
+  \Cref{eq:k-dep-dep} and hence immediate.
+
+  Now suppose, towards a contradiction, that the clause fails for some
+  $Z\in\rmZ$, i.e.\ $Y \indep{\pr} Z \mid X \cup (\rmZ \setminus Z)$.
+  Since $\rmZ\setminus Z$ is a proper subset of $\rmZ$ and the
+  separating set is empty, the second conjunct of \Cref{eq:k-dep-dep}
+  gives $Y \indep{\pr} X \mid \rmZ \setminus Z$. Applying the
+  contraction and then weak union graphoid axioms of
+  \Cref{def:graphoid},
   \begin{equation}
     \begin{aligned}
-      &(Y \indep{\pr} Z \mid X \cup \rmS' \cup \rmZ \setminus Z)
-        \wedge (Y \indep{\pr} X \mid \rmS' \cup \rmZ \setminus Z)\\
-      &\implies Y \indep{\pr} \{X, Z\} \mid \rmS' \cup \rmZ \setminus Z\\
-      &\implies Y \indep{\pr} X \mid \rmS' \cup \rmZ
+      &(Y \indep{\pr} Z \mid X \cup (\rmZ \setminus Z))
+        \wedge (Y \indep{\pr} X \mid \rmZ \setminus Z)\\
+      &\implies Y \indep{\pr} \{X, Z\} \mid \rmZ \setminus Z
+      \implies Y \indep{\pr} X \mid \rmZ,
     \end{aligned}\label{eq:k-dep-inter-eq4}
   \end{equation}
-  However, referring back to the definition of a $k$-order dependence in
-  \Cref{def:k-dep}, we know that our initial assumption of
-  $\kdep{\rmS}{Y,X}{\rmZ}$ implies that,
-  \begin{gather}
-    \label{eq:k-dep-inter-eq3}
-    \kdep{\rmS}{Y,X}{\rmZ} \implies
-    \forall \rmS' \subseteq \rmS : Y \dep{\pr} X \mid \rmS' \cup \rmZ,
-  \end{gather}
-  which causes a contradiction with the conclusion in
-  \Cref{eq:k-dep-inter-eq4}. Therefore, the conjunction of our initial
-  assumptions must be false. Taking the negation of this conjunction
-  leads to,
-  \begin{align*}
-    &\neg \bigl(
-    \kdep{\rmS}{Y,X}{\rmZ} \wedge\\
-    &\qquad\exists Z \in \rmZ \:\: \exists \rmS' \subseteq \rmS: 
-    Y \indep{\pr} Z \mid X \cup \rmS \cup \rmZ \setminus Z
-    \bigr)\\
-    &=\neg\kdep{\rmS}{Y,X}{\rmZ} \vee\\
-    &\qquad\forall Z \in \rmZ \:\: \forall \rmS' \subseteq \rmS: 
-    Y \dep{\pr} Z \mid X \cup \rmS \cup \rmZ \setminus Z\\
-    &=\kdep{\rmS}{Y,X}{\rmZ} \implies
-    \forall Z \in \rmZ :
-      \kassoc{\rmS}{Y,Z}{X\cup\rmZ\setminus Z}.
-  \end{align*}
-  Which in addition to the implication we know to be true in
-  \Cref{eq:k-dep-inter-eq3} results in,
-  \begin{equation}
-    \label{eq:29}
-    \kdep{\rmS}{Y,X}{\rmZ} \implies \kinter{\rmS}{Y, \rmZ \cup X},
-  \end{equation}
-  concluding our proof.
-\end{proof}
-
-
-%%%% Dep subset
-\depsubset*
-\begin{proof}
-  Recall that $\kdep{\rmS}{Y,X}{\rmZ}$ is defined in \Cref{def:k-dep} as
-  \begin{equation}
-    \begin{aligned}
-      &\kdep{\rmS}{Y,X}{\rmZ}\\
-      &:= \kassoc{\rmS}{Y,X}{\rmZ} \wedge
-        \forall \rmZ' \subset \rmZ : \neg\,\kassoc{\rmS}{Y,X}{\rmZ'}.
-    \end{aligned}\tag{\ref{eq:k-dep-dep}}
-  \end{equation}
-  Therefore, to prove \Cref{eq:subset-res}, we will first explore how
-  reducing the separating set to $\rmS'\subseteq\rmS$ affects the
-  first term of the conjunction in \Cref{eq:k-dep-dep},
-  \begin{align}
-    \kdep{\rmS}{Y,X}{\rmZ}
-    \implies &\kassoc{\rmS}{Y,X}{\rmZ}\\
-    \iff &\forall \rmS^{*} \subseteq \rmS :
-           Y \dep{\pr} X \mid \rmZ \cup \rmS^{*}\label{eq:subset-0}\\
-    \implies
-         &\forall \rmS^{*} \subseteq \rmS' :
-           Y \dep{\pr} X \mid \rmZ \cup \rmS^{*}\label{eq:subset-1}\\
-    \iff &\kassoc{\rmS'}{Y,X}{\rmZ}\label{eq:subset-2}.
-  \end{align}
-  The implication in \Cref{eq:subset-1} follows from the
-  fact that $\mathcal{P}(\rmS')\subseteq\mathcal{P}(\rmS)$ and therefore
-  the set of conditional dependencies in \Cref{eq:subset-1} is a subset
-  of the conditional dependencies in \Cref{eq:subset-0}.
-
-  Furthermore, using the result from \Cref{lem:k-dep-inter}, we can show
-  that,
-  \begin{align}
-    &\kdep{\rmS}{Y,X}{\rmZ}\implies \kinter{\rmS}{Y,X\cup\rmZ}\\
-    &\implies \forall Z \in\rmZ :
-               \kassoc{\rmS}{Y,Z}{X\cup\rmZ\setminus Z}\\
-    &\implies \forall Z \in\rmZ :
-      \kassoc{\rmS'}{Y,Z}{X\cup\rmZ\setminus Z},
-      \label{eq:subset-3}
-  \end{align}
-  where the implication in \Cref{eq:subset-3} follows from the previous
-  implication between \Cref{eq:subset-0,eq:subset-2}.
-  Therefore, combining the implications in
-  \Cref{eq:subset-2,eq:subset-3} we obtain,
-  \begin{align}
-    \kdep{\rmS}{Y,X}{\rmZ}
-    \implies\kinter{\rmS'}{Y,X\cup\rmZ},
-  \end{align}
-  which concludes this proof.
+  contradicting $Y\dep{\pr}X\mid\rmZ$. Hence
+  $Y\dep{\pr}Z\mid X\cup(\rmZ\setminus Z)$ for every $Z\in\rmZ$, which
+  together with $Y\dep{\pr}X\mid\rmZ$ is precisely
+  $\kinter{\emptyset}{Y,\rmZ\cup X}$.
 \end{proof}
 
 %%% Proofs of Theorems
@@ -208,144 +92,161 @@
 \begin{proof}
   The function \textit{find\_cond} first iterates through all the
   subsets $\rmX'\in\powerleq{k-|\rmX|}{\rmS}$ and for each $\rmX'$ where
-  $Y \dep{\pre} X \mid \rmX'$ (line 9 in \textit{find\_cond}), it passes
+  $Y \dep{\pre} X \mid \rmX\cup\rmX'$ (line 9 in \textit{find\_cond}), it passes
   $\rmX'$ to the function \textit{no\_seps} (line 10 in
   \textit{find\_cond}) to determine if there are any subsets
   $\rmS'\in\powerleq{l}{\rmS\setminus\rmX'}$ that results in
-  $Y \dep{\pre} X \mid \rmX'\cup \rmS'$ (line 3 in \textit{no\_seps}).
+  $Y \indep{\pre} X \mid \rmX\cup\rmX'\cup \rmS'$ (line 4 in \textit{no\_seps}).
   As soon as \textit{no\_seps} finds such a $\rmS'$, it returns
   \texttt{False} (line 4 in \textit{no\_seps}), and \textit{find\_cond}
   will need to go to the next iteration. Otherwise, if \textit{no\_seps}
   is unable to find any such subset $\rmS'$, it returns \texttt{True}
   (line 5 in \textit{no\_seps}), and \textit{find\_cond} then
   immediately returns $\rmZ=\rmX'\cup\rmX$ (line 11 in
-  \textit{find\_cond}) as there are no $l$-bounded subsets of $\rmS$
-  that renders $Y$ and $X$ conditionally independent given
-  $\rmZ$. However, if \textit{find\_cond} completes all its iteration
+  \textit{find\_cond}) as there are no $l$-bounded subsets
+  $\rmS'\in\powerleq{l}{\rmS\setminus\rmZ}$ that render $Y$ and $X$
+  conditionally independent given
+  $\rmZ\cup\rmS'$. Here we use that the external set $\rmX$ is disjoint from
+  $\rmS$, so $\rmS\setminus\rmZ=\rmS\setminus\rmX'$; and since
+  $\emptyset\in\powerleq{l}{\rmS\setminus\rmX'}$, the dependence check
+  $Y\dep{\pre}X\mid\rmZ$ on line 9 is precisely the $\rmS'=\emptyset$
+  instance tested by \textit{no\_seps}, so a returned $\rmZ$ satisfies
+  \Cref{eq:25} in full. However, if \textit{find\_cond} completes all its iteration
   without returning early, then we know that all subset $\rmX'$ has some
   $l$-bounded subset $\rmS'$ that will cause
   $Y\indep{\pre}X\mid\rmX'\cup\rmX\cup\rmS'$. Therefore
-  \textit{find\_cond} just returns the emptyset in this case (line 12 in
-  \textit{find\_cond}).
+  \textit{find\_cond} returns the failure value $\bot$ in this case
+  (line 12 in \textit{find\_cond}).
 \end{proof}
 
 \assocmine*
 \begin{proof}
-  During each function call, \textit{find\_inter\_dep} is passed
-  some---potentially empty---set $\rmX$ and it then iterates through each
-  variable $X$ that has not been included in $\rmX$ yet,
-  $X\in\verts\setminus(Y \cup \rmX \cup \rmS)$. In each iteration it
-  calls the function \textit{find\_cond} to find a subset
-  $\rmX' \in \powerleq{k-|\rmX|}{\rmS}$ such that
-  \begin{equation*}
-    \forall \rmS' \in \powerleq{l}{\rmS \setminus \rmX'} :
-    Y\dep{\pre}X  \mid \rmX \cup \rmX' \cup \rmS'.
-  \end{equation*}
-  When \textit{find\_cond} fails to find such a set $\rmX'$, it just
-  returns an empty set, causing \textit{find\_inter\_dep} to check the
-  next variable $X$ not already in $\rmX\cup\rmS$. 
-  
-  Otherwise, when a suitable set $\rmX'$ is found, \textit{find\_cond}
-  returns $\rmZ=\rmX'\cup\rmX$ and $\rmZ$ is then passed on to the
-  function \textit{make\_strict} to remove any superfluous variables
-  resulting in the set $\rmZ'\subseteq(\rmZ\cup X)$ such that,
-  \begin{align*}
-    &\forall Z \in \rmZ'\:\:
-    \forall \rmS' \in \powerleq{l}{\rmS}:
-    Y \dep{\pre} Z \mid \rmZ \cup \rmS' \setminus Z\\
-    &\iff \forall Z \in \rmZ' :
-      \lassoc{\rmS}{Y,Z}{\rmZ\setminus Z}\\
-    &\iff \linter{\rmS}{Y,X\cup\rmX\cup\rmX'}.
-  \end{align*}
-  Furthermore, since \textit{find\_inter\_dep} explores the enumeration
-  tree of the set $\verts \setminus (Y \cup \rmS)$ up to subsets of
-  cardinality $k$ (lines 13 to 17 in \textit{find\_inter\_dep}) , we
-  know that every subset
-  $\rmX\in\powerleq{k}{\verts \setminus (Y \cup \rmS)}$ will be
-  explored---barring any early returns. In combination with
-  \textit{find\_cond} exploring the subsets
-  $\rmX' \in \powerleq{k-|\rmX|}{\rmS}$, \textit{find\_inter\_dep}
-  returns $X\cup\rmZ$ where $\rmZ=\rmX\cup\rmX'$ if and only if
-  \begin{align*}
-    \exists \rmZ \in \powerleq{k}{\hat{\verts}} \:\:
-    \exists X \in \hat{\verts}\setminus(\rmX\cup\rmS) :
-    \linter{\rmS}{Y,X\cup\rmZ}.
-  \end{align*}
-  where $\hat{\verts}=\verts\setminus Y$. If no such $X$ and $\rmZ$ can
-  be found, \textit{find\_inter\_dep} will return an empty set when
-  every subset $\rmX\in\powerleq{k}{\verts\setminus (Y\cup\rmS)}$ has
-  been explored.
+  First consider a call that returns a nonempty set.
+  \textit{find\_inter\_dep} does so only by returning
+  \textit{make\_strict}$(Y,X,\rmZ,\rmS,k,l)$ after a call
+  \textit{find\_cond}$(Y,X,\rmX,\rmS,k,l)$ has returned some
+  $\rmZ\neq\bot$, for some $X\in\verts\setminus(Y\cup\rmS\cup\rmX)$
+  (as $\rmS$ is passed unchanged through every recursive call, any such
+  $X$ satisfies $X\in\verts\setminus(Y\cup\rmS)=\verts'$, matching the
+  theorem's candidate set). By
+  \Cref{thm:citest}, $\rmZ=\rmX\cup\rmX'$ for some
+  $\rmX'\in\powerleq{k-|\rmX|}{\rmS}$ such that
+  $Y\dep{\pre}X\mid\rmZ\cup\rmS'$ holds for all
+  $\rmS'\in\powerleq{l}{\rmS\setminus\rmX'}$. As the dependence set $\rmX$ is
+  disjoint from $\rmS$, we have $\rmS\setminus\rmX'=\rmS\setminus\rmZ$, so
+  $Y\dep{\pre}X\mid\rmZ\cup\rmS'$ holds for all
+  $\rmS'\in\powerleq{l}{\rmS\setminus\rmZ}$ with
+  $\rmZ\in\powerleq{k}{\verts\setminus\{Y,X\}}$---the estimated $l$-bounded
+  association claimed in the theorem. Since
+  \textit{make\_strict} only removes variables from $\rmZ$, the returned
+  set is $X\cup\rmZ_{R}$ for some $\rmZ_{R}\subseteq\rmZ$, as claimed.
+
+  Next consider a call that returns the empty set. Here every internal
+  \textit{find\_cond} call must have failed, so \textit{find\_inter\_dep}
+  traverses the full enumeration tree of the dependence sets
+  $\rmX\in\powerleq{k}{\verts\setminus(Y\cup\rmS)}$ (lines 13--17 of
+  \textit{find\_inter\_dep}), and for each visits every candidate
+  $X\in\verts\setminus(Y\cup\rmS\cup\rmX)$ through
+  \textit{find\_cond}$(Y,X,\rmX,\rmS,k,l)$, which by \Cref{thm:citest}
+  searches all $\rmX'\in\powerleq{k-|\rmX|}{\rmS}$. Every conditioning
+  set $\rmZ\in\powerleq{k}{\verts\setminus\{Y,X\}}$ decomposes uniquely
+  into its part outside and its part inside the candidate blanket,
+  $\rmZ=(\rmZ\setminus\rmS)\cup(\rmZ\cap\rmS)=\rmX\cup\rmX'$, so this
+  enumeration covers every pair $(X,\rmZ)$ with $X\in\verts'$ and
+  $\rmZ\in\powerleq{k}{\verts\setminus\{Y,X\}}$. By \Cref{thm:citest},
+  the call for $(X,\rmX)$ returns $\bot$ exactly when every such $\rmX'$
+  admits a separator $\rmS'\in\powerleq{l}{\rmS\setminus\rmX'}$ with
+  $Y\indep{\pre}X\mid\rmX\cup\rmX'\cup\rmS'$. Therefore
+  \textit{find\_inter\_dep} returns the empty set if and only if
+  \Cref{eq:fid-empty} holds. The distinguished value $\bot$ lets the
+  callers tell such a failure from a success that returns the empty
+  conditioning set.
 \end{proof}
 
 \algkomb*
 \begin{proof}
-  First let $\hat{\verts}=\verts\setminus Y$.  At each iteration of the
-  grow phase, if there is a variable $X$ and subset $\rmZ$ where
-  following logical statement is true,
-  \begin{equation*}
-    \exists \rmZ \in \powerleq{k}{\hat{\verts}} \:\:
-    \exists X \in \hat{\verts}\setminus(\rmX\cup\rmS) :
-    \linter{\rmS}{Y,X\cup\rmZ},
-  \end{equation*}
-  then the function \textit{find\_inter\_dep} will return the set
-  $(X\cup\rmZ)$. Furthermore, we know that under the $k$-order
-  faithfulness assumption, for some
-  existing---potentially empty---candidate Markov blanket 
-  $\rmS\subseteq \subverts$, $k'\leq k$, and for all possible $X$,
-  \begin{align}
-    &Y \dep{\gr} X \mid \verts \iff X \in \mbs{\gr}(Y)
-      \label{eq:komb-1}\\
-    &\implies \exists \rmZ \in \powereq{k'}{\subverts}:
-      \kdep{\verts}{Y,X}{\rmZ}
-      \label{eq:komb-2}\\
-    &\implies \exists \rmZ \in \powereq{k'}{\subverts}:
-      \kinter{\rmS}{Y,X\cup\rmZ}\label{eq:komb-3}\\
-    &\implies \exists \rmZ \in \powereq{k'}{\subverts}:
-      \linter{\rmS}{Y,X\cup\rmZ}\label{eq:komb-4},
-  \end{align}
-  where \Cref{eq:komb-1,eq:komb-2} is true by definition, the
-  implication in \Cref{eq:komb-3} follows from the result in
-  \Cref{lem:subset}, and \Cref{eq:komb-4} is true under the $l$-bounded
-  separator assumption in \Cref{def:bound-sep}.
-  
-  Therefore, we know that whenever there exists some $X$ that is in the
-  true Markov blanket of $Y$ but not yet included in the candidate
-  Markov blanket $\rmS$, thanks to the implication in \Cref{eq:komb-4},
-  we know that \textit{find\_inter\_dep} will be able to find and
-  appropriate $\rmZ$ such that $\linter{\rmS}{Y,X\cup\rmZ}$ is true and
-  the set $X\cup\rmZ$ will be added into $\rmS$.
+  Throughout we assume that the \gls{ci} decisions are accurate, so
+  $\pre$ and $\pr$ agree on every tested statement.
 
-  Therefore once \textit{find\_inter\_dep} starts to return empty sets,
-  we know that there are no more variables left in
-  $\hat{\verts}\setminus\rmS$ that are in the true Markov blanket of
-  $Y$,
-  \begin{equation*}
-    \mbs{\gr}(Y) \subseteq \rmS.
-  \end{equation*}
+  In the grow phase, every nonempty set returned by
+  \textit{find\_inter\_dep} contains a variable $X\notin\rmS$ by
+  \Cref{thm:assocmine}, so each iteration of the repeat loop strictly
+  grows $\rmS$ and the phase terminates. Upon termination
+  \textit{find\_inter\_dep} returned the empty set, so by
+  \Cref{thm:assocmine} the condition in \Cref{eq:fid-empty} holds in
+  $\pre$, and by accuracy in $\pr$. Fix any
+  $X\in\verts\setminus(\rmS\cup Y)$. For every
+  $\rmZ\in\powerleq{k}{\verts\setminus\{Y,X\}}$, \Cref{eq:fid-empty}
+  supplies an $\rmS'\in\powerleq{l}{\rmS\setminus\rmZ}
+  \subseteq\powerleq{l}{\rmS}$ with $Y\indep{\pr}X\mid\rmZ\cup\rmS'$;
+  the $l$-bounded separator assumption (\Cref{def:bound-sep}) then
+  lifts this, for every such $\rmZ$, to the unbounded statement that
+  some $\rmS'\subseteq\rmS$ gives $Y\indep{\pr}X\mid\rmZ\cup\rmS'$,
+  which is the antecedent of $k$-order faithfulness
+  (\Cref{eq:k-faith-indep}). Hence $Y\indep{\gr}X\mid\rmS$ for every
+  $X\in\verts\setminus(\rmS\cup Y)$. Since the parents and children of
+  $Y$---and, for an undirected $\gr$, its neighbours---can never be
+  separated from $Y$, they must all lie in $\rmS$. Any spouse $X$
+  shares a child $C\in\text{ch}(Y)\subseteq\rmS$, so the collider path
+  $Y\rightarrow C\leftarrow X$ is active given $\rmS$; hence
+  $Y\dep{\gr}X\mid\rmS$, which forces $X\in\rmS$ as well. Therefore
+  $\mbs{\gr}(Y)\subseteq\rmS$, establishing \Cref{eq:27}.
 
-  During the shrink phase, {\method} iteratively calls
-  \textit{find\_cond} on every variable in $\rmS$ and removes that
-  variable from $\rmS$ if \textit{find\_cond} returns an empty set. We
-  know that given the variable $X$ and initial conditioning set
-  $\emptyset$, \textit{find\_cond} returns the empty set if,
-  \begin{align*}
-    &\forall \rmZ\in\powerleq{k}{\rmS\setminus X}\:\:
-    \exists \rmS'\in\powerleq{l}{\rmS\setminus(X\cup\rmZ)} :\\
-    &Y \indep{\pre} X \mid \rmZ \cup \rmS'\\
-    &\iff \\
-    &\forall \rmZ\in\powerleq{k}{\subverts}\:\:
-    \exists \rmS'\in\powerleq{l}{\rmS\setminus X} :\\
-    &Y \indep{\pre} X \mid \rmZ \cup \rmS' \\
-    &\iff Y \indep{\gr} X \mid (\rmS\setminus X)
-  \end{align*}
-  where the biconditionals follow from the global Markov property since
-  $\mbs{\gr}(Y)\subseteq\rmS$ and the $l$-bounded separator
-  assumption.
+  During the shrink phase we maintain the invariant
+  $\mbs{\gr}(Y)\subseteq\rmS$, which holds on entry by \Cref{eq:27}.
+  First, we show that no true member is ever removed. For
+  $X\in\mbs{\gr}(Y)$, the in-blanket witness hypothesis of
+  \Cref{thm:algkomb} supplies a set
+  $\rmZ\in\powerleq{k}{\mbs{\gr}(Y)\setminus X}
+  \subseteq\powerleq{k}{\rmS\setminus X}$ such that
+  $Y\dep{\pr}X\mid\rmZ\cup\rmS'$ holds for all
+  $\rmS'\in\powerleq{l}{(\rmS\setminus X)\setminus\rmZ}$. By accuracy and \Cref{thm:citest}
+  (with candidate blanket $\rmS\setminus X$, external dependence set
+  $\rmX=\emptyset$, and $\rmX'=\rmZ$), the call
+  \textit{find\_cond}$(Y,X,\emptyset,\rmS\setminus X,k,l)$ does not
+  return $\bot$, so $X$ is never selected for removal (a member whose
+  only witness is $\rmZ=\emptyset$ makes \textit{find\_cond} return the
+  empty set rather than $\bot$).
 
-  Therefore, whenever a variable $X\in\rmS$ is not in the Markov blanket
-  of $Y$, \textit{find\_cond} returns an empty set and $X$ is removed
-  from $\rmS$. As such, after the shrink phase, the subset $\rmS$ is
-  exactly the graphical Markov blanket of $Y$, $\rmS=\mbs{\gr}(Y)$.
+  Next, we show that every non-member is removed once selected. Let
+  $X\in\rmS\setminus\mbs{\gr}(Y)$; by the invariant
+  $\mbs{\gr}(Y)\subseteq\rmS\setminus X$. We first observe that
+  $\mbs{\gr}(Y)$ separates $Y$ from $X$ even after conditioning on any
+  further set $\rmZ\subseteq\verts\setminus\{Y,X\}$. Since
+  $X\notin\mbs{\gr}(Y)$, $X$ is not adjacent to $Y$, so every path
+  between them has at least one interior vertex; write such a path as
+  $Y=N_{0}\sim N_{1}\sim\cdots\sim N_{m}=X$ with $m\geq 2$. Its first
+  interior vertex $N_{1}$ is adjacent to $Y$ and hence lies in
+  $\mbs{\gr}(Y)$. If $N_{1}$ is a non-collider on the path, it blocks
+  the path. If instead $N_{1}$ is a collider
+  $Y\rightarrow N_{1}\leftarrow N_{2}$, then $N_{1}$ is a common child of
+  $Y$ and its successor $N_{2}$ on the path, so $N_{2}$ is a spouse of
+  $Y$ and hence $N_{2}\in\mbs{\gr}(Y)$. In particular $N_{2}\neq X$ (as
+  $X\notin\mbs{\gr}(Y)$), so $N_{2}$ is a genuine interior vertex; and
+  since the edge $N_{2}\rightarrow N_{1}$ points out of $N_{2}$, it is a
+  non-collider on the path and blocks it. For an undirected $\gr$, $N_{1}$ is instead a neighbour of
+  $Y$ and blocks the path directly. As each path is thus blocked at a
+  conditioned vertex of $\mbs{\gr}(Y)$ irrespective of
+  $\rmZ$~\citep{pearl1988,lauritzen1996},
+  $Y\indep{\gr}X\mid\mbs{\gr}(Y)\cup\rmZ$ for every
+  $\rmZ\in\powerleq{k}{\verts\setminus\{Y,X\}}$.
+
+  The Global Markov
+  Property transfers this to $\pr$ with the separator
+  $\rmS'\coloneq\mbs{\gr}(Y)\setminus\rmZ\subseteq\rmS\setminus X$, so
+  the unbounded side of \Cref{def:bound-sep}---at the separating set
+  $\rmS\setminus X$---holds for every such $\rmZ$. The biconditional
+  then yields some $\rmS'\in\powerleq{l}{\rmS\setminus X}$; discarding
+  any overlap with $\rmZ$ leaves $\rmZ\cup\rmS'$ unchanged and gives
+  $\rmS'\in\powerleq{l}{(\rmS\setminus X)\setminus\rmZ}$ with
+  $Y\indep{\pr}X\mid\rmZ\cup\rmS'$. By accuracy and \Cref{thm:citest},
+  \textit{find\_cond}$(Y,X,\emptyset,\rmS\setminus X,k,l)$ returns
+  $\bot$, so $X$ is removed once selected.
+
+  Each iteration of the while loop removes one variable, so the phase
+  terminates; it exits only when no $X\in\rmS$ yields $\bot$, whence
+  $\rmS\setminus\mbs{\gr}(Y)=\emptyset$ and, with the invariant,
+  $\rmS=\mbs{\gr}(Y)$, establishing \Cref{eq:28}.
 \end{proof}
 
 \section{Complexity of {\method}}\label{apx:proof-complex}
@@ -365,13 +266,13 @@
   dependence, calls \textit{no\_seps}, which iterates over every
   separator $\rmS'\in\powerleq{l}{\rmS\setminus\rmX'}$ and performs one
   further \gls{ci} test per separator. Writing $|\rmX'|=i'$, there are at
-  most $\sum_{j=0}^{l}\binom{K-i'-i}{j}$ such separators, so a single
+  most $\sum_{j=0}^{l}\binom{K-i'}{j}$ such separators, so a single
   call to \textit{find\_cond} costs
   \begin{equation}
     \label{eq:cost-findcond}
     O\!\left(
       \sum_{i'=0}^{k-i}\binom{K}{i'}
-      \sum_{j=0}^{l}\binom{K-i'-i}{j}\, N
+      \sum_{j=0}^{l}\binom{K-i'}{j}\, N
     \right),
   \end{equation}
   where the convention $\binom{n}{m}=0$ for $n<m$ accounts for the
@@ -380,8 +281,9 @@
   Next consider \textit{find\_inter\_dep} (\Cref{alg:assoc-mine}). It
   explores the enumeration tree of $\verts\setminus Y$ up to subsets of
   cardinality $k$ (lines 13--17 of \textit{find\_inter\_dep}), and hence
-  visits each of the $\sum_{i=0}^{k}\binom{n}{i}$ dependence sets
-  $\rmX\in\powerleq{k}{\verts\setminus Y}$. For every such $\rmX$ it
+  visits at most $\sum_{i=0}^{k}\binom{n}{i}$ dependence sets
+  $\rmX\in\powerleq{k}{\verts\setminus Y}$ (a loose bound on the exact
+  count $\sum_{i=0}^{k}\binom{n-1}{i}$, as $|\verts\setminus Y|=n-1$). For every such $\rmX$ it
   loops over the $O(n)$ candidate variables
   $X\in\verts\setminus(Y\cup\rmS\cup\rmX)$ and invokes
   \textit{find\_cond}. Multiplying these two factors by
@@ -393,19 +295,31 @@
       n \sum_{i=0}^{k}\binom{n}{i}
       \left[
         \sum_{i'=0}^{k-i}\binom{K}{i'}
-        \sum_{j=0}^{l}\binom{K-i'-i}{j}\, N
+        \sum_{j=0}^{l}\binom{K-i'}{j}\, N
       \right]
     \right).
   \end{equation}
+  Each successful sweep additionally invokes \textit{make\_strict}
+  exactly once; it iterates over the found dependence set $\rmZ$---of
+  size at most $\min(k,n-2)$, since $\rmZ\subseteq\verts\setminus\{Y,X\}$
+  and $|\rmZ|\leq k$---and performs a single \textit{no\_seps} call per
+  element, at cost
+  $O\!\left(\min(k,n-2)\sum_{j=0}^{l}\binom{K}{j}\,N\right)$. This is dominated by
+  the per-sweep \textit{find\_cond} total already counted in
+  \Cref{eq:cost-sweep}---whose bracketed factor already contains the
+  term $\sum_{j=0}^{l}\binom{K}{j}$ (at $i'=0$) multiplied by the outer
+  factor $n\sum_{i=0}^{k}\binom{n}{i}\geq n\geq\min(k,n-2)$---and is
+  therefore absorbed into the bound.
 
   Finally, consider {\method} itself (\Cref{alg:komb}). Each successful
   call to \textit{find\_inter\_dep} in the grow phase returns a
-  non-empty set $X\cup\rmZ$ that is added to $\rmS$, so the candidate
+  nonempty set $X\cup\rmZ$ that is added to $\rmS$, so the candidate
   Markov blanket grows by at least one variable per successful call; as
   $|\rmS|\leq K$ throughout, the grow phase performs at most $O(K)$
-  association-mining sweeps. The shrink phase calls \textit{find\_cond}
-  for each of the at most $K$ variables in $\rmS$, the cost of which is
-  dominated by that of the grow phase. Multiplying \Cref{eq:cost-sweep}
+  association-mining sweeps. The shrink phase re-evaluates its guard after
+  each removal, calling \textit{find\_cond} at most $O(K^{2})$ times over the
+  at most $K$ removals; as $K\leq n-1$, this cost is dominated by that of the
+  grow phase. Multiplying \Cref{eq:cost-sweep}
   by these $O(K)$ sweeps yields the bound in \Cref{eq:complexity},
   completing the proof.
 \end{proof}

@@ -645,11 +645,10 @@ distinction between the possible dependants $\rmZ$ and the possible
 separators $\rmS$. The other odd aspect of \Cref{def:k-dep} is that we
 define both $k$-order association and dependence over some arbitrary
 subset $\rmS\subseteq\subverts$ instead of just the entirety of
-$\subverts$. This allows us to reason about what the implications of
-$\kdep{\rmS}{Y,X}{\rmZ}$ are when we only condition on a subset of the
-available variables in $\verts$ later in \Cref{lem:subset}; which will
-help us prove in \Cref{sec:algo} that our algorithm {\method}
-correctly recovers the Markov boundary of some variable $Y\in\verts$.
+$\subverts$. This allows us to reason about associations relative to
+the candidate Markov blanket maintained by our algorithm, which is
+central to proving in \Cref{sec:algo} that {\method} correctly recovers
+the Markov boundary of some variable $Y\in\verts$.
 
 Since henceforth we need to reason about subsets with a restricted
 cardinality; before continuing we will first define some notational
@@ -768,71 +767,38 @@ successfully cause $Y$ and $X$ to be conditionally independent. In other
 words, instead of considering the dependence between $Y$ and $X$ over
 all the variables in $\verts$, $\kdep{\subverts}{Y,X}{\rmZ}$; we will
 instead consider the association between $Y$ and $X$ over just the
-current candidate \gls{mb} $\rmS$, $\kassoc{\rmS}{Y,X}{\rmZ}$. This
-relationship between $\kdep{\subverts}{Y,X}{\rmZ}$ and
-$\kassoc{\rmS}{Y,X}{\rmZ}$ is explored later in
-\Cref{lem:subset}. However before that, we first need to show that a
-$k$-order dependence between $Y$ and $X$ given 
-$\rmZ\subseteq\subverts$ implies a $k$-order association between $Y$ and
-all the variables in $\rmZ$ as this result will be useful in proving
-\Cref{lem:subset}.
+current candidate \gls{mb} $\rmS$, $\kassoc{\rmS}{Y,X}{\rmZ}$. As a
+first step, we show that a $k$-order dependence between $Y$ and $X$ with
+no separating variables to consider implies that $Y$ is $k$-order
+associated with every one of the involved variables.
 
-\begin{restatable}[$k$-Order Dependence Implies Inter-Association]{lemma}{kdepinter}
-  % \begin{lemma}[$k$-Order Dependence Implies Inter-Association]
+\begin{restatable}[Marginal $k$-Order Dependence Implies Inter-Association]{lemma}{kdepinter}
   \label{lem:k-dep-inter}
   Given a \gls{pgm} $\model=(\gr, \pr)$, let $X,Y\in\verts$ be distinct
-  variables and $\rmS,\rmZ\subseteq\subverts$ be disjoint subsets in
-  $\verts$. Then if $Y$ and $X$ are $|\rmZ|$-order dependent
-  w.r.t. $\rmZ$ over the separating set $\rmS$, it implies that $Y$ is
-  also $|\rmZ|$-order associated with all the variables in $\rmZ$,
-  assuming $\gr$ is $k$-order faithful to $\pr$,
+  variables and $\rmZ\subseteq\subverts$. Then if $Y$ and $X$ are
+  $|\rmZ|$-order dependent w.r.t. $\rmZ$ over the empty separating set,
+  $Y$ is $|\rmZ|$-order associated with every variable in $\rmZ\cup X$,
   \begin{gather}
-    \kdep{\rmS}{Y,X}{\rmZ}
-    \implies 
-    \kinter{\rmS}{Y,\rmZ \cup X},\label{eq:k-dep-inter-2}
+    \kdep{\emptyset}{Y,X}{\rmZ}
+    \implies
+    \kinter{\emptyset}{Y,\rmZ \cup X},\label{eq:k-dep-inter-2}
     \intertext{where}
     \begin{aligned}
       \kinter{\rmS}{Y,\rmW} := \forall W\in\rmW :
-      \kassoc{\rmS}{Y,Z}{\rmW\setminus W}.
+      \kassoc{\rmS}{Y,W}{\rmW\setminus W}.
     \end{aligned}
   \end{gather}
   When \Cref{eq:k-dep-inter-2} is true, we say that $Y$ is
-  $|\rmZ|$-order \emph{inter-associated} with $X\cup\rmZ$ over the
-  separating set $\rmS$.
-% \end{lemma}
+  $|\rmZ|$-order \emph{inter-associated} with $X\cup\rmZ$.
 \end{restatable}
 
-Using \Cref{lem:k-dep-inter}, we can now show that a $k$-order
-dependency between $Y$ and $X$ w.r.t. $\rmZ$ over the separating set
-$\rmS$ implies that $Y$ is at least $k$-order inter-associated with
-$X\cup\rmZ$ over any subset of the separating set
-$\rmS'\subseteq\rmS$. This result will be particularly useful in reasoning
-about the behaviour of {\method} as the candidate \gls{mb} is
-growing.
-
-% Intuitively, a reduction of the separating set to $\rmS'\subseteq\rmS$
-% can cause $Y$ and $X$ to be associated w.r.t. some subset
-% $\rmZ'\subseteq\rmZ$ that they weren't already associated
-% w.r.t. already. This is due to $\rmS'$ potentially no longer
-% containing the variables that caused $Y$ and $X$ to be conditionally
-% independent w.r.t. $\rmZ'$ in the first place.  With this intuition in
-% mind, we will now formalise this result in \Cref{lem:subset}.
-
-\begin{restatable}[Dependence over a Separating
-  Subset]{lemma}{depsubset}
-  % \begin{lemma}[MB Subset]
-  \label{lem:subset}
-  Given a \gls{pgm}, distinct variables $Y,X\in\verts$, and disjoint
-  subsets $\rmZ,\rmS\subseteq\subverts$, the following logical
-  implication holds for all $\rmS'\subseteq\rmS$,
-  \begin{gather}
-    \label{eq:subset-res}
-    \kdep{\rmS}{Y,X}{\rmZ}
-    \implies \kinter{\rmS'}{Y,X\cup\rmZ},
-  \end{gather}
-  assuming $\gr$ is $k$-order faithful to $\pr$.
-% \end{lemma}
-\end{restatable}
+\Cref{lem:k-dep-inter} requires no faithfulness assumption---it holds
+for every distribution via the semi-graphoid axioms---and generalises
+the $2$-association property of unfaithful triples in
+\citet[Definition 6]{marx2021} to arbitrary orders; the noisy-parity
+\Cref{ex:parity} is exactly this case with $\rmZ=\{X_{2},X_{3}\}$. It
+motivates the \textit{make\_strict} routine of \Cref{alg:assoc-mine},
+which prunes a found dependence set towards an inter-associated one.
 
 The last consideration we need to make for {\method} to be remotely
 feasible---especially in cases where the true \gls{mb} of $Y\in\verts$
@@ -938,15 +904,15 @@ used in \Cref{sec:exp-real}.
   \SetKwProg{Fn}{Function}{:}{}
   \KwIn{$\db$, $\model$, $Y$, $\alpha$, $k$, $l$}
   \KwOut{$\mbs{\gr}(Y)$}
-  $\verts' \gets \verts \setminus Y$\;
   $\rmS \gets \emptyset$\tcp*[r]{Candidate Markov Blanket}
   \Repeat
   {$\rmX' = \emptyset$}{
-    $\rmX' \gets $ find\_dep($Y$, $\emptyset$, $\rmS$, $\verts'$)\;
+    $\verts' \gets \verts \setminus (Y \cup \rmS)$\;
+    $\rmX' \gets $ find\_inter\_dep($Y$, $\emptyset$, $\rmS$, $\verts'$, $k$, $l$)\;
     $\rmS \gets \rmS \cup \rmX'$
   }
   \While{$\exists X \in \rmS : \textit{find\_cond}(Y, X,
-    \emptyset, \rmS\setminus X, k, l) = \emptyset$}{
+    \emptyset, \rmS\setminus X, k, l) = \bot$}{
     $\rmS \gets \rmS \setminus X$\;
   }
   \Return{$\rmS$}\;
@@ -1009,7 +975,7 @@ any subsequent Theorems can be found in \Cref{apx:proofs-thm}.
     %   $\kinter{\rmS}{Y,X\cup\rmX'}$}
     \For{$Z \in \rmZ$}{
       \If{$\neg$ no\_seps($Y$, $Z$, $X\cup\rmZ
-        \setminus Z$, $\rmS$, $k$, $l$)}{
+        \setminus Z$, $\rmS$, $l$)}{
         remove $Z$ from $\rmZ$\;
       }
     }
@@ -1024,7 +990,7 @@ any subsequent Theorems can be found in \Cref{apx:proofs-thm}.
     \For{$X \in \rmV\setminus(Y\cup\rmS \cup \rmX)$}{
       $\rmZ\gets$\textit{find\_cond}
       ($Y$, $X$, $\rmX$, $\rmS$, $k$, $l$)\;
-      \If{$\rmZ \neq \emptyset$}{
+      \If{$\rmZ \neq \bot$}{
         % \tcp{$\forall \rmS'\in\powerleq{l}{\rmS} :
         %   Y \dep{} X \mid \rmZ \cup \rmS'$}
         \Return{make\_strict($Y$, $X$, $\rmZ$, $\rmS$, $k$, $l$)}\;
@@ -1056,25 +1022,35 @@ any subsequent Theorems can be found in \Cref{apx:proofs-thm}.
     \forall \rmS' \in \powerleq{l}{\rmS \setminus \rmX'} :
     Y \dep{\pre} X \mid \rmX \cup \rmX' \cup \rmS'.
   \end{equation}
-  Otherwise \textit{find\_cond} just returns an empty set.
+  Otherwise \textit{find\_cond} returns the failure value $\bot$,
+  distinct from the empty set, which it may return on success when
+  $\rmX'=\rmX=\emptyset$.
 \end{restatable}
 
 \begin{restatable}[Correctness of \Cref{alg:assoc-mine}]{theorem}{assocmine}
   \label{thm:assocmine}
-  Given an estimated distribution $\pre$, the target variable whose
-  Markov blanket in $\gr$ we want to discover $Y\in\verts$, the current
-  candidate \gls{mb} $\rmS\subset\verts\setminus Y$, the remaining
-  variables not already in the candidate \gls{mb}
+  Given an estimated distribution $\pre$, the target variable
+  $Y\in\verts$, the current candidate \gls{mb}
+  $\rmS\subset\verts\setminus Y$, the remaining variables
   $\verts'=\verts\setminus(Y\cup \rmS)$, and the natural numbers
-  $k,l\in\mathbb{N}$; the function \textit{find\_inter\_dep} in
-  \Cref{alg:assoc-mine} returns the set $X\cup\rmZ$ if
+  $k,l\in\mathbb{N}$; the call
+  \textit{find\_inter\_dep}$(Y,\emptyset,\rmS,\verts',k,l)$ returns the
+  empty set if and only if
   \begin{equation}
-    \exists \rmZ \in \powerleq{k}{\hat{\verts}} \:\:
-    \exists X \in \hat{\verts}\setminus(\rmX\cup\rmS) :
-    \linter{\rmS}{Y,X\cup\rmZ}.
+    \label{eq:fid-empty}
+    \begin{aligned}
+      &\forall X \in \verts'\:\:
+        \forall \rmZ \in \powerleq{k}{\verts\setminus\{Y,X\}}\:\:
+        \exists \rmS' \in \powerleq{l}{\rmS\setminus\rmZ} :\\
+      &\qquad Y \indep{\pre} X \mid \rmZ \cup \rmS'.
+    \end{aligned}
   \end{equation}
-  where $\rmZ=\rmX\cup\rmX'$ and $\hat{\verts}=\verts\setminus Y$.
-  Otherwise, \textit{find\_inter\_dep} just returns the empty set.
+  Otherwise it returns a nonempty set $X\cup\rmZ_{R}$ with
+  $X\in\verts'$ and $\rmZ_{R}\subseteq\rmZ$ for some
+  $\rmZ\in\powerleq{k}{\verts\setminus\{Y,X\}}$ satisfying the estimated
+  $l$-bounded association
+  $\forall\rmS'\in\powerleq{l}{\rmS\setminus\rmZ}:
+  Y\dep{\pre}X\mid\rmZ\cup\rmS'$.
 \end{restatable}
 
 
@@ -1086,7 +1062,7 @@ any subsequent Theorems can be found in \Cref{apx:proofs-thm}.
   % \KwIn{$Y$, $X$, $\rmX$, $\rmS$, $k$, $l$, $\alpha$}
   % \KwOut{is $Y \dep{} X \mid \rmX \cup \rmS$?}
   % \Inv{$\rmX \dep{} Y \mid \rmS$}
-  \Fn{no\_seps($Y$, $X$, $\rmZ$, $\rmS$, $l$, $\alpha$)}{
+  \Fn{no\_seps($Y$, $X$, $\rmZ$, $\rmS$, $l$)}{
     % \Inv{$X \dep{} Y \mid \rmZ$}
     % \KwOut{is $Y \dep{} X \mid \rmZ \cup \rmS$?}
     % max\_p $\gets 1$\;
@@ -1098,7 +1074,7 @@ any subsequent Theorems can be found in \Cref{apx:proofs-thm}.
     }
     \Return{True}\;
   }
-  \Fn{find\_cond($Y$, $X$, $\rmX$, $\rmS$, $k$, $l$, $\alpha$)}{
+  \Fn{find\_cond($Y$, $X$, $\rmX$, $\rmS$, $k$, $l$)}{
     % \KwOut{is $Y \dep{\pr} X \mid \rmX \cup \rmS$}
     % \KwOut{$\exists \rmX' \in \powerleq{k-|\rmX|}{\rmS} : Y \dep{\pr} X
     %   \mid \rmX \cup \rmX' \cup \rmS$}
@@ -1107,12 +1083,12 @@ any subsequent Theorems can be found in \Cref{apx:proofs-thm}.
       $\rmZ \gets \rmX' \cup \rmX$\;
       % $p \gets$ p-value of test $H_{0}: Y \indep{} X \mid \rmX'$\;
       \If{$Y \dep{} X \mid \rmZ$}{
-        \If{no\_seps($Y$, $X$, $\rmZ$, $\rmS$, $l$, $\alpha$)}{
+        \If{no\_seps($Y$, $X$, $\rmZ$, $\rmS$, $l$)}{
           \Return{$\rmZ$}\;
         }
       }
     }
-    \Return{$\emptyset$}\;
+    \Return{$\bot$}\;
   }
 \end{algorithm}
 
@@ -1129,8 +1105,12 @@ any subsequent Theorems can be found in \Cref{apx:proofs-thm}.
     \label{eq:27}
     \mbs{\gr}(Y) \subseteq \rmS.
   \end{equation}
-  The shrink phase of {\method} then removes variables from $\rmS$
-  until,
+  If, in addition, every true blanket member admits an in-blanket
+  dependence witness---i.e. for every $X\in\mbs{\gr}(Y)$ and every
+  $\rmS$ with $\mbs{\gr}(Y)\subseteq\rmS\subseteq\verts\setminus Y$
+  there is a witness $\rmZ\in\powerleq{k}{\mbs{\gr}(Y)\setminus X}$ with
+  $\lassoc{\rmS\setminus(X\cup\rmZ)}{Y,X}{\rmZ}$---then the shrink phase
+  of {\method} removes variables from $\rmS$ until,
   \begin{equation}
     \label{eq:28}
     \mbs{\gr}(Y) = \rmS,
@@ -1162,7 +1142,7 @@ its worst-case time complexity, which we state in
       K\, n \sum_{i=0}^{k}\binom{n}{i}
       \left[
         \sum_{i'=0}^{k-i}\binom{K}{i'}
-        \sum_{j=0}^{l}\binom{K-i'-i}{j}\, N
+        \sum_{j=0}^{l}\binom{K-i'}{j}\, N
       \right]
     \right),
   \end{equation}
@@ -1235,9 +1215,8 @@ positives in the inferred \gls{mb} and the size of the true
   \includegraphics[width=\columnwidth]{fig/syn_metrics/syn_metrics_grid.pdf}
   \caption{Precision, recall, and F1 score of \gls{gs} and
     ({\method}-$k$-$l$) when recovering the \glspl{mb} of the synthetic
-    \glspl{bn} in \Cref{sec:exp-syn}, as a function of the sample
-    size. Each row corresponds to a metric and each column to a
-    \gls{bn}.}
+    \glspl{bn} in \Cref{sec:exp-syn}, over sample size. Each row
+    corresponds to a metric and each column to a \gls{bn}.}
   \label{fig:syn-metrics}
 \end{figure}
 
