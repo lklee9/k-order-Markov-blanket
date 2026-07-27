@@ -58,3 +58,7 @@ wheels/
 /experiments/data_load.py
 /experiments/data_sample.py
 /paper/main-source.zip
+
+# ---- Poster build artifacts (mirrors the paper convention above) ----
+/poster/auto/
+/poster/main.pdf
