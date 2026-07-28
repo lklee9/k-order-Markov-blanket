@@ -113,7 +113,7 @@
 #let authors-lead = author-list.enumerate().map(((i, a)) => {
     if i == 0 { strong(a) } else { a }
 }).join(", ")
-#let institutes = "Hybrid Intelligence · Fraunhofer IAIS · Germany"
+#let institutes = "Fraunhofer IAIS · Germany"
 #pop.title-box(
     headline,
     // Betterposters: the header band carries ONLY the message, set as large as
@@ -131,15 +131,39 @@
         whitespace-height: qr-spacing)),
 )
 
-// ---- identity strip: above head height, costs the headline nothing ----------
+// ---- masthead: all identity in one strip, above head height -----------------
+// Replaces the old bottom footer, which cost 5.2cm (4.3% of the sheet) to carry
+// an institute line plus the logo. Consolidating here frees that space, drops a
+// structural element, and removes the hazard that a `place`d footer reserves no
+// area and can be silently overlapped by a growing column. The institute line
+// stays because it names Lamarr, which the IAIS logo does not.
 #v(-0.4em)
-#block(width: 100%, inset: (x: 0.6em, y: 0em))[
-    #text(size: 0.92em, weight: "bold")[#formal-title]\
-    #text(size: 0.82em, fill: fhg-grey.darken(45%))[
-        // presenting author bolded: attendees need to know who is standing here
-        #authors-lead
-    ]
-]
+#block(width: 100%, inset: (x: 0.6em, top: 0em, bottom: 0em),
+    // stroke: (bottom: 3pt + fhg-green),
+    grid(
+        rows: (4.75em, 1em),
+        column-gutter: 0em,
+        align: top,
+        grid(
+            columns: (1fr, auto),
+            column-gutter: 2em,
+            align: top,
+            [
+                #text(size: 1.75em, weight: "regular")[#formal-title]
+            ],
+            // image("iais_85mm_rgb.png", width: 8.5cm),
+            image("iais_85mm_rgb.png", height: 3.50em),
+        ),    
+        text(size: 1.5em, fill: fhg-grey.darken(45%))[
+            // presenting author bolded: attendees need to know who is here
+            #grid(
+            columns: (1fr, auto), authors-lead, institutes
+            )
+        ]
+    )
+)
+
+
 
 // ===========================================================================
 //  BODY
@@ -531,10 +555,13 @@
         // whiskers, lanes grouped by cardinality. Data from
         // experiments/output/real_f1.csv; SE = std over the 10 targets /sqrt(10).
         #let bench-data = (
-            (name: "Alarm1",    bl: (0.674, 0.343, 0.764, 0.693, 0.681, 0.769, 0.737, 0.660), best: 5, bestse: 0.059, k1: (0.780, 0.036), k2: (0.821, 0.061)),
-            (name: "Insurance", bl: (0.659, 0.461, 0.675, 0.629, 0.628, 0.698, 0.630, 0.565), best: 5, bestse: 0.044, k1: (0.714, 0.042), k2: (0.734, 0.051)),
-            (name: "Barley",    bl: (0.339, 0.211, 0.340, 0.337, 0.337, 0.330, 0.228, 0.215), best: 2, bestse: 0.041, k1: (0.516, 0.062), k2: (0.313, 0.050)),
-            (name: "Mildew",    bl: (0.495, 0.287, 0.492, 0.468, 0.467, 0.486, 0.416, 0.273), best: 0, bestse: 0.034, k1: (0.622, 0.050), k2: (0.436, 0.044)),
+            // `card` = mean domain size |X| per variable, measured over all ten
+            // s5000 samples in experiments/data/<net>/. Lanes are ordered by it,
+            // so the "higher cardinality favours lower k" trend is spatial.
+            (name: "Alarm1",    card: "2.8", bl: (0.674, 0.343, 0.764, 0.693, 0.681, 0.769, 0.737, 0.660), best: 5, bestse: 0.059, k1: (0.780, 0.036), k2: (0.821, 0.061)),
+            (name: "Insurance", card: "3.3", bl: (0.659, 0.461, 0.675, 0.629, 0.628, 0.698, 0.630, 0.565), best: 5, bestse: 0.044, k1: (0.714, 0.042), k2: (0.734, 0.051)),
+            (name: "Barley",    card: "8.7", bl: (0.339, 0.211, 0.340, 0.337, 0.337, 0.330, 0.228, 0.215), best: 2, bestse: 0.041, k1: (0.516, 0.062), k2: (0.313, 0.050)),
+            (name: "Mildew",    card: "15.4", bl: (0.495, 0.287, 0.492, 0.468, 0.467, 0.486, 0.416, 0.273), best: 0, bestse: 0.034, k1: (0.622, 0.050), k2: (0.436, 0.044)),
         )
         #let grey-dark = rgb("#6E7676")
         #let bench-chart = cetz.canvas(length: 1cm, {
@@ -542,7 +569,6 @@
             let W = 24.5
             let LM = 6.2
             let lane-h = 2.3     // roomier: value labels sit inside the lane
-            let hdr-h = 1.0      // group-header rows
             let x0 = 0.15
             let x1 = 0.90
             let fx(v) = LM + (v - x0) / (x1 - x0) * W
@@ -558,19 +584,15 @@
             // (legend lives outside the canvas, in a measured typst grid)
             let y = 0.4
             for (i, d) in bench-data.enumerate() {
-                if i == 0 or i == 2 {
-                    y -= hdr-h
-                    content((LM - 5.6, y), anchor: "west",
-                        text(size: 0.66em, fill: grey-dark, style: "italic")[
-                            #if i == 0 [low cardinality] else [high cardinality]
-                        ])
-                }
                 y -= lane-h / 2 + 0.35
                 let y1 = y + 0.5     // k = 1 tier
                 let y2 = y - 0.5     // k = 2 tier
 
-                content((LM - 0.5, y), anchor: "east",
-                    text(size: 0.85em, weight: "bold")[#d.name])
+                content((LM - 0.5, y), anchor: "east", box[
+                    #text(size: 0.62em, fill: grey-dark)[$(abs(cal(X)) approx #d.card)$]
+                    #h(0.3em)
+                    #text(size: 0.85em, weight: "bold")[#d.name]
+                ])
 
                 // range of all 8 baselines: one soft band instead of 8 ticks
                 let lo = calc.min(..d.bl)
@@ -652,7 +674,8 @@
             ],
             numbering: none,
             caption: figure.caption([
-                #text(size: 0.85em)[Mean F1 on benchmark networks, $N = 5000$.]
+                #text(size: 0.85em)[Mean F1 on benchmark networks, $N = 5000$;
+                $abs(cal(X))$ = mean domain size per variable.]
             ], position: top),
         )
 
@@ -692,34 +715,3 @@
 
 
 ])
-
-// ===========================================================================
-//  BOTTOM
-// ===========================================================================
-// Full-bleed footer, pinned to the physical page bottom with place() — the
-// dx/dy escape the 1.6cm page margins, so the bar touches the sheet edge.
-// Being out of flow, it also cannot be pushed to a second page (which retires
-// the old #v(-1.2cm) pull-up hack); the trade is that nothing reserves its
-// area, so if the columns ever grow past ~93% they will overlap it silently.
-#place(bottom + left,
-    block(
-    width: 100%,
-    fill: white,
-    stroke: (top: 5pt + fhg-green),
-    inset: (x: 1em, top: 1em, bottom: 0em),
-    grid(
-        columns: (1fr, auto),
-        column-gutter: 1em,
-        align: horizon,
-        [
-            // Title and authors live in the identity strip under the headline
-            // (above head height). The footer is the branding strip: institute
-            // text beside the logo, which is what Faulkes and Purrington both
-            // say a bottom strip is for.
-            #text(size: 1.35em, weight: "bold")[#institutes]
-        ],
-        // IAIS logo, 2008 x 551 px: height 3.2cm renders it at ~11.7cm wide.
-        // image("iais_85mm_rgb.png", width: 8.5cm),
-        image("iais_85mm_rgb.png", width: 12cm),
-    ),
-))
