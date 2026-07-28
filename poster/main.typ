@@ -166,24 +166,59 @@
 
 
 // ===========================================================================
+//  SUMMARY BOX  (the "billboard" element: the 30-second version)
+// ===========================================================================
+// Full width, so it sits above the two-column body. It absorbs what used to be
+// the left column's "Motivation" box and the right column's "Takeaways" box —
+// keeping those as well would say the same things twice. The detail sections
+// below now start straight at "What is Faithfulness?" / "Contribution".
+#block(
+    width: 100%,
+    fill: fhg-green.lighten(92%),
+    stroke: (left: 8pt + fhg-green),
+    inset: (x: 1em, y: 0.7em),
+    grid(
+        columns: (1fr, 1fr),
+        column-gutter: 1.6em,
+        align: top,
+
+        [
+            #text(fill: fhg-blue, weight: "bold", size: 1.05em)[The problem]
+            #v(0.15em)
+            - *Markov blanket discovery* --- the minimal set shielding a target
+              $Y$ --- underpins feature selection, causal discovery and
+              Bayesian / Markov network structure learning.
+
+            - Nearly every method assumes *faithfulness*: an independence in
+              the distribution $P$ implies a separation in the graph $G$.
+
+            - Faithfulness *breaks* --- on XOR/parity relations, and on finite
+              samples. A true blanket member then looks irrelevant, and is
+              silently dropped.
+        ],
+
+        [
+            #text(fill: fhg-blue, weight: "bold", size: 1.05em)[What we contribute]
+            #v(0.15em)
+            - *$k$-order faithfulness*: an edge must still reveal itself in the
+              data --- but up to $k$ *witness* variables may be needed to see it.
+
+            - *kOMB*: Grow-and-Shrink over whole witness sets, provably
+              recovering the blanket under the relaxation.
+
+            - One fixed $k = 1$ beats the best of *eight* baselines on *all
+              four* benchmarks; on parity gates every baseline scores $0.03$
+              where kOMB reaches #hl[1.00].
+        ],
+    ),
+)
+
+// ===========================================================================
 //  BODY
 // ===========================================================================
 #columns(2, [
 
     // ------------------------------------------------ LEFT COLUMN
-    #pop.column-box(heading: [*Motivation*: Markov Blanket Discovery])[
-        
-        - *Markov blanket (MB) discovery* finds the minimal set that
-          shields a target $Y$ from all other variables.
-
-        - It is the backbone of feature selection, causal discovery, and
-          Bayesian / Markov network structure learning.
-
-        - Nearly all constraint-based methods rest on one load-bearing
-          assumption, *faithfulness*.
-      
-    ]
-    
     #pop.column-box(heading: "What is Faithfulness?")[
         
         Every independence in the distribution $P$ must appear as a
@@ -701,17 +736,6 @@
           hits a 30-min cap (F1 $0.00$ on Barley).
     ]
 
-    #pop.column-box(heading: "Takeaways & Future Work")[
-        // The parity hero number lives here now that the synthetic table is
-        // gone — it is the one empirical proof that witness sets recover
-        // blankets faithfulness-based methods cannot see at all.
-        - *Witness sets recover what faithfulness loses*: on parity gates
-          every baseline scores $0.03$ --- kOMB $k=2$ hits #hl[1.00] (40/40).
-
-        - *$k = l <= 2$ is a robust default* (ablation in the paper); kOMB
-          is a proof of concept --- approximate variants that tame the
-          $k = 2$ runtime are the open problem.
-    ]
 
     // Nothing is cited yet, so this renders as a heading over an empty box and
     // just costs column height. Re-enable once the sections carry citations.
