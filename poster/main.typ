@@ -681,8 +681,7 @@
 #pop.bottom-box(
     heading-box-args: (inset: 1cm, fill: white),
     heading-text-args: (fill: black, weight: "bold"),
-    // Placeholder until the real institute logo lands — swap the PNG in place
-    // (2008 x 551 px, so height: 3.2cm renders it at ~11.7cm wide).
+    // IAIS logo, 2008 x 551 px: height 3.2cm renders it at ~11.7cm wide.
     logo: image("iais_85mm_rgb.png", height: 3.2cm),
     text-relative-width: 84%,
 )[
