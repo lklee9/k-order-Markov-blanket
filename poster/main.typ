@@ -582,7 +582,7 @@
 
             // ---- lanes, grouped by cardinality with horizontal headers ----
             // (legend lives outside the canvas, in a measured typst grid)
-            let y = 0.4
+            let y = -0.35
             for (i, d) in bench-data.enumerate() {
                 y -= lane-h / 2 + 0.35
                 let y1 = y + 0.5     // k = 1 tier
@@ -671,7 +671,11 @@
         #figure(
             figure-block[
                 #align(center, legend)
-                #v(0.15em)
+                // Negative: the legend block and the chart canvas each carry
+                // their own leading/descender space, which left a visible band
+                // between them. (NB `stack(spacing: ...)` clamps negatives —
+                // only an explicit #v() in the content flow pulls them together.)
+                #v(-0.7em)
                 #align(center, bench-chart)
             ],
             numbering: none,
