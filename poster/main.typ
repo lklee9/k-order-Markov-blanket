@@ -566,8 +566,8 @@
         #let grey-dark = rgb("#6E7676")
         #let bench-chart = cetz.canvas(length: 1cm, {
             import cetz.draw: *
-            let W = 24.5
-            let LM = 6.2
+            let W = 23.0
+            let LM = 7.7
             let lane-h = 2.3     // roomier: value labels sit inside the lane
             let x0 = 0.15
             let x1 = 0.90
@@ -589,7 +589,9 @@
                 let y2 = y - 0.5     // k = 2 tier
 
                 content((LM - 0.5, y), anchor: "east", box[
-                    #text(size: 0.62em, fill: grey-dark)[$(abs(cal(X)) approx #d.card)$]
+                    // Plain words, not |X|: the paper uses X for a SET of variables,
+                    // so |X| would read as a variable count, not a domain size.
+                    #text(size: 0.62em, fill: grey-dark)[($approx$#d.card states)]
                     #h(0.3em)
                     #text(size: 0.85em, weight: "bold")[#d.name]
                 ])
@@ -674,8 +676,7 @@
             ],
             numbering: none,
             caption: figure.caption([
-                #text(size: 0.85em)[Mean F1 on benchmark networks, $N = 5000$;
-                $abs(cal(X))$ = mean domain size per variable.]
+                #text(size: 0.85em)[Mean F1 on benchmark networks, $N = 5000$.]
             ], position: top),
         )
 
