@@ -173,8 +173,8 @@
     // ------------------------------------------------ LEFT COLUMN
     #pop.column-box(heading: [*Motivation*: Markov Blanket Discovery])[
         
-        - *Markov blanket (MB) discovery* finds the minimal variable set
-          that shields a target $Y$ from all other variables.
+        - *Markov blanket (MB) discovery* finds the minimal set that
+          shields a target $Y$ from all other variables.
 
         - It is the backbone of feature selection, causal discovery, and
           Bayesian / Markov network structure learning.
@@ -359,8 +359,9 @@
         #let break-panel(caption-body, tab-title, tab, p-side, g-side, note) = [
             #figure(
                 figure-block[
-                    #v(0.5em)
+                    #v(0.25em)
                     #text(size: 0.8em, fill: black)[#tab-title]
+                    #v(-0.5em)
                     #align(center, grid(
                         columns: (auto, auto),
                         column-gutter: 0.7em,
@@ -391,6 +392,7 @@
                             #g-side
                         ],
                     ))
+                    #v(-0.5em)
                     #align(center, text(size: 0.72em)[#note])
                 ],
                 numbering: none,
