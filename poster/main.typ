@@ -269,21 +269,19 @@
     ]
 
 
-    // ------------------------------------------------ RIGHT COLUMN
     #pop.column-box(heading: "When Faithfulness Breaks")[
         // Intro text beside a single shared DAG: both examples live on the same
         // collider, so the graph is hoisted out instead of redrawn per panel.
+        There are two ways the faithfulness assumption can be violated:
         #grid(
             columns: (1fr, auto),
-            column-gutter: 1em,
+            column-gutter: -1em,
             align: horizon,
-
+            inset: (left: 1em, right: 1.5em),
             [
-                Either way, a true blanket member gets dropped.
+                - *Empirical* --- faithful $P$ and $G$, but unlucky sample; more data fixes it.
 
-                - *Empirical* --- faithful gate, unlucky sample; more data fixes it.
-
-                - *Structural* --- $P$ itself is unfaithful; no sample size helps.
+                - *Structural* --- $P$ itself is unfaithful to $G$; no sample size helps.
             ],
 
             // the one graph both examples share
@@ -292,17 +290,15 @@
                 #diagram(
                     node-stroke: 1pt + black,
                     node-fill: white,
-                    spacing: (1.7em, 1.45em),
-                    node((0, 0), $X$, radius: 0.8em),
-                    node((0.9, 0), $Z$, radius: 0.8em),
-                    node((0.45, 0.85), $Y$, radius: 0.8em),
+                    spacing: (2.1em, 1.8em),
+                    node((0, 0), $X$, radius: 0.95em),
+                    node((0.9, 0), $Z$, radius: 0.95em),
+                    node((0.45, 0.85), $Y$, radius: 0.95em),
                     edge((0, 0), (0.45, 0.85), "-|>"),
                     edge((0.9, 0), (0.45, 0.85), "-|>"),
                 )
-                #v(0.15em)
-                #text(size: 0.7em, fill: fhg-grey.darken(30%))[
-                    same $G$ in both
-                ]
+                #v(-0.5em)
+                #text(size: 0.7em)[same $G$ in both]
             ],
         )
 
@@ -313,7 +309,7 @@
         // pair fits half a column. Order is still P above G, and the arrow
         // still points at the conclusion (P) as in the horizontal version.
         // The negated up-arrow comes from `nimplies-up` (a rotated glyph).
-        #let break-panel(caption-body, tab, p-side, g-side, note) = [
+        #let break-panel(caption-body, tab-title, tab, p-side, g-side, note) = [
             #figure(
                 figure-block[
                     #v(0.5em)
@@ -322,8 +318,13 @@
                         column-gutter: 0.7em,
                         align: horizon,
 
-                        // the logic table / sample
-                        grid.cell(align: horizon + center, tab),
+                        // the logic table / sample, named directly above it
+                        grid.cell(align: horizon + center)[
+                            #text(size: 0.6em, fill: fhg-grey.darken(30%),
+                                weight: "bold")[#tab-title]
+                            #v(0.1em)
+                            #tab
+                        ],
 
                         // the broken implication, read top-down (P above G, as in fig1)
                         grid.cell(align: horizon + center)[
@@ -373,7 +374,8 @@
             // 4-row sample, one noise flip (red), gives EXACT empirical
             // independence between Y and X while Z stays dependent.
             break-panel(
-                [*Empirical* --- unlucky sample],
+                [*Empirical*],
+                [sample from *AND*],
                 tab-style(
                     [0], [0], [0],
                     [0], [1], text(fill: alert, weight: "bold")[1],
@@ -391,7 +393,8 @@
 
             // ---------- (2) structural: noisy XOR ----------
             break-panel(
-                [*Structural* --- noisy XOR],
+                [*Structural*],
+                [noisy *XOR*],
                 tab-style(
                     [0], [0], [0],
                     [0], [1], [1],
@@ -410,6 +413,8 @@
             ),
         )
     ]
+    
+    // ------------------------------------------------ RIGHT COLUMN
 
     #colbreak()
 
@@ -515,73 +520,118 @@
             import cetz.draw: *
             let W = 24.5
             let LM = 6.2
-            let lane-h = 1.85
+            let lane-h = 2.3     // roomier: value labels sit inside the lane
+            let hdr-h = 1.0      // group-header rows
             let x0 = 0.15
             let x1 = 0.90
             let fx(v) = LM + (v - x0) / (x1 - x0) * W
-            let top = 0
 
+            // SE whisker with end caps, so it reads as an interval
+            let whisker(xa, xb, y, col) = {
+                line((xa, y), (xb, y), stroke: 2.6pt + col)
+                line((xa, y - 0.14), (xa, y + 0.14), stroke: 2.6pt + col)
+                line((xb, y - 0.14), (xb, y + 0.14), stroke: 2.6pt + col)
+            }
+
+            // ---- lanes, grouped by cardinality with horizontal headers ----
+            // (legend lives outside the canvas, in a measured typst grid)
+            let y = 0.4
             for (i, d) in bench-data.enumerate() {
-                let y = top - i * lane-h
-                let y1 = y + 0.42
-                let y2 = y - 0.42
-                line((LM, y), (LM + W, y), stroke: 0.6pt + fhg-grey)
-                content((LM - 0.4, y), anchor: "east",
-                    text(size: 0.8em, weight: "bold")[#d.name])
-                for (j, v) in d.bl.enumerate() {
-                    let h = if j == d.best { 0.34 } else { 0.20 }
-                    let s = if j == d.best { 2.4pt + grey-dark } else { 1.6pt + fhg-grey }
-                    line((fx(v), y - h), (fx(v), y + h), stroke: s)
+                if i == 0 or i == 2 {
+                    y -= hdr-h
+                    content((LM - 5.6, y), anchor: "west",
+                        text(size: 0.66em, fill: grey-dark, style: "italic")[
+                            #if i == 0 [low cardinality] else [high cardinality]
+                        ])
                 }
+                y -= lane-h / 2 + 0.35
+                let y1 = y + 0.5     // k = 1 tier
+                let y2 = y - 0.5     // k = 2 tier
+
+                content((LM - 0.5, y), anchor: "east",
+                    text(size: 0.85em, weight: "bold")[#d.name])
+
+                // range of all 8 baselines: one soft band instead of 8 ticks
+                let lo = calc.min(..d.bl)
+                let hi = calc.max(..d.bl)
+                rect((fx(lo), y - 0.24), (fx(hi), y + 0.24),
+                    fill: fhg-grey.lighten(55%), stroke: none)
+
+                // best baseline: dark dot + SE whisker on the centreline
                 let bb = d.bl.at(d.best)
-                line((fx(bb - d.bestse), y), (fx(bb + d.bestse), y), stroke: 2pt + grey-dark)
+                whisker(fx(bb - d.bestse), fx(bb + d.bestse), y, grey-dark)
+                circle((fx(bb), y), radius: 0.22, fill: grey-dark, stroke: none)
+
+                // kOMB k = 1 (filled) above, k = 2 (hollow) below
                 let (m1, s1) = d.k1
-                line((fx(m1 - s1), y1), (fx(m1 + s1), y1), stroke: 2pt + fhg-orange)
-                circle((fx(m1), y1), radius: 0.17, fill: fhg-orange, stroke: none)
-                content((fx(m1), y1 + 0.30), anchor: "south",
-                    text(size: 0.5em, fill: fhg-orange, weight: "bold")[#calc.round(m1, digits: 2)])
+                whisker(fx(m1 - s1), fx(m1 + s1), y1, fhg-orange)
+                circle((fx(m1), y1), radius: 0.24, fill: fhg-orange, stroke: none)
+                content((fx(m1), y1 + 0.36), anchor: "south",
+                    text(size: 0.62em, fill: fhg-orange, weight: "bold")[
+                        #calc.round(m1, digits: 2)
+                    ])
                 let (m2, s2) = d.k2
-                line((fx(m2 - s2), y2), (fx(m2 + s2), y2), stroke: 2pt + fhg-orange)
-                circle((fx(m2), y2), radius: 0.17, fill: white, stroke: 2.4pt + fhg-orange)
-                content((fx(m2), y2 - 0.30), anchor: "north",
-                    text(size: 0.5em, fill: fhg-orange)[#calc.round(m2, digits: 2)])
+                whisker(fx(m2 - s2), fx(m2 + s2), y2, fhg-orange)
+                circle((fx(m2), y2), radius: 0.24, fill: white, stroke: 3pt + fhg-orange)
+                content((fx(m2), y2 - 0.36), anchor: "north",
+                    text(size: 0.62em, fill: fhg-orange)[#calc.round(m2, digits: 2)])
+
+                y -= lane-h / 2
             }
 
-            // direct labels, first lane only — no legend
-            let d0 = bench-data.at(0)
-            content((fx(d0.k1.at(0) - d0.k1.at(1)) - 0.35, top + 0.42), anchor: "east",
-                text(size: 0.6em, fill: fhg-orange, weight: "bold")[k = 1])
-            content((fx(d0.k2.at(0) + d0.k2.at(1)) + 0.35, top - 0.42), anchor: "west",
-                text(size: 0.6em, fill: fhg-orange, weight: "bold")[k = 2])
-
-            // cardinality brackets
-            let by0 = top + 0.9
-            let by1 = top - 1 * lane-h - 0.9
-            let by2 = top - 2 * lane-h + 0.9
-            let by3 = top - 3 * lane-h - 0.9
-            line((-0.5, by0), (-0.5, by1), stroke: 1.2pt + fhg-grey)
-            content((-0.9, (by0 + by1) / 2), anchor: "center", angle: 90deg,
-                text(size: 0.5em, fill: grey-dark)[low card.])
-            line((-0.5, by2), (-0.5, by3), stroke: 1.2pt + fhg-grey)
-            content((-0.9, (by2 + by3) / 2), anchor: "center", angle: 90deg,
-                text(size: 0.5em, fill: grey-dark)[high card.])
-
-            // x axis
-            let ax = top - (bench-data.len() - 1) * lane-h - 1.1
-            line((LM, ax), (LM + W, ax), stroke: 1pt + black)
+            // ---- x axis ----
+            let ax = y - 0.5
+            line((LM, ax), (LM + W, ax), stroke: 1.2pt + black)
             for t in (0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8) {
-                line((fx(t), ax), (fx(t), ax - 0.15), stroke: 1pt + black)
-                content((fx(t), ax - 0.24), anchor: "north", text(size: 0.55em)[#t])
+                line((fx(t), ax), (fx(t), ax - 0.18), stroke: 1.2pt + black)
+                content((fx(t), ax - 0.30), anchor: "north", text(size: 0.65em)[#t])
             }
-            content((LM + W + 0.3, ax), anchor: "west", text(size: 0.6em)[F1])
+            content((LM + W + 0.3, ax - 0.05), anchor: "west",
+                text(size: 0.7em, weight: "bold")[F1])
         })
 
+        // Legend as a measured grid: auto columns cannot overlap, unlike
+        // hand-placed canvas labels. Swatches are tiny cetz canvases.
+        #let sw(body) = cetz.canvas(length: 1cm, body)
+        #let legend = grid(
+            columns: 9,
+            column-gutter: (0.35em, 1.1em) * 4 + (0.35em,),
+            align: horizon,
+            sw({
+                import cetz.draw: *
+                rect((0, -0.2), (1.0, 0.2), fill: fhg-grey.lighten(55%), stroke: none)
+            }),
+            text(size: 0.66em, fill: grey-dark)[8 baselines],
+            sw({
+                import cetz.draw: *
+                line((0, 0), (1.0, 0), stroke: 2.6pt + grey-dark)
+                line((0, -0.14), (0, 0.14), stroke: 2.6pt + grey-dark)
+                line((1.0, -0.14), (1.0, 0.14), stroke: 2.6pt + grey-dark)
+                circle((0.5, 0), radius: 0.22, fill: grey-dark, stroke: none)
+            }),
+            text(size: 0.66em, fill: grey-dark)[their best],
+            sw({
+                import cetz.draw: *
+                circle((0.25, 0), radius: 0.24, fill: fhg-orange, stroke: none)
+            }),
+            text(size: 0.66em, fill: fhg-orange, weight: "bold")[kOMB $k = 1$],
+            sw({
+                import cetz.draw: *
+                circle((0.25, 0), radius: 0.24, fill: white, stroke: 3pt + fhg-orange)
+            }),
+            text(size: 0.66em, fill: fhg-orange, weight: "bold")[$k = 2$],
+            text(size: 0.58em, fill: grey-dark)[#h(0.6em) bars: $plus.minus 1$ SE],
+        )
+
         #figure(
-            figure-block[#align(center, bench-chart)],
+            figure-block[
+                #align(center, legend)
+                #v(0.15em)
+                #align(center, bench-chart)
+            ],
             numbering: none,
             caption: figure.caption([
-                #text(size: 0.85em)[F1 $plus.minus 1$ SE, $N = 5000$;
-                grey ticks = 8 baselines (best whiskered).]
+                #text(size: 0.85em)[Mean F1 on benchmark networks, $N = 5000$.]
             ], position: top),
         )
 
@@ -629,14 +679,18 @@
 // spacing below its last box, which alone pushes the footer to a second page.
 #v(-1.2cm)
 #pop.bottom-box(
-    heading-box-args: (inset: 1cm, fill: fhg-green),
-    heading-text-args: (fill: white, weight: "bold")
+    heading-box-args: (inset: 1cm, fill: white),
+    heading-text-args: (fill: black, weight: "bold"),
+    // Placeholder until the real institute logo lands — swap the PNG in place
+    // (2008 x 551 px, so height: 3.2cm renders it at ~11.7cm wide).
+    logo: image("iais_85mm_rgb.png", height: 3.2cm),
+    text-relative-width: 84%,
 )[
     #text(size: 0.8em)[
         // Paper Details:\
         #formal-title\
         #authors\
-        #institutes\
+        // #institutes\
         // Code: #link("https://github.com/lklee9/k-order-Markov-blanket")[github.com/lklee9/k-order-Markov-blanket]
     ]
     // Code: #link("https://github.com/lklee9/k-order-Markov-blanket")[github.com/lklee9/k-order-Markov-blanket]
