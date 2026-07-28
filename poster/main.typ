@@ -419,51 +419,80 @@
         itself in the data --- but you may need up to $k$ extra variables
         to see it.
 
-        // The paper writes the witness set as Z; on the poster Z is already a
-        // variable in every example, so it is renamed W here to avoid a clash.
+        // The ladder replaces the formula panel and the prose bullets: one
+        // column per order, same tested edge (green), growing witness set
+        // (orange, W — the paper's Z, renamed to avoid the example variables).
+        // Row 3 shows the edge invisible below its order, row 4 the witness
+        // set that reveals it, row 5 which assumption covers that rung.
+        #let rung(n-par) = {
+            let R = 0.85em
+            let xs = range(n-par).map(i => i * 1.0)
+            let cx = (xs.at(0) + xs.at(-1)) / 2
+            diagram(
+                node-stroke: 1pt + black,
+                node-fill: white,
+                spacing: (2.1em, 1.5em),
+                // tested variable X — the green edge into Y is the one to detect
+                node((0, 0), $X$, radius: R, stroke: 1.6pt + fhg-green),
+                edge((0, 0), (cx, 1), "-|>", stroke: 1.6pt + fhg-green),
+                // witnesses
+                ..range(1, n-par).map(i => node((xs.at(i), 0),
+                    text(fill: fhg-orange)[$W_#i$],
+                    radius: R, stroke: 1.6pt + fhg-orange,
+                    fill: fhg-orange.lighten(88%))),
+                ..range(1, n-par).map(i => edge((xs.at(i), 0), (cx, 1), "-|>")),
+                node((cx, 1), $Y$, radius: R),
+            )
+        }
+        #let dim = fhg-grey.darken(30%)
+
         #let fig4 = figure-block[
-            #set align(center)
-            #text(size: 0.72em, fill: fhg-grey.darken(30%))[
-                standard --- the edge must show given $S$ alone
-            ]
-            #v(0.1em)
-            #text(size: 0.9em)[
-                $Y #nci($G$) X mid(|) S quad ==> quad Y #nci($P$) X mid(|) S$
-            ]
+            #align(center, grid(
+                columns: (auto, auto, auto),
+                row-gutter: 0.55em,
+                column-gutter: 1.6em,
+                align: center + horizon,
 
-            #v(0.45em)
+                // ---- row 1: the order ----
+                text(weight: "bold", size: 0.85em)[$k = 0$],
+                text(weight: "bold", size: 0.85em)[$k = 1$ #text(size: 0.75em)[(XOR)]],
+                text(weight: "bold", size: 0.85em)[$k = 2$ #text(size: 0.75em)[(parity)]],
 
-            #text(size: 0.72em, fill: fhg-orange, weight: "bold")[
-                $k$-order --- a witness set $bold(W)$ may be needed
-            ]
-            #v(0.1em)
-            #text(size: 0.9em)[
-                $Y #nci($G$) X mid(|) S quad ==> quad
-                 exists bold(W), abs(bold(W)) <= k :
-                 Y #nci($P$) X mid(|) #hl($bold(W)$) union S'$
-            ]
-            #v(0.1em)
-            #text(size: 0.62em, fill: fhg-grey.darken(30%))[
-                for every $S' subset.eq S$
-            ]
+                // ---- row 2: the DAGs ----
+                rung(1), rung(2), rung(3),
+
+                // ---- row 3: testing the pair alone ----
+                [#text(size: 0.78em)[$Y #nci($P$) X$]
+                 #text(size: 0.7em, fill: fhg-green)[✓]],
+                [#text(size: 0.78em, fill: dim)[$Y #ci($P$) X$]
+                 #text(size: 0.7em, fill: alert)[✗ invisible]],
+                [#text(size: 0.78em, fill: dim)[$Y #ci($P$) X mid(|) W_1$]
+                 #text(size: 0.7em, fill: alert)[✗ invisible]],
+
+                // ---- row 4: with the witness set ----
+                text(size: 0.7em, fill: dim)[no witness needed],
+                [#text(size: 0.78em)[$Y #nci($P$) X mid(|) #text(fill: fhg-orange)[$W_1$]$]
+                 #text(size: 0.7em, fill: fhg-green)[✓]],
+                [#text(size: 0.78em)[$Y #nci($P$) X mid(|) #text(fill: fhg-orange)[${W_1, W_2}$]$]
+                 #text(size: 0.7em, fill: fhg-green)[✓]],
+
+                // ---- row 5: which assumption covers this rung ----
+                text(size: 0.66em, fill: dim)[standard faithfulness],
+                text(size: 0.66em, fill: dim)[2-adjacency\ (Marx et al., 2021)],
+                text(size: 0.7em, fill: fhg-orange, weight: "bold")[
+                    $k$-order (this work)\ any $k$
+                ],
+            ))
         ]
 
         #figure(
             fig4,
             numbering: none,
             caption: figure.caption([
-                The relaxation --- same promise, one extra set.
+                Each order admits edges invisible below it --- parity over
+                $k + 2$ variables needs order $k$.
             ], position: top)
         )
-
-        - Standard faithfulness is the case $bold(W) = emptyset$ ---
-          visible with no help at all.
-
-        - *XOR* above needs $abs(bold(W)) = 1$, with $bold(W) = {Z}$ ---
-          the case 2-adjacency faithfulness (Marx et al., 2021) covers.
-
-        - *Parity over $k+2$ variables* needs $abs(bold(W)) = k$: no
-          existing relaxation reaches past $k = 1$.
     ]
 
     #pop.column-box(heading: "Results")[
