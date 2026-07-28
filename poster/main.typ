@@ -1,6 +1,7 @@
 #import "@preview/peace-of-posters:0.6.0" as pop
 #import "@preview/fletcher:0.5.8" as fletcher: diagram, node, edge
 #import "@preview/tiaoma:0.3.0"
+#import "@preview/cetz:0.3.4"
 
 // ===========================================================================
 //  High-Order Markov Blanket Discovery — UAI 2026 poster
@@ -76,6 +77,10 @@
 #let nci(sub) = math.attach(
     math.class("relation", math.cancel($perp#h(-0.42em)perp$)), br: sub,
 )
+// "does not imply", pointing down. Typst has no negated vertical double arrow,
+// so the clean horizontal glyph is rotated rather than built out of cancel()
+// (which renders as an illegible knot of strokes at poster sizes).
+#let nimplies-down = rotate(-90deg, reflow: true)[$arrow.l.double.not$]
 // A figure panel: framed and white (no tint), so it reads as one self-contained
 // unit against the body text without chopping the figure into sub-panels.
 #let figure-block(body) = block(
@@ -83,7 +88,7 @@
     fill: white,
     stroke: 1.5pt + fhg-grey,
     radius: 8pt,
-    inset: (x: 1em, y: 0.5em),
+    inset: (x: 0.8em, y: 0.4em),
     body,
 )
 
@@ -266,174 +271,143 @@
 
     // ------------------------------------------------ RIGHT COLUMN
     #pop.column-box(heading: "When Faithfulness Breaks")[
-        Either way, a true blanket member gets dropped.
+        // Intro text beside a single shared DAG: both examples live on the same
+        // collider, so the graph is hoisted out instead of redrawn per panel.
+        #grid(
+            columns: (1fr, auto),
+            column-gutter: 1em,
+            align: horizon,
 
-        #v(0.2em)
+            [
+                Either way, a true blanket member gets dropped.
 
-        // ---------- (1) empirical violation: pathological sample ----------
-        // The SAME noisy AND gate as fig1 — verified faithful in the true
-        // distribution — but this 4-row sample (one noise flip, in red) makes
-        // Y look exactly independent of X, while Z survives.
-        #let fig2 = figure-block[
-            #align(center, grid(
-                columns: (auto, auto, auto, auto, auto),
-                column-gutter: 0.45em,
-                align: horizon,
+                - *Empirical* --- faithful gate, unlucky sample; more data fixes it.
 
-                // the pathological sample
-                grid.cell(align: horizon + center)[
-                    #table(
-                        columns: 3,
-                        align: center,
-                        inset: (x: 0.42em, y: 0.22em),
-                        stroke: none,
-                        table.hline(stroke: 1pt),
-                        table.header([$X$], [$Z$], [$Y$]),
-                        table.hline(stroke: 0.6pt),
-                        [0], [0], [0],
-                        [0], [1], text(fill: alert, weight: "bold")[1],
-                        [1], [0], [0],
-                        [1], [1], [1],
-                        table.hline(stroke: 1pt),
-                    )
-                ],
+                - *Structural* --- $P$ itself is unfaithful; no sample size helps.
+            ],
 
-                // what the sample reports
-                grid.cell(align: horizon + center)[
-                    #text(size: 1em)[$Y #ci($hat(P)$) X$]
-                    #v(0.2em)
-                    #text(size: 0.72em)[
-                        $hat(P)(X, Y) = hat(P)(X) hat(P)(Y)$
-                    ]
-                ],
-
-                // the contrapositive, broken again
-                grid.cell(align: horizon + center, stack(
-                    spacing: 0.25em,
-                    text(size: 2em, fill: alert, weight: "bold")[
-                        $arrow.l.double.not$
-                    ],
-                    text(size: 0.75em, fill: alert, weight: "bold")[
-                        faithfulness\ fails
-                    ],
-                )),
-
-                // what the graph says
-                grid.cell(align: horizon + center)[
-                    #text(size: 1em)[$Y #nci($G$) X$]
-                ],
-
-                // the graph: unchanged and still faithful
-                grid.cell(align: horizon + center)[
-                    #diagram(
-                        node-stroke: 1pt + black,
-                        node-fill: white,
-                        spacing: (2.1em, 1.8em),
-                        node((0, 0), $X$, radius: 0.95em),
-                        node((0.9, 0), $Z$, radius: 0.95em),
-                        node((0.45, 0.85), $Y$, radius: 0.95em),
-                        edge((0, 0), (0.45, 0.85), "-|>"),
-                        edge((0.9, 0), (0.45, 0.85), "-|>"),
-                    )
-                ],
-            ))
-
-            #v(0.25em)
-
-            #align(center, text(size: 0.8em)[
-                One noise flip makes $Y$ a copy of $Z$ — $X$ is dropped,
-                $Z$ survives.
-            ])
-        ]
-
-        #figure(
-            fig2,
-            numbering: none,
-            caption: figure.caption([
-                *Empirical* --- the *AND gate* is faithful, its *sample* is not.
-            ], position: top)
+            // the one graph both examples share
+            [
+                #set align(center)
+                #diagram(
+                    node-stroke: 1pt + black,
+                    node-fill: white,
+                    spacing: (1.7em, 1.45em),
+                    node((0, 0), $X$, radius: 0.8em),
+                    node((0.9, 0), $Z$, radius: 0.8em),
+                    node((0.45, 0.85), $Y$, radius: 0.8em),
+                    edge((0, 0), (0.45, 0.85), "-|>"),
+                    edge((0.9, 0), (0.45, 0.85), "-|>"),
+                )
+                #v(0.15em)
+                #text(size: 0.7em, fill: fhg-grey.darken(30%))[
+                    same $G$ in both
+                ]
+            ],
         )
 
-        // ---------- (2) structural violation: noisy XOR ----------
-        // Same shape as fig1: the broken contrapositive read across, evidence in
-        // the panel and the setup carried by a top caption.
-        #let fig3 = figure-block[
-            // Same five-column shape as fig1: table | P-CIs | arrow | G-CIs | graph.
-            #align(center, grid(
-                columns: (auto, auto, auto, auto, auto),
-                column-gutter: 0.45em,
-                align: horizon,
+        #v(0.3em)
 
-                // the XOR logic table
-                grid.cell(align: horizon + center)[
-                    #table(
-                        columns: 3,
-                        align: center,
-                        inset: (x: 0.42em, y: 0.22em),
-                        stroke: none,
-                        table.hline(stroke: 1pt),
-                        table.header([$X$], [$Z$], [$Y$]),
-                        table.hline(stroke: 0.6pt),
-                        [0], [0], [0],
-                        [0], [1], [1],
-                        [1], [0], [1],
-                        [1], [1], [0],
-                        table.hline(stroke: 1pt),
-                    )
+        // ---- the two violations, side by side ----
+        // Each panel puts the evidence beside a VERTICAL implication, so the
+        // pair fits half a column. Order is still P above G, and the arrow
+        // still points at the conclusion (P) as in the horizontal version.
+        // The negated up-arrow comes from `nimplies-up` (a rotated glyph).
+        #let break-panel(caption-body, tab, p-side, g-side, note) = [
+            #figure(
+                figure-block[
+                    #v(0.5em)
+                    #align(center, grid(
+                        columns: (auto, auto),
+                        column-gutter: 0.7em,
+                        align: horizon,
+
+                        // the logic table / sample
+                        grid.cell(align: horizon + center, tab),
+
+                        // the broken implication, read top-down (P above G, as in fig1)
+                        grid.cell(align: horizon + center)[
+                            #set align(center)
+                            #p-side
+                            // #grid(
+                            //     columns: (auto, auto),
+                            //     column-gutter: 0.25em,
+                            //     align: horizon,
+                            //     text(size: 1.6em, fill: alert, weight: "bold")[
+                            //         #nimplies-down
+                            //     ]
+                            // )
+                            #v(-1.5em)
+                            #text(size: 1.6em, fill: alert, weight: "bold")[
+                                #nimplies-down
+                            ]
+                            #v(-1.5em)
+                            #g-side
+                        ],
+                    ))
+                    #v(0.25em)
+                    #align(center, text(size: 0.72em)[#note])
                 ],
-
-                // what every test in the data reports
-                grid.cell(align: horizon + center)[
-                    #text(size: 1em)[$Y #ci($P$) X$\ ]
-                    #text(size: 1em)[$Y #ci($P$) Z$]
-                ],
-
-                // the contrapositive, broken
-                grid.cell(align: horizon + center, stack(
-                    spacing: 0.25em,
-                    text(size: 2em, fill: alert, weight: "bold")[
-                        $arrow.l.double.not$
-                    ],
-                    text(size: 0.75em, fill: alert, weight: "bold")[
-                        faithfulness\ fails
-                    ],
-                )),
-
-                // what the graph says
-                grid.cell(align: horizon + center)[
-                    #text(size: 1em)[$Y #nci($G$) X$\ ]
-                    #text(size: 1em)[$Y #nci($G$) Z$]
-                ],
-
-                // the graph: same collider shape as fig1
-                grid.cell(align: horizon + center)[
-                    #diagram(
-                        node-stroke: 1pt + black,
-                        node-fill: white,
-                        spacing: (2.1em, 1.8em),
-                        node((0, 0), $X$, radius: 0.95em),
-                        node((0.9, 0), $Z$, radius: 0.95em),
-                        node((0.45, 0.85), $Y$, radius: 0.95em),
-                        edge((0, 0), (0.45, 0.85), "-|>"),
-                        edge((0.9, 0), (0.45, 0.85), "-|>"),
-                    )
-                ],
-            ))
-
-            #v(0.25em)
-
-            #align(center, text(size: 0.8em)[
-                Visible only given the other:#h(0.3em)
-                $Y #nci($P$) X mid(|) Z$ — needs order $k = 1$.
-            ])
+                numbering: none,
+                caption: figure.caption(caption-body, position: top),
+            )
         ]
 
-        #figure(
-            fig3,
-            numbering: none,
-            caption: figure.caption([
-                *Structural* --- noisy *XOR*, $Y = X plus.o Z$ (w.p. $0.9$).
-            ], position: top)
+        #let tab-style(..rows) = table(
+            columns: 3,
+            align: center,
+            inset: (x: 0.34em, y: 0.1em),
+            stroke: none,
+            table.hline(stroke: 1pt),
+            table.header([$X$], [$Z$], [$Y$]),
+            table.hline(stroke: 0.6pt),
+            ..rows.pos(),
+            table.hline(stroke: 1pt),
+        )
+
+        #grid(
+            columns: (1fr, 1fr),
+            column-gutter: 0.8em,
+
+            // ---------- (1) empirical: the same faithful AND gate ----------
+            // 4-row sample, one noise flip (red), gives EXACT empirical
+            // independence between Y and X while Z stays dependent.
+            break-panel(
+                [*Empirical* --- unlucky sample],
+                tab-style(
+                    [0], [0], [0],
+                    [0], [1], text(fill: alert, weight: "bold")[1],
+                    [1], [0], [0],
+                    [1], [1], [1],
+                ),
+                [
+                    #text(size: 0.82em)[$Y #ci($hat(P)$) X$]
+                    // #v(0.15em)
+                    // #text(size: 0.58em)[$hat(P)(X,Y) = hat(P)(X) hat(P)(Y)$]
+                ],
+                text(size: 0.82em)[$Y #nci($G$) X$],
+                [One flip makes $Y$ a copy of $Z$: $X$ is dropped, $Z$ survives.],
+            ),
+
+            // ---------- (2) structural: noisy XOR ----------
+            break-panel(
+                [*Structural* --- noisy XOR],
+                tab-style(
+                    [0], [0], [0],
+                    [0], [1], [1],
+                    [1], [0], [1],
+                    [1], [1], [0],
+                ),
+                [
+                    #text(size: 0.82em)[$Y #ci($P$) X$]
+                    // #text(size: 0.82em)[$Y #ci($P$) Z$]
+                ],
+                [
+                    #text(size: 0.82em)[$Y #nci($G$) X$]
+                    // #text(size: 0.82em)[$Y #nci($G$) Z$]
+                ],
+                [Visible only as $Y #nci($P$) X mid(|) Z$ — needs order $k = 1$.],
+            ),
         )
     ]
 
@@ -441,29 +415,172 @@
 
 
     #pop.column-box(heading: [$k$-Order Faithfulness])[
-        // NOTE: this section must carry the generalisation the XOR panel no
-        // longer states — XOR is only the k=1 case, already handled by
-        // 2-adjacency faithfulness [Marx+ 2021]; parity over k+2 variables
-        // needs order k, and that is the novel part.
-        #todo[$k$-order dependence + the assumption; XOR is only $k=1$,
-        parity over $k+2$ variables needs order $k$.]
-    ]
+        Keep the guarantee, add a *witness set*: an edge must still reveal
+        itself in the data --- but you may need up to $k$ extra variables
+        to see it.
 
-    #pop.column-box(heading: "The kOMB Algorithm")[
-        #todo[Grow-and-Shrink, modified: search sets of up to $k$ variables +
-        $l$-bounded separators. Correctness guarantee. One compact box.]
+        // The paper writes the witness set as Z; on the poster Z is already a
+        // variable in every example, so it is renamed W here to avoid a clash.
+        #let fig4 = figure-block[
+            #set align(center)
+            #text(size: 0.72em, fill: fhg-grey.darken(30%))[
+                standard --- the edge must show given $S$ alone
+            ]
+            #v(0.1em)
+            #text(size: 0.9em)[
+                $Y #nci($G$) X mid(|) S quad ==> quad Y #nci($P$) X mid(|) S$
+            ]
+
+            #v(0.45em)
+
+            #text(size: 0.72em, fill: fhg-orange, weight: "bold")[
+                $k$-order --- a witness set $bold(W)$ may be needed
+            ]
+            #v(0.1em)
+            #text(size: 0.9em)[
+                $Y #nci($G$) X mid(|) S quad ==> quad
+                 exists bold(W), abs(bold(W)) <= k :
+                 Y #nci($P$) X mid(|) #hl($bold(W)$) union S'$
+            ]
+            #v(0.1em)
+            #text(size: 0.62em, fill: fhg-grey.darken(30%))[
+                for every $S' subset.eq S$
+            ]
+        ]
+
+        #figure(
+            fig4,
+            numbering: none,
+            caption: figure.caption([
+                The relaxation --- same promise, one extra set.
+            ], position: top)
+        )
+
+        - Standard faithfulness is the case $bold(W) = emptyset$ ---
+          visible with no help at all.
+
+        - *XOR* above needs $abs(bold(W)) = 1$, with $bold(W) = {Z}$ ---
+          the case 2-adjacency faithfulness (Marx et al., 2021) covers.
+
+        - *Parity over $k+2$ variables* needs $abs(bold(W)) = k$: no
+          existing relaxation reaches past $k = 1$.
     ]
 
     #pop.column-box(heading: "Results")[
-        #todo[Hero: synthetic F1 (parity 1.00 vs ~0.03) + syn_metrics_grid
-        plot. Then benchmark BNs (Alarm1 / Barley / Insurance / Mildew):
-        higher order helps on low-cardinality nets.]
+        *kOMB* --- Grow-and-Shrink over whole witness sets --- beats every
+        baseline on *all four* benchmarks.
+
+        // ---- benchmark dot plot ------------------------------------------
+        // Replaces the old benchmark table. All 8 baselines as grey ticks
+        // (best whiskered), kOMB k=1 filled / k=2 hollow orange with ±1 SE
+        // whiskers, lanes grouped by cardinality. Data from
+        // experiments/output/real_f1.csv; SE = std over the 10 targets /sqrt(10).
+        #let bench-data = (
+            (name: "Alarm1",    bl: (0.674, 0.343, 0.764, 0.693, 0.681, 0.769, 0.737, 0.660), best: 5, bestse: 0.059, k1: (0.780, 0.036), k2: (0.821, 0.061)),
+            (name: "Insurance", bl: (0.659, 0.461, 0.675, 0.629, 0.628, 0.698, 0.630, 0.565), best: 5, bestse: 0.044, k1: (0.714, 0.042), k2: (0.734, 0.051)),
+            (name: "Barley",    bl: (0.339, 0.211, 0.340, 0.337, 0.337, 0.330, 0.228, 0.215), best: 2, bestse: 0.041, k1: (0.516, 0.062), k2: (0.313, 0.050)),
+            (name: "Mildew",    bl: (0.495, 0.287, 0.492, 0.468, 0.467, 0.486, 0.416, 0.273), best: 0, bestse: 0.034, k1: (0.622, 0.050), k2: (0.436, 0.044)),
+        )
+        #let grey-dark = rgb("#6E7676")
+        #let bench-chart = cetz.canvas(length: 1cm, {
+            import cetz.draw: *
+            let W = 24.5
+            let LM = 6.2
+            let lane-h = 1.85
+            let x0 = 0.15
+            let x1 = 0.90
+            let fx(v) = LM + (v - x0) / (x1 - x0) * W
+            let top = 0
+
+            for (i, d) in bench-data.enumerate() {
+                let y = top - i * lane-h
+                let y1 = y + 0.42
+                let y2 = y - 0.42
+                line((LM, y), (LM + W, y), stroke: 0.6pt + fhg-grey)
+                content((LM - 0.4, y), anchor: "east",
+                    text(size: 0.8em, weight: "bold")[#d.name])
+                for (j, v) in d.bl.enumerate() {
+                    let h = if j == d.best { 0.34 } else { 0.20 }
+                    let s = if j == d.best { 2.4pt + grey-dark } else { 1.6pt + fhg-grey }
+                    line((fx(v), y - h), (fx(v), y + h), stroke: s)
+                }
+                let bb = d.bl.at(d.best)
+                line((fx(bb - d.bestse), y), (fx(bb + d.bestse), y), stroke: 2pt + grey-dark)
+                let (m1, s1) = d.k1
+                line((fx(m1 - s1), y1), (fx(m1 + s1), y1), stroke: 2pt + fhg-orange)
+                circle((fx(m1), y1), radius: 0.17, fill: fhg-orange, stroke: none)
+                content((fx(m1), y1 + 0.30), anchor: "south",
+                    text(size: 0.5em, fill: fhg-orange, weight: "bold")[#calc.round(m1, digits: 2)])
+                let (m2, s2) = d.k2
+                line((fx(m2 - s2), y2), (fx(m2 + s2), y2), stroke: 2pt + fhg-orange)
+                circle((fx(m2), y2), radius: 0.17, fill: white, stroke: 2.4pt + fhg-orange)
+                content((fx(m2), y2 - 0.30), anchor: "north",
+                    text(size: 0.5em, fill: fhg-orange)[#calc.round(m2, digits: 2)])
+            }
+
+            // direct labels, first lane only — no legend
+            let d0 = bench-data.at(0)
+            content((fx(d0.k1.at(0) - d0.k1.at(1)) - 0.35, top + 0.42), anchor: "east",
+                text(size: 0.6em, fill: fhg-orange, weight: "bold")[k = 1])
+            content((fx(d0.k2.at(0) + d0.k2.at(1)) + 0.35, top - 0.42), anchor: "west",
+                text(size: 0.6em, fill: fhg-orange, weight: "bold")[k = 2])
+
+            // cardinality brackets
+            let by0 = top + 0.9
+            let by1 = top - 1 * lane-h - 0.9
+            let by2 = top - 2 * lane-h + 0.9
+            let by3 = top - 3 * lane-h - 0.9
+            line((-0.5, by0), (-0.5, by1), stroke: 1.2pt + fhg-grey)
+            content((-0.9, (by0 + by1) / 2), anchor: "center", angle: 90deg,
+                text(size: 0.5em, fill: grey-dark)[low card.])
+            line((-0.5, by2), (-0.5, by3), stroke: 1.2pt + fhg-grey)
+            content((-0.9, (by2 + by3) / 2), anchor: "center", angle: 90deg,
+                text(size: 0.5em, fill: grey-dark)[high card.])
+
+            // x axis
+            let ax = top - (bench-data.len() - 1) * lane-h - 1.1
+            line((LM, ax), (LM + W, ax), stroke: 1pt + black)
+            for t in (0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8) {
+                line((fx(t), ax), (fx(t), ax - 0.15), stroke: 1pt + black)
+                content((fx(t), ax - 0.24), anchor: "north", text(size: 0.55em)[#t])
+            }
+            content((LM + W + 0.3, ax), anchor: "west", text(size: 0.6em)[F1])
+        })
+
+        #figure(
+            figure-block[#align(center, bench-chart)],
+            numbering: none,
+            caption: figure.caption([
+                #text(size: 0.85em)[F1 $plus.minus 1$ SE, $N = 5000$;
+                grey ticks = 8 baselines (best whiskered).]
+            ], position: top),
+        )
+
+        // Why the hollow marks matter: k=2 > k=1 on the low-cardinality nets is
+        // the evidence that real networks carry order-2 dependence — the case
+        // beyond 2-adjacency faithfulness, i.e. the reason this paper exists.
+        - *Higher order pays*: $k=2$ beats $k=1$ on Alarm1 and Insurance ---
+          real order-2 dependence no $k=1$ relaxation can see; on
+          high-cardinality nets its CI tests lose power, and $k=1$ wins.
+
+        // Cost stated against the real baseline envelope. NB an earlier draft
+        // said "baselines run in <=6 s" — false: LRH needs 89.9 s on Alarm1 and
+        // 45.4 s on Insurance (runtime.csv), which kOMB k=1 actually beats.
+        - *The cost.* Baselines are not all cheap --- LRH needs $90$ s where
+          kOMB $k=1$ needs $5$ s. But $k=2$ costs up to $336$ s, and $k=3$
+          hits a 30-min cap (F1 $0.00$ on Barley).
     ]
 
     #pop.column-box(heading: "Takeaways & Future Work")[
-        #todo[3-4 bullets: exploiting high-order dependence improves MB
-        discovery; k = l ≤ 2 is a robust default; future = approximate /
-        scalable variants.]
+        // The parity hero number lives here now that the synthetic table is
+        // gone — it is the one empirical proof that witness sets recover
+        // blankets faithfulness-based methods cannot see at all.
+        - *Witness sets recover what faithfulness loses*: on parity gates
+          every baseline scores $0.03$ --- kOMB $k=2$ hits #hl[1.00] (40/40).
+
+        - *$k = l <= 2$ is a robust default* (ablation in the paper); kOMB
+          is a proof of concept --- approximate variants that tame the
+          $k = 2$ runtime are the open problem.
     ]
 
     // Nothing is cited yet, so this renders as a heading over an empty box and
@@ -479,6 +596,9 @@
 // ===========================================================================
 //  BOTTOM
 // ===========================================================================
+// Pull the footer up: the columns block ends with ~1cm of trailing block
+// spacing below its last box, which alone pushes the footer to a second page.
+#v(-1.2cm)
 #pop.bottom-box(
     heading-box-args: (inset: 1cm, fill: fhg-green),
     heading-text-args: (fill: white, weight: "bold")
