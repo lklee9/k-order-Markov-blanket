@@ -41,7 +41,7 @@
         weight: "bold",
     ),
     "title-box-args": (
-        inset: 1.9em,
+        inset: (left: 2em, right: 2em, top: 2em, bottom: 2em),
         width: 100%,
         fill: fhg-green,
         stroke: none,
@@ -58,6 +58,7 @@
 #pop.update-poster-layout(
     body-size: 40pt,
     institutes-size: 40pt,
+    title-size: 100pt,
 )
 #pop.set-theme(fhg-theme)
 #set text(size: pop.layout-a0.at("body-size"), fill: black, font: "Frutiger LT Com")
@@ -96,27 +97,49 @@
 //  TITLE
 // ===========================================================================
 // ---- Headline (betterposters style: state the MESSAGE, not the topic) -------
-// Swap this one string to try another headline; the formal paper title stays as
-// the subtitle underneath. Keep it <= ~12 words so it reads from 3 metres.
+// Swap this one string to try another headline; the formal paper title sits in
+// the identity strip below. Keep it <= ~12 words so it reads from 3 metres.
 // NB "standard benchmarks", not "real networks": Alarm1/Barley/Insurance/Mildew
 // supply the structure, but the samples are simulated — "real" would overclaim.
-#let headline = "Higher-order faithfulness finds better Markov blankets — even on standard benchmarks"
+#let headline = [Higher-order faithfulness finds better Markov blankets — even on standard benchmarks]
 #let formal-title = "High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption"
 #let qr-url = "https://github.com/lklee9/k-order-Markov-blanket"
 
 #let qr-spacing = 2
-#let authors = "Loong Kuan Lee, Ragavi Krishnamoorthy, Nico Piatkowski"
+// One source of truth for the names: `authors` is the plain footer list,
+// `authors-lead` bolds the presenting author for the identity strip.
+#let author-list = ("Loong Kuan Lee", "Ragavi Krishnamoorthy", "Nico Piatkowski")
+#let authors = author-list.join(", ")
+#let authors-lead = author-list.enumerate().map(((i, a)) => {
+    if i == 0 { strong(a) } else { a }
+}).join(", ")
 #let institutes = "Hybrid Intelligence · Fraunhofer IAIS · Germany"
 #pop.title-box(
     headline,
-    // subtitle: formal-title,
-    authors: authors,
-    institutes: institutes,
+    // Betterposters: the header band carries ONLY the message, set as large as
+    // it will go (title-size 100pt, above) so it reads across the hall. The
+    // formal title and presenting author go in the strip immediately below —
+    // NOT in the footer. Reason: on A0 portrait a footer sits at ~waist height
+    // and is behind bodies all session, which is exactly the identity info you
+    // need when you cannot get close (approach / programme-match / photograph).
+    // This is also where Morrison's own official portrait template puts them.
+    // authors: authors,
+    // institutes: institutes,
     logo: tiaoma.qrcode(qr-url, width: 100%, options: (
         bg-color: white,
         whitespace-width: qr-spacing,
-        whitespace-height: qr-spacing)),    
+        whitespace-height: qr-spacing)),
 )
+
+// ---- identity strip: above head height, costs the headline nothing ----------
+#v(-0.4em)
+#block(width: 100%, inset: (x: 0.6em, y: 0em))[
+    #text(size: 0.92em, weight: "bold")[#formal-title]\
+    #text(size: 0.82em, fill: fhg-grey.darken(45%))[
+        // presenting author bolded: attendees need to know who is standing here
+        #authors-lead
+    ]
+]
 
 // ===========================================================================
 //  BODY
@@ -124,7 +147,7 @@
 #columns(2, [
 
     // ------------------------------------------------ LEFT COLUMN
-    #pop.column-box(heading: "Motivation: Markov Blanket Discovery")[
+    #pop.column-box(heading: [*Motivation*: Markov Blanket Discovery])[
         
         - *Markov blanket (MB) discovery* finds the minimal variable set
           that shields a target $Y$ from all other variables.
@@ -313,6 +336,7 @@
             #figure(
                 figure-block[
                     #v(0.5em)
+                    #text(size: 0.8em, fill: black)[#tab-title]
                     #align(center, grid(
                         columns: (auto, auto),
                         column-gutter: 0.7em,
@@ -320,9 +344,6 @@
 
                         // the logic table / sample, named directly above it
                         grid.cell(align: horizon + center)[
-                            #text(size: 0.6em, fill: fhg-grey.darken(30%),
-                                weight: "bold")[#tab-title]
-                            #v(0.1em)
                             #tab
                         ],
 
@@ -346,7 +367,6 @@
                             #g-side
                         ],
                     ))
-                    #v(0.25em)
                     #align(center, text(size: 0.72em)[#note])
                 ],
                 numbering: none,
@@ -357,13 +377,13 @@
         #let tab-style(..rows) = table(
             columns: 3,
             align: center,
-            inset: (x: 0.34em, y: 0.1em),
+            inset: (x: 0.5em, y: 0.25em),
             stroke: none,
-            table.hline(stroke: 1pt),
+            table.hline(stroke: 2.5pt),
             table.header([$X$], [$Z$], [$Y$]),
-            table.hline(stroke: 0.6pt),
-            ..rows.pos(),
             table.hline(stroke: 1pt),
+            ..rows.pos(),
+            table.hline(stroke: 2.5pt),
         )
 
         #grid(
@@ -375,7 +395,7 @@
             // independence between Y and X while Z stays dependent.
             break-panel(
                 [*Empirical*],
-                [sample from *AND*],
+                [Noisy sample from *AND*],
                 tab-style(
                     [0], [0], [0],
                     [0], [1], text(fill: alert, weight: "bold")[1],
@@ -383,18 +403,18 @@
                     [1], [1], [1],
                 ),
                 [
-                    #text(size: 0.82em)[$Y #ci($hat(P)$) X$]
+                    #text(size: 0.85em)[$Y #ci($hat(P)$) X$]
                     // #v(0.15em)
                     // #text(size: 0.58em)[$hat(P)(X,Y) = hat(P)(X) hat(P)(Y)$]
                 ],
-                text(size: 0.82em)[$Y #nci($G$) X$],
-                [One flip makes $Y$ a copy of $Z$: $X$ is dropped, $Z$ survives.],
+                text(size: 0.85em)[$Y #nci($G$) X$],
+                [One noisy flip makes $Y$ *appear* independent to $X$],
             ),
 
             // ---------- (2) structural: noisy XOR ----------
             break-panel(
                 [*Structural*],
-                [noisy *XOR*],
+                [Full samples from *XOR*],
                 tab-style(
                     [0], [0], [0],
                     [0], [1], [1],
@@ -409,7 +429,7 @@
                     #text(size: 0.82em)[$Y #nci($G$) X$]
                     // #text(size: 0.82em)[$Y #nci($G$) Z$]
                 ],
-                [Visible only as $Y #nci($P$) X mid(|) Z$ — needs order $k = 1$.],
+                [Visible only as $Y #nci($P$) X mid(|) Z$\ needs order $k = 1$.],
             ),
         )
     ]
@@ -419,9 +439,9 @@
     #colbreak()
 
 
-    #pop.column-box(heading: [$k$-Order Faithfulness])[
-        Keep the guarantee, add a *witness set*: an edge must still reveal
-        itself in the data --- but you may need up to $k$ extra variables
+    #pop.column-box(heading: [*Contribution*: $k$-Order Faithfulness])[
+        Assume that an edge must still reveal itself in the distribution
+        --- but you may need up to $k$ extra variables, or *witnesses*,
         to see it.
 
         // The ladder replaces the formula panel and the prose bullets: one
@@ -444,7 +464,7 @@
                 ..range(1, n-par).map(i => node((xs.at(i), 0),
                     text(fill: fhg-orange)[$W_#i$],
                     radius: R, stroke: 1.6pt + fhg-orange,
-                    fill: fhg-orange.lighten(88%))),
+                    )),
                 ..range(1, n-par).map(i => edge((xs.at(i), 0), (cx, 1), "-|>")),
                 node((cx, 1), $Y$, radius: R),
             )
@@ -475,17 +495,17 @@
                  #text(size: 0.7em, fill: alert)[✗ invisible]],
 
                 // ---- row 4: with the witness set ----
-                text(size: 0.7em, fill: dim)[no witness needed],
+                text(size: 0.7em)[no witness needed],
                 [#text(size: 0.78em)[$Y #nci($P$) X mid(|) #text(fill: fhg-orange)[$W_1$]$]
                  #text(size: 0.7em, fill: fhg-green)[✓]],
                 [#text(size: 0.78em)[$Y #nci($P$) X mid(|) #text(fill: fhg-orange)[${W_1, W_2}$]$]
                  #text(size: 0.7em, fill: fhg-green)[✓]],
 
                 // ---- row 5: which assumption covers this rung ----
-                text(size: 0.66em, fill: dim)[standard faithfulness],
-                text(size: 0.66em, fill: dim)[2-adjacency\ (Marx et al., 2021)],
-                text(size: 0.7em, fill: fhg-orange, weight: "bold")[
-                    $k$-order (this work)\ any $k$
+                text(size: 0.66em)[standard faithfulness],
+                text(size: 0.66em)[2-adjacency],
+                text(size: 0.66em)[
+                    $k$-order faithfulness (ours)
                 ],
             ))
         ]
@@ -494,15 +514,16 @@
             fig4,
             numbering: none,
             caption: figure.caption([
-                Each order admits edges invisible below it --- parity over
-                $k + 2$ variables needs order $k$.
-            ], position: top)
+                Increasing order admits edges invisible on lower
+                orders. Genarally, parity over $k + 2$ variables needs
+                order $k$.
+            ], position: bottom)
         )
     ]
 
     #pop.column-box(heading: "Results")[
-        *kOMB* --- Grow-and-Shrink over whole witness sets --- beats every
-        baseline on *all four* benchmarks.
+        *kOMB*: Grow-and-Shrink over whole witness sets --- beats every
+        baseline on *all four* standard benchmarks.
 
         // ---- benchmark dot plot ------------------------------------------
         // Replaces the old benchmark table. All 8 baselines as grey ticks
@@ -675,26 +696,30 @@
 // ===========================================================================
 //  BOTTOM
 // ===========================================================================
-// Pull the footer up: the columns block ends with ~1cm of trailing block
-// spacing below its last box, which alone pushes the footer to a second page.
-#v(-1.2cm)
-#pop.bottom-box(
-    heading-box-args: (inset: 1cm, fill: white),
-    heading-text-args: (fill: black, weight: "bold"),
-    // IAIS logo, 2008 x 551 px: height 3.2cm renders it at ~11.7cm wide.
-    logo: image("iais_85mm_rgb.png", height: 3.2cm),
-    text-relative-width: 84%,
-)[
-    #text(size: 0.8em)[
-        // Paper Details:\
-        #formal-title\
-        #authors\
-        // #institutes\
-        // Code: #link("https://github.com/lklee9/k-order-Markov-blanket")[github.com/lklee9/k-order-Markov-blanket]
-    ]
-    // Code: #link("https://github.com/lklee9/k-order-Markov-blanket")[github.com/lklee9/k-order-Markov-blanket]
-    // #h(2em)
-    // Funded by the German Federal Ministry of Research, Technology and Space and
-    // the state of North Rhine-Westphalia as part of the Lamarr Institute for
-    // Machine Learning and Artificial Intelligence.
-]
+// Full-bleed footer, pinned to the physical page bottom with place() — the
+// dx/dy escape the 1.6cm page margins, so the bar touches the sheet edge.
+// Being out of flow, it also cannot be pushed to a second page (which retires
+// the old #v(-1.2cm) pull-up hack); the trade is that nothing reserves its
+// area, so if the columns ever grow past ~93% they will overlap it silently.
+#place(bottom + left,
+    block(
+    width: 100%,
+    fill: white,
+    stroke: (top: 5pt + fhg-green),
+    inset: (x: 1em, top: 1em, bottom: 0em),
+    grid(
+        columns: (1fr, auto),
+        column-gutter: 1em,
+        align: horizon,
+        [
+            // Title and authors live in the identity strip under the headline
+            // (above head height). The footer is the branding strip: institute
+            // text beside the logo, which is what Faulkes and Purrington both
+            // say a bottom strip is for.
+            #text(size: 1.35em, weight: "bold")[#institutes]
+        ],
+        // IAIS logo, 2008 x 551 px: height 3.2cm renders it at ~11.7cm wide.
+        // image("iais_85mm_rgb.png", width: 8.5cm),
+        image("iais_85mm_rgb.png", width: 12cm),
+    ),
+))
