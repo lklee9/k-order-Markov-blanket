@@ -105,7 +105,7 @@
 #let formal-title = "High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption"
 #let qr-url = "https://github.com/lklee9/k-order-Markov-blanket"
 
-#let qr-spacing = 2
+#let qr-spacing = 4   // ISO/IEC 18004 minimum quiet zone
 // One source of truth for the names: `authors` is the plain footer list,
 // `authors-lead` bolds the presenting author for the identity strip.
 #let author-list = ("Loong Kuan Lee", "Ragavi Krishnamoorthy", "Nico Piatkowski")
@@ -135,14 +135,15 @@
 // Replaces the old bottom footer, which cost 5.2cm (4.3% of the sheet) to carry
 // an institute line plus the logo. Consolidating here frees that space, drops a
 // structural element, and removes the hazard that a `place`d footer reserves no
-// area and can be silently overlapped by a growing column. The institute line
-// stays because it names Lamarr, which the IAIS logo does not.
+// area and can be silently overlapped by a growing column.
+// NB the two grid rows are fixed heights (4.75em / 1em): a formal title that
+// wraps to three lines would clip, so re-check this strip if the title changes.
 #v(-0.4em)
-#block(width: 100%, inset: (x: 0.6em, top: 0em, bottom: 0em),
+#block(width: 100%, inset: (x: 0.6em, top: 1em, bottom: 0.25em),
     // stroke: (bottom: 3pt + fhg-green),
     grid(
         rows: (4.75em, 1em),
-        column-gutter: 0em,
+        row-gutter: 0.25em,
         align: top,
         grid(
             columns: (1fr, auto),
@@ -154,7 +155,7 @@
             // image("iais_85mm_rgb.png", width: 8.5cm),
             image("iais_85mm_rgb.png", height: 3.50em),
         ),    
-        text(size: 1.5em, fill: fhg-grey.darken(45%))[
+        text(size: 1.35em, fill: fhg-grey.darken(45%))[
             // presenting author bolded: attendees need to know who is here
             #grid(
             columns: (1fr, auto), authors-lead, institutes
@@ -174,41 +175,42 @@
 // below now start straight at "What is Faithfulness?" / "Contribution".
 #block(
     width: 100%,
-    fill: fhg-green.lighten(92%),
-    stroke: (left: 8pt + fhg-green),
-    inset: (x: 1em, y: 0.7em),
+    fill: fhg-green.lighten(90%),
+    // stroke: (left: 8pt + fhg-green, right: 8pt + fhg-green),
+    // stroke: (left: 8pt + fhg-green),
+    inset: (x: 1em, y: 1.5em),
     grid(
         columns: (1fr, 1fr),
         column-gutter: 1.6em,
         align: top,
 
         [
-            #text(fill: fhg-blue, weight: "bold", size: 1.05em)[The problem]
-            #v(0.15em)
-            - *Markov blanket discovery* --- the minimal set shielding a target
-              $Y$ --- underpins feature selection, causal discovery and
-              Bayesian / Markov network structure learning.
+            #text(fill: fhg-blue, weight: "bold", size: 1.05em)[Our Motivation]
+            #v(0em)
+            - *Markov blanket discovery* finds the minimal set shielding a target
+              $Y$. Underpins Bayesian / Markov network structure learning.
 
             - Nearly every method assumes *faithfulness*: an independence in
               the distribution $P$ implies a separation in the graph $G$.
 
-            - Faithfulness *breaks* --- on XOR/parity relations, and on finite
-              samples. A true blanket member then looks irrelevant, and is
-              silently dropped.
+            - But faithfulness can be *violated*, for example: on XOR/parity
+              relations, and on finite samples
         ],
 
         [
-            #text(fill: fhg-blue, weight: "bold", size: 1.05em)[What we contribute]
-            #v(0.15em)
-            - *$k$-order faithfulness*: an edge must still reveal itself in the
-              data --- but up to $k$ *witness* variables may be needed to see it.
+            #text(fill: fhg-blue, weight: "bold", size: 1.05em)[Our Contributions]
+            #v(0em)
+            - *$k$-order faithfulness*: assume an edge must still reveal itself in the
+              distribution, but up to $k$ *witness* variables may be needed to see it.
 
-            - *kOMB*: Grow-and-Shrink over whole witness sets, provably
-              recovering the blanket under the relaxation.
+            - *kOMB*: A proof of concept Grow-and-Shrink type
+              algorithm. Provably recovers the blanket under $k$-order
+              faithfulness.
 
-            - One fixed $k = 1$ beats the best of *eight* baselines on *all
-              four* benchmarks; on parity gates every baseline scores $0.03$
+            - *Result*: kOMB $k = 1$ beats *all eight* baselines on *all
+              four* benchmarks. On parity every baseline scores $0.03$
               where kOMB reaches #hl[1.00].
+            
         ],
     ),
 )
@@ -351,7 +353,7 @@
     ]
 
 
-    #pop.column-box(heading: "When Faithfulness Breaks")[
+    #pop.column-box(heading: "When Faithfulness is Violated")[
         // Intro text beside a single shared DAG: both examples live on the same
         // collider, so the graph is hoisted out instead of redrawn per panel.
         There are two ways the faithfulness assumption can be violated:
@@ -427,8 +429,10 @@
                             #g-side
                         ],
                     ))
-                    #v(-0.5em)
+                    #v(-0.4em)
                     #align(center, text(size: 0.72em)[#note])
+                    #v(0.5em)
+
                 ],
                 numbering: none,
                 caption: figure.caption(caption-body, position: top),
@@ -469,7 +473,7 @@
                     // #text(size: 0.58em)[$hat(P)(X,Y) = hat(P)(X) hat(P)(Y)$]
                 ],
                 text(size: 0.85em)[$Y #nci($G$) X$],
-                [One noisy flip makes $Y$ *appear* independent to $X$],
+                [One noisy flip makes $Y$ *appear* independent of $X$],
             ),
 
             // ---------- (2) structural: noisy XOR ----------
@@ -500,10 +504,8 @@
     #colbreak()
 
 
-    #pop.column-box(heading: [*Contribution*: $k$-Order Faithfulness])[
-        Assume that an edge must still reveal itself in the distribution
-        --- but you may need up to $k$ extra variables, or *witnesses*,
-        to see it.
+    #pop.column-box(heading: [$k$-Order Faithfulness])[
+        Edge might need up to $k$ extra variables to see it in $P$.
 
         // The ladder replaces the formula panel and the prose bullets: one
         // column per order, same tested edge (green), growing witness set
@@ -549,18 +551,18 @@
 
                 // ---- row 3: testing the pair alone ----
                 [#text(size: 0.78em)[$Y #nci($P$) X$]
-                 #text(size: 0.7em, fill: fhg-green)[✓]],
+                 #text(size: 0.7em, fill: fhg-green)[$checkmark$]],
                 [#text(size: 0.78em, fill: dim)[$Y #ci($P$) X$]
-                 #text(size: 0.7em, fill: alert)[✗ invisible]],
+                 #text(size: 0.7em, fill: alert)[$crossmark$ invisible]],
                 [#text(size: 0.78em, fill: dim)[$Y #ci($P$) X mid(|) W_1$]
-                 #text(size: 0.7em, fill: alert)[✗ invisible]],
+                 #text(size: 0.7em, fill: alert)[$crossmark$ invisible]],
 
                 // ---- row 4: with the witness set ----
                 text(size: 0.7em)[no witness needed],
                 [#text(size: 0.78em)[$Y #nci($P$) X mid(|) #text(fill: fhg-orange)[$W_1$]$]
-                 #text(size: 0.7em, fill: fhg-green)[✓]],
+                 #text(size: 0.7em, fill: fhg-green)[$checkmark$]],
                 [#text(size: 0.78em)[$Y #nci($P$) X mid(|) #text(fill: fhg-orange)[${W_1, W_2}$]$]
-                 #text(size: 0.7em, fill: fhg-green)[✓]],
+                 #text(size: 0.7em, fill: fhg-green)[$checkmark$]],
 
                 // ---- row 5: which assumption covers this rung ----
                 text(size: 0.66em)[standard faithfulness],
@@ -576,15 +578,14 @@
             numbering: none,
             caption: figure.caption([
                 Increasing order admits edges invisible on lower
-                orders. Genarally, parity over $k + 2$ variables needs
+                orders. Generally, parity over $k + 2$ variables needs
                 order $k$.
             ], position: bottom)
         )
     ]
 
     #pop.column-box(heading: "Results")[
-        *kOMB*: Grow-and-Shrink over whole witness sets --- beats every
-        baseline on *all four* standard benchmarks.
+        *kOMB* ($k=1$) beats *every* baseline on *all four* benchmarks.
 
         // ---- benchmark dot plot ------------------------------------------
         // Replaces the old benchmark table. All 8 baselines as grey ticks
@@ -642,7 +643,10 @@
                 // best baseline: dark dot + SE whisker on the centreline
                 let bb = d.bl.at(d.best)
                 whisker(fx(bb - d.bestse), fx(bb + d.bestse), y, grey-dark)
-                circle((fx(bb), y), radius: 0.22, fill: grey-dark, stroke: none)
+                // square, not a circle: shape (not hue) has to carry this, or the
+                // baseline and kOMB marks merge in greyscale (contrast 1.46:1)
+                rect((fx(bb) - 0.2, y - 0.2), (fx(bb) + 0.2, y + 0.2),
+                    fill: grey-dark, stroke: none)
 
                 // kOMB k = 1 (filled) above, k = 2 (hollow) below
                 let (m1, s1) = d.k1
@@ -689,7 +693,7 @@
                 line((0, 0), (1.0, 0), stroke: 2.6pt + grey-dark)
                 line((0, -0.14), (0, 0.14), stroke: 2.6pt + grey-dark)
                 line((1.0, -0.14), (1.0, 0.14), stroke: 2.6pt + grey-dark)
-                circle((0.5, 0), radius: 0.22, fill: grey-dark, stroke: none)
+                rect((0.3, -0.2), (0.7, 0.2), fill: grey-dark, stroke: none)
             }),
             text(size: 0.66em, fill: grey-dark)[their best],
             sw({
@@ -704,6 +708,9 @@
             text(size: 0.66em, fill: fhg-orange, weight: "bold")[$k = 2$],
             text(size: 0.58em, fill: grey-dark)[#h(0.6em) bars: $plus.minus 1$ SE],
         )
+
+        - *Recovers Parity Perfectly.* On synthetic parity datasets,
+          every baseline scores $0.03$ while kOMB with $k=2$ reaches #hl[1.00].
 
         #figure(
             figure-block[
@@ -724,16 +731,15 @@
         // Why the hollow marks matter: k=2 > k=1 on the low-cardinality nets is
         // the evidence that real networks carry order-2 dependence — the case
         // beyond 2-adjacency faithfulness, i.e. the reason this paper exists.
-        - *Higher order pays*: $k=2$ beats $k=1$ on Alarm1 and Insurance ---
-          real order-2 dependence no $k=1$ relaxation can see; on
+        - *A bigger search budget cuts both ways*: it wins on Alarm1 and
+          Insurance, but on
           high-cardinality nets its CI tests lose power, and $k=1$ wins.
 
         // Cost stated against the real baseline envelope. NB an earlier draft
         // said "baselines run in <=6 s" — false: LRH needs 89.9 s on Alarm1 and
         // 45.4 s on Insurance (runtime.csv), which kOMB k=1 actually beats.
-        - *The cost.* Baselines are not all cheap --- LRH needs $90$ s where
-          kOMB $k=1$ needs $5$ s. But $k=2$ costs up to $336$ s, and $k=3$
-          hits a 30-min cap (F1 $0.00$ on Barley).
+        - *The cost.* Runtime grows with the budget: $k=1$ takes $5$--$58$ s,
+          $k=2$ takes $14$--$336$ s, $k=3$ hits a 30-min cap (F1 $0.00$).
     ]
 
 
