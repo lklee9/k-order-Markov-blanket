@@ -41,7 +41,7 @@
         weight: "bold",
     ),
     "title-box-args": (
-        inset: (left: 2em, right: 2em, top: 2em, bottom: 2em),
+        inset: (x: 3em, y: 1.2em),
         width: 100%,
         fill: fhg-green,
         stroke: none,
@@ -101,7 +101,7 @@
 // the identity strip below. Keep it <= ~12 words so it reads from 3 metres.
 // NB "standard benchmarks", not "real networks": Alarm1/Barley/Insurance/Mildew
 // supply the structure, but the samples are simulated — "real" would overclaim.
-#let headline = [Higher-order faithfulness finds better Markov blankets — even on standard benchmarks]
+#let headline = [Higher-order faithfulness\ finds better Markov blankets,\ even on standard benchmarks]
 #let formal-title = "High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption"
 #let qr-url = "https://github.com/lklee9/k-order-Markov-blanket"
 
@@ -116,6 +116,12 @@
 #let institutes = "Fraunhofer IAIS · Germany"
 #pop.title-box(
     headline,
+    // Slot width for the QR: it shares the band with the headline, and once the
+    // QR image (black area + its 4-module quiet zone) exceeds the headline's
+    // height it inflates the band 1:1. 74% with the reduced y-inset below is the
+    // largest QR that still fits one page; 70% overflows, and below ~66% the
+    // headline's manual line breaks stop fitting and it rewraps.
+    text-relative-width: 74%,
     // Betterposters: the header band carries ONLY the message, set as large as
     // it will go (title-size 100pt, above) so it reads across the hall. The
     // formal title and presenting author go in the strip immediately below —
@@ -585,7 +591,7 @@
     ]
 
     #pop.column-box(heading: "Results")[
-        *kOMB* ($k=1$) beats *every* baseline on *all four* benchmarks.
+        *kOMB* beats *every* baseline on *all four* benchmarks.
 
         // ---- benchmark dot plot ------------------------------------------
         // Replaces the old benchmark table. All 8 baselines as grey ticks
@@ -739,7 +745,7 @@
         // said "baselines run in <=6 s" — false: LRH needs 89.9 s on Alarm1 and
         // 45.4 s on Insurance (runtime.csv), which kOMB k=1 actually beats.
         - *The cost.* Runtime grows with the budget: $k=1$ takes $5$--$58$ s,
-          $k=2$ takes $14$--$336$ s, $k=3$ hits a 30-min cap (F1 $0.00$).
+          $k=2$ takes $14$--$336$ s, $k=3$ hits a 30-min cap.
     ]
 
 
