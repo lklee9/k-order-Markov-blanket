@@ -41,7 +41,7 @@
         weight: "bold",
     ),
     "title-box-args": (
-        inset: (x: 3em, y: 1.2em),
+        inset: (x: 1.5em, y: 1.5em),
         width: 100%,
         fill: fhg-green,
         stroke: none,
@@ -58,7 +58,7 @@
 #pop.update-poster-layout(
     body-size: 40pt,
     institutes-size: 40pt,
-    title-size: 105pt,
+    title-size: 110pt,
 )
 #pop.set-theme(fhg-theme)
 #set text(size: pop.layout-a0.at("body-size"), fill: black, font: "Frutiger LT Com")
@@ -145,7 +145,7 @@
             whitespace-height: qr-spacing,
         ))
     pop.title-box(
-        box(height: measure(qr).height, align(horizon, headline)),
+        box(inset: (left: 0.25em), height: measure(qr).height, align(horizon, headline)),
         // Slot width for the QR: it shares the band with the headline, and once
         // the QR (black area + its 4-module quiet zone) exceeds the headline's
         // height it inflates the band 1:1. This value with the reduced y-inset
@@ -388,6 +388,7 @@
         // Intro text beside a single shared DAG: both examples live on the same
         // collider, so the graph is hoisted out instead of redrawn per panel.
         There are two ways the faithfulness assumption can be violated:
+        #v(-0.6em)
         #grid(
             columns: (1fr, auto),
             column-gutter: -1em,
@@ -417,7 +418,7 @@
             ],
         )
 
-        #v(0.3em)
+        #v(-0.3em)
 
         // ---- the two violations, side by side ----
         // Each panel puts the evidence beside a VERTICAL implication, so the
@@ -462,7 +463,7 @@
                     ))
                     #v(-0.4em)
                     #align(center, text(size: 0.72em)[#note])
-                    #v(0.5em)
+                    #v(0.4em)
 
                 ],
                 numbering: none,
@@ -525,7 +526,7 @@
                     #text(size: 0.82em)[$Y #nci($G$) X$]
                     // #text(size: 0.82em)[$Y #nci($G$) Z$]
                 ],
-                [Visible only as $Y #nci($P$) X mid(|) Z$\ needs order $k = 1$.],
+                [Visible only as $Y #nci($P$) X mid(|) Z$ ---\ needs order $k = 1$.],
             ),
         )
     ]
@@ -536,7 +537,7 @@
 
 
     #pop.column-box(heading: [$k$-Order Faithfulness])[
-        Edge might need up to $k$ extra variables to see it in $P$.
+        An edge might need up to $k$ extra variables to be visible in $P$.
 
         // The ladder replaces the formula panel and the prose bullets: one
         // column per order, same tested edge (green), growing witness set
@@ -763,8 +764,8 @@
         // the evidence that real networks carry order-2 dependence — the case
         // beyond 2-adjacency faithfulness, i.e. the reason this paper exists.
         - *A bigger search budget cuts both ways*: it wins on Alarm1 and
-          Insurance, but on
-          high-cardinality nets its CI tests lose power, and $k=1$ wins.
+          Insurance, but on high-cardinality nets the independence tests
+          lose power, and $k=1$ wins.
 
         // Cost stated against the real baseline envelope. NB an earlier draft
         // said "baselines run in <=6 s" — false: LRH needs 89.9 s on Alarm1 and
