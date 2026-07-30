@@ -103,7 +103,16 @@
 // supply the structure, but the samples are simulated — "real" would overclaim.
 #let headline = [Higher-order faithfulness\ finds better Markov blankets,\ even on standard benchmarks]
 #let formal-title = "High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption"
-#let qr-url = "https://github.com/lklee9/k-order-Markov-blanket"
+// QR target. Pointed at arXiv because that URL is VERIFIED LIVE and permanent;
+// the project page (lklee9.github.io/k-order-Markov-blanket) is the nicer hub
+// but Pages must be enabled and the URL loaded in a browser before it is safe
+// to freeze into print. Swap this one line once you have confirmed it resolves.
+#let qr-url  = "https://arxiv.org/abs/2607.26357"
+// #let qr-url = "https://lklee9.github.io/k-order-Markov-blanket"
+// Printed as text as well: the QR is otherwise the ONLY route to the work, and
+// a dead phone, a scuffed code or someone standing in front of it leaves a
+// reader with nothing. Short enough to type, and self-evidently the paper.
+#let qr-text = "arxiv.org/abs/2607.26357"
 
 #let qr-spacing = 4   // ISO/IEC 18004 minimum quiet zone
 // One source of truth for the names: `authors` is the plain footer list,
@@ -144,8 +153,18 @@
             whitespace-width: qr-spacing,
             whitespace-height: qr-spacing,
         ))
+    // Stack the printed URL under the QR and treat the PAIR as the logo, so the
+    // headline's centring box (measured below) still matches the slot exactly.
+    // Positive spacing is mandatory: the URL is white text, so any overlap with
+    // the QR's white quiet zone makes it invisible.
+    let qr-block = stack(
+        spacing: 0.2em,
+        qr,
+        align(center, text(size: 0.58em, fill: white, weight: "bold")[#qr-text]),
+    )
     pop.title-box(
-        box(inset: (left: 0.25em), height: measure(qr).height, align(horizon, headline)),
+        box(inset: (left: 0.25em), height: measure(qr-block).height,
+            align(horizon, headline)),
         // Slot width for the QR: it shares the band with the headline, and once
         // the QR (black area + its 4-module quiet zone) exceeds the headline's
         // height it inflates the band 1:1. This value with the reduced y-inset
@@ -158,7 +177,7 @@
         // below — NOT in a footer, which on A0 portrait sits at ~waist height
         // and is behind bodies all session, exactly when that identity info is
         // needed (approach / programme-match / photograph).
-        logo: qr,
+        logo: qr-block,
     )
 })
 
@@ -537,7 +556,7 @@
 
 
     #pop.column-box(heading: [$k$-Order Faithfulness])[
-        An edge might need up to $k$ extra variables to be visible in $P$.
+        An edge might need up to $k$ variables to be visible in $P$.
 
         // The ladder replaces the formula panel and the prose bullets: one
         // column per order, same tested edge (green), growing witness set
@@ -617,7 +636,6 @@
     ]
 
     #pop.column-box(heading: "Results")[
-        *kOMB* beats *every* baseline on *all four* benchmarks.
 
         // ---- benchmark dot plot ------------------------------------------
         // Replaces the old benchmark table. All 8 baselines as grey ticks
@@ -743,6 +761,8 @@
 
         - *Recovers Parity Perfectly.* On synthetic parity datasets,
           every baseline scores $0.03$ while kOMB with $k=2$ reaches #hl[1.00].
+
+        - *kOMB* $k=1$ beats *every* baseline on *all* benchmarks.
 
         #figure(
             figure-block[

@@ -1,0 +1,9 @@
+# GitHub Pages (Jekyll) config for the project page.
+# Enable in the repo: Settings -> Pages -> Source: <default branch>, folder /docs
+title: High-Order Markov Blanket Discovery
+description: >-
+  A k-order relaxation of the faithfulness assumption, and kOMB — a Markov
+  blanket discovery algorithm that recovers members hidden by XOR/parity-type
+  dependence. UAI 2026.
+theme: jekyll-theme-minimal
+show_downloads: false

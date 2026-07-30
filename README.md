@@ -1,5 +1,7 @@
 # High-Order Markov Blanket Discovery
 
+**Paper:** [arXiv:2607.26357](https://arxiv.org/abs/2607.26357) · **Project page:** [lklee9.github.io/k-order-Markov-blanket](https://lklee9.github.io/k-order-Markov-blanket)
+
 Code accompanying the paper:
 
 > **High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption**
@@ -100,6 +102,9 @@ If you use this software or its results, please cite our paper:
   author    = {Lee, Loong Kuan and Krishnamoorthy, Ragavi and Piatkowski, Nico},
   booktitle = {Proceedings of the Conference on Uncertainty in Artificial Intelligence (UAI)},
   year      = {2026},
+  eprint    = {2607.26357},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG},
 }
 ```
 
