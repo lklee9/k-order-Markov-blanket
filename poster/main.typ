@@ -58,7 +58,7 @@
 #pop.update-poster-layout(
     body-size: 40pt,
     institutes-size: 40pt,
-    title-size: 100pt,
+    title-size: 105pt,
 )
 #pop.set-theme(fhg-theme)
 #set text(size: pop.layout-a0.at("body-size"), fill: black, font: "Frutiger LT Com")
@@ -114,14 +114,25 @@
     if i == 0 { strong(a) } else { a }
 }).join(", ")
 #let institutes = "Fraunhofer IAIS · Germany"
+// title-box lays the headline and the logo out in a horizontal `stack`, which
+// TOP-aligns them — so with the QR now taller than the text the headline sat
+// high (1.2cm above, 3.6cm below). Give the headline a box the same height as
+// the QR slot and centre inside it; both items then share one centreline.
+//   page inner width 84.1 - 2*1.6 = 80.9cm, minus the band's 2*3em x-inset
+//   (3em @ 40pt = 4.233cm) -> 72.433cm. The nominal logo slot is
+//   100% - 5% (title-box spacing) - 74% (text-relative-width) = 21%, but the
+//   QR renders slightly smaller than its slot, so 0.2035 is the factor that
+//   matches the two heights: any larger and the text box sets the band and
+//   pushes the QR off centre (measured: 0.2085 -> QR 3mm low, band +3mm).
+#let qr-slot-side = 0.2035 * 72.433cm
 #pop.title-box(
-    headline,
+    box(height: qr-slot-side, align(horizon, headline)),
     // Slot width for the QR: it shares the band with the headline, and once the
     // QR image (black area + its 4-module quiet zone) exceeds the headline's
     // height it inflates the band 1:1. 74% with the reduced y-inset below is the
     // largest QR that still fits one page; 70% overflows, and below ~66% the
     // headline's manual line breaks stop fitting and it rewraps.
-    text-relative-width: 74%,
+    text-relative-width: 75%,
     // Betterposters: the header band carries ONLY the message, set as large as
     // it will go (title-size 100pt, above) so it reads across the hall. The
     // formal title and presenting author go in the strip immediately below —
