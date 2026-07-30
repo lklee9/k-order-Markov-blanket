@@ -110,17 +110,24 @@
 // lklee.dev while the custom domain is configured, so encoding it would only
 // add a hop, and lklee.dev/... is shorter and cleaner to print and to type.
 //
-// !! BEFORE PRINTING: this URL returned 404 when last checked — the page is not
-// !! deployed yet. Push docs/ and enable Settings -> Pages -> Source: <branch>,
-// !! /docs, then load the URL in a browser AND scan the printed QR. If it is
-// !! still not live at print time, fall back to the arXiv line below, which is
-// !! verified working.
-#let qr-url  = "https://lklee.dev/k-order-Markov-blanket"
+// A short redirect rather than the canonical project-page URL
+// (lklee.dev/k-order-Markov-blanket): it is half the length, so the code needs
+// fewer modules and each module prints larger — a coarser code scans from
+// further away and survives a crease — and it is short enough that a reader can
+// simply type it off the poster.
+//
+// !! BEFORE PRINTING: this redirect does not exist yet, and the page it should
+// !! point at (lklee.dev/k-order-Markov-blanket) returned 404 when last checked.
+// !! Create the redirect, push docs/, enable Settings -> Pages -> Source: main,
+// !! /docs, then load the short URL in a browser AND scan the printed QR. If it
+// !! is still not live at print time, fall back to the arXiv line below, which
+// !! is verified working.
+#let qr-url  = "https://lklee.dev/uai26"
 // #let qr-url  = "https://arxiv.org/abs/2607.26357"   // verified live fallback
 // Printed as text too: the QR is otherwise the ONLY route to the work, and a
 // dead phone or an obscured code would leave a reader with nothing. Matches the
 // QR target so the text also tells you where the code goes.
-#let qr-text = "lklee.dev/k-order-Markov-blanket"
+#let qr-text = "lklee.dev/uai26"
 
 #let qr-spacing = 4   // ISO/IEC 18004 minimum quiet zone
 // One source of truth for the names: `authors` is the plain footer list,
@@ -165,10 +172,15 @@
     // headline's centring box (measured below) still matches the slot exactly.
     // Positive spacing is mandatory: the URL is white text, so any overlap with
     // the QR's white quiet zone makes it invisible.
+    //
+    // Size is bounded on both sides: the string must stay on ONE line (a wrap
+    // grows the band ~2cm and pushes the poster to a second page), and every
+    // point of height here inflates the band 1:1. 0.75em is the largest tested
+    // value that keeps both; the short URL leaves ~4cm of horizontal slack.
     let qr-block = stack(
         spacing: 0.2em,
         qr,
-        align(center, text(size: 0.50em, fill: white, weight: "bold")[#qr-text]),
+        align(center, text(size: 0.75em, fill: white, weight: "bold")[#qr-text]),
     )
     pop.title-box(
         box(inset: (left: 0.25em), height: measure(qr-block).height,
