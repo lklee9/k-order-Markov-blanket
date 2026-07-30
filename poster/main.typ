@@ -115,38 +115,52 @@
 }).join(", ")
 #let institutes = "Fraunhofer IAIS · Germany"
 // title-box lays the headline and the logo out in a horizontal `stack`, which
-// TOP-aligns them — so with the QR now taller than the text the headline sat
-// high (1.2cm above, 3.6cm below). Give the headline a box the same height as
-// the QR slot and centre inside it; both items then share one centreline.
-//   page inner width 84.1 - 2*1.6 = 80.9cm, minus the band's 2*3em x-inset
-//   (3em @ 40pt = 4.233cm) -> 72.433cm. The nominal logo slot is
-//   100% - 5% (title-box spacing) - 74% (text-relative-width) = 21%, but the
-//   QR renders slightly smaller than its slot, so 0.2035 is the factor that
-//   matches the two heights: any larger and the text box sets the band and
-//   pushes the QR off centre (measured: 0.2085 -> QR 3mm low, band +3mm).
-#let qr-slot-side = 0.2035 * 72.433cm
-#pop.title-box(
-    box(height: qr-slot-side, align(horizon, headline)),
-    // Slot width for the QR: it shares the band with the headline, and once the
-    // QR image (black area + its 4-module quiet zone) exceeds the headline's
-    // height it inflates the band 1:1. 74% with the reduced y-inset below is the
-    // largest QR that still fits one page; 70% overflows, and below ~66% the
-    // headline's manual line breaks stop fitting and it rewraps.
-    text-relative-width: 75%,
-    // Betterposters: the header band carries ONLY the message, set as large as
-    // it will go (title-size 100pt, above) so it reads across the hall. The
-    // formal title and presenting author go in the strip immediately below —
-    // NOT in the footer. Reason: on A0 portrait a footer sits at ~waist height
-    // and is behind bodies all session, which is exactly the identity info you
-    // need when you cannot get close (approach / programme-match / photograph).
-    // This is also where Morrison's own official portrait template puts them.
-    // authors: authors,
-    // institutes: institutes,
-    logo: tiaoma.qrcode(qr-url, width: 100%, options: (
-        bg-color: white,
-        whitespace-width: qr-spacing,
-        whitespace-height: qr-spacing)),
-)
+// TOP-aligns them — so with the QR taller than the text the headline sat high
+// in the band (1.2cm above, 3.6cm below). Fix: give the headline a box exactly
+// as tall as the QR and centre inside it, so both share one centreline.
+//
+// The QR's height is MEASURED rather than assumed. It has to match to the
+// millimetre: if the text box ends up taller it becomes the band-setting
+// element and pushes the QR off centre instead. Deriving it also means the
+// two percentages below stay the single source of truth — an earlier hardcoded
+// factor silently went stale the moment hdr-text-frac changed.
+//
+// Scope: this centres the headline against the QR, which assumes the QR is the
+// TALLER of the two (true by design since we maximised it). If hdr-text-frac
+// rose far enough that the QR became shorter than the headline, the text would
+// set the band height and title-box would top-align the QR instead — verified
+// at 80%, where the QR sits 7mm high. Centring both would additionally need the
+// headline's height, which cannot be measured here because its 100pt size lives
+// in title-box's internal state, not in the ambient text size.
+#let hdr-text-frac = 75%   // title-box `text-relative-width`
+#let hdr-gap       = 5%    // title-box `spacing` default
+#let hdr-x-inset   = 3em   // matches title-box-args inset.x in the theme
+#layout(avail => context {
+    // title-box applies its x-inset inside, so take it off the available width
+    let inner = avail.width - 2 * hdr-x-inset.to-absolute()
+    let qr = tiaoma.qrcode(qr-url, width: (100% - hdr-gap - hdr-text-frac) * inner,
+        options: (
+            bg-color: white,
+            whitespace-width: qr-spacing,
+            whitespace-height: qr-spacing,
+        ))
+    pop.title-box(
+        box(height: measure(qr).height, align(horizon, headline)),
+        // Slot width for the QR: it shares the band with the headline, and once
+        // the QR (black area + its 4-module quiet zone) exceeds the headline's
+        // height it inflates the band 1:1. This value with the reduced y-inset
+        // is about the largest QR that still fits one page; ~70% overflows, and
+        // below ~66% the headline's manual line breaks stop fitting.
+        text-relative-width: hdr-text-frac,
+        // Betterposters: the header band carries ONLY the message, set as large
+        // as it will go (title-size 100pt, above) so it reads across the hall.
+        // The formal title and presenting author go in the strip immediately
+        // below — NOT in a footer, which on A0 portrait sits at ~waist height
+        // and is behind bodies all session, exactly when that identity info is
+        // needed (approach / programme-match / photograph).
+        logo: qr,
+    )
+})
 
 // ---- masthead: all identity in one strip, above head height -----------------
 // Replaces the old bottom footer, which cost 5.2cm (4.3% of the sheet) to carry
