@@ -103,16 +103,24 @@
 // supply the structure, but the samples are simulated — "real" would overclaim.
 #let headline = [Higher-order faithfulness\ finds better Markov blankets,\ even on standard benchmarks]
 #let formal-title = "High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption"
-// QR target. Pointed at arXiv because that URL is VERIFIED LIVE and permanent;
-// the project page (lklee9.github.io/k-order-Markov-blanket) is the nicer hub
-// but Pages must be enabled and the URL loaded in a browser before it is safe
-// to freeze into print. Swap this one line once you have confirmed it resolves.
-#let qr-url  = "https://arxiv.org/abs/2607.26357"
-// #let qr-url = "https://lklee9.github.io/k-order-Markov-blanket"
-// Printed as text as well: the QR is otherwise the ONLY route to the work, and
-// a dead phone, a scuffed code or someone standing in front of it leaves a
-// reader with nothing. Short enough to type, and self-evidently the paper.
-#let qr-text = "arxiv.org/abs/2607.26357"
+// QR target: the project page, which fans out to the paper, the code and the
+// poster, and which you can update after the poster is frozen in print.
+//
+// Use the CUSTOM DOMAIN, not lklee9.github.io: that host 301-redirects to
+// lklee.dev while the custom domain is configured, so encoding it would only
+// add a hop, and lklee.dev/... is shorter and cleaner to print and to type.
+//
+// !! BEFORE PRINTING: this URL returned 404 when last checked — the page is not
+// !! deployed yet. Push docs/ and enable Settings -> Pages -> Source: <branch>,
+// !! /docs, then load the URL in a browser AND scan the printed QR. If it is
+// !! still not live at print time, fall back to the arXiv line below, which is
+// !! verified working.
+#let qr-url  = "https://lklee.dev/k-order-Markov-blanket"
+// #let qr-url  = "https://arxiv.org/abs/2607.26357"   // verified live fallback
+// Printed as text too: the QR is otherwise the ONLY route to the work, and a
+// dead phone or an obscured code would leave a reader with nothing. Matches the
+// QR target so the text also tells you where the code goes.
+#let qr-text = "lklee.dev/k-order-Markov-blanket"
 
 #let qr-spacing = 4   // ISO/IEC 18004 minimum quiet zone
 // One source of truth for the names: `authors` is the plain footer list,
@@ -160,7 +168,7 @@
     let qr-block = stack(
         spacing: 0.2em,
         qr,
-        align(center, text(size: 0.58em, fill: white, weight: "bold")[#qr-text]),
+        align(center, text(size: 0.50em, fill: white, weight: "bold")[#qr-text]),
     )
     pop.title-box(
         box(inset: (left: 0.25em), height: measure(qr-block).height,
