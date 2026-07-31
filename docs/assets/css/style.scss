@@ -390,6 +390,27 @@ figure { margin: 0 0 1.3rem; }
   transform: rotate(22deg);
 }
 
+// Each reading is premise -> conclusion, and the arrow ALWAYS points from the
+// premise to the conclusion. That is why reading 2 puts the GRAPH block first:
+// the contrapositive runs G -> P, so leading with P would make the arrow assert
+// the false direction (you cannot infer a missing edge from a dependence in P).
+// An earlier version stacked all six statements as one P-block over one G-block
+// with a two-headed arrow, which read as if both directions applied to all of
+// them — the poster instead gives each reading its own row and arrow.
+.reading { margin: 0.2rem 0 0.4rem; }
+
+.readnote {
+  font-size: 0.9rem;
+  color: #494949;
+  margin: 0 0 0.9rem;
+}
+
+.readsplit {
+  border: 0;
+  border-top: 1px solid #dfe4e4;
+  margin: 0 0 0.9rem;
+}
+
 // The faithfulness connector: label above a down arrow, up arrow above a label.
 .connector {
   text-align: center;
@@ -567,6 +588,19 @@ summary:focus-visible { outline: 2px solid #179c7d; outline-offset: 2px; }
   // Beside the graph the table is content-sized again, but keep enough width
   // that its caption still reads as a sentence rather than a column of words.
   .duo > .truth { width: auto; min-width: 13rem; }
+
+  // The poster reads left-to-right: premise | arrow | conclusion. Same DOM, so
+  // the phone's top-to-bottom order and this one cannot disagree.
+  .reading {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0 0.8rem;
+    align-items: center;
+  }
+
+  // -90deg is counter-clockwise, so the down arrow comes to point RIGHT, in the
+  // same direction the row now reads. The label must not rotate with it.
+  .reading .connector .arrow { transform: rotate(-90deg); }
 
   // The ladder's three rungs side by side, as on the poster. DOM order is
   // already k = 0 -> 1 -> 2, so the grid never carries meaning of its own.

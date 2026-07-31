@@ -22,6 +22,37 @@ image: /poster.png
 
 <div class="tldr"><div><h2>Our Motivation</h2><ul><li><strong>Markov blanket discovery</strong> finds the minimal set shielding a target <i>Y</i>. Underpins Bayesian / Markov network structure learning.</li><li>Nearly every method assumes <strong>faithfulness</strong>: an independence in the distribution <i>P</i> implies a separation in the graph <i>G</i>.</li><li>But faithfulness can be <strong>violated</strong>, for example: on XOR/parity relations, and on finite samples</li></ul></div><div><h2>Our Contributions</h2><ul><li><strong><i>k</i>-order faithfulness</strong>: assume an edge must still reveal itself in the distribution, but up to <i>k</i> <strong>witness</strong> variables may be needed to see it.</li><li><strong>kOMB</strong>: A proof of concept Grow-and-Shrink type algorithm. Provably recovers the blanket under <i>k</i>-order faithfulness.</li><li><strong>Result</strong>: kOMB <i>k</i> = 1 beats <strong>all eight</strong> baselines on <strong>all four</strong> benchmarks. On parity every baseline scores 0.03 where kOMB (<i>k</i> = 2) reaches <span class="wit">1.00</span>.</li></ul></div></div>
 
+## Abstract
+{: #abstract }
+
+The problem of learning the graphical Markov blanket (MB) of a variable from data has applications in many areas such as structure learning for Bayesian networks and Markov random fields, causal discovery, and feature selection. However, a common assumption most methods make is that the conditional independencies in the distribution imply the same separation in the graphical structure — also known as the **faithfulness assumption**. Unfortunately, this assumption can be violated by higher-order dependencies such as XOR and parity-type relations, and — on finite samples — by empirical violations that, in extreme cases, even induce spurious dependencies absent from the true distribution. Therefore, in this paper we propose a "*k*-order" relaxation of the faithfulness assumption that captures parity-type relationships between *k*+2 variables. We then propose a proof-of-concept algorithm called ***k*-order Markov blanket (kOMB)** that uses this relaxation for MB discovery. Finally, we empirically show how kOMB can recover the MB of a variable under both true and empirical violations of faithfulness.
+
+## Cite this work
+{: #citing }
+
+Lee, L. K., Krishnamoorthy, R., & Piatkowski, N. (2026). High-Order Markov Blanket Discovery via a *k*-Order Relaxation of the Faithfulness Assumption. arXiv:2607.26357.
+
+<details><summary>BibTeX</summary><div markdown="1">
+
+<div class="scroller" tabindex="0" role="region" aria-label="BibTeX entry" markdown="1">
+
+```bibtex
+@misc{lee2026highorder,
+  title  = {High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption},
+  author = {Lee, Loong Kuan and Krishnamoorthy, Ragavi and Piatkowski, Nico},
+  year   = {2026},
+  eprint = {2607.26357},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.LG},
+}
+```
+
+</div>
+</div></details>
+
+Cite the arXiv preprint for now. This will be replaced with the UAI proceedings entry once they are published. A machine-readable [`CITATION.cff`](https://github.com/lklee9/k-order-Markov-blanket/blob/main/CITATION.cff) is included in the repository.
+
+
 <ul class="jump"><li><a href="#faithfulness">Faithfulness</a></li><li><a href="#breaks">How it breaks</a></li><li><a href="#korder"><i>k</i>-order</a></li><li><a href="#results">Results</a></li><li><a href="#citing">Cite</a></li></ul>
 
 ## What is Faithfulness?
@@ -29,9 +60,7 @@ image: /poster.png
 
 Every independence in the distribution <i>P</i> must appear as a separation in the graph <i>G</i>.
 
-<div class="panel"><p class="cap">Example — <strong>AND gate</strong> between independent fair coins.</p><div class="duo"><table class="truth"><caption>The AND gate: <i>Y</i> = 1 only when <i>X</i> = <i>Z</i> = 1.</caption><thead><tr><th><i>X</i></th><th><i>Z</i></th><th><i>Y</i></th></tr></thead><tbody><tr><td>0</td><td>0</td><td>0</td></tr><tr><td>0</td><td>1</td><td>0</td></tr><tr><td>1</td><td>0</td><td>0</td></tr><tr><td>1</td><td>1</td><td>1</td></tr></tbody></table><div><div class="side side-p"><h3>in the distribution <i>P</i></h3><p class="rel"><i>X</i> <span class="ci" role="img" aria-label="is independent of">⊥⊥</span><sub><i>P</i></sub> <i>Z</i></p><p class="rel"><i>X</i> <span class="nci" role="img" aria-label="is not independent of">⊥⊥</span><sub><i>P</i></sub> <i>Y</i></p><p class="rel"><i>Z</i> <span class="nci" role="img" aria-label="is not independent of">⊥⊥</span><sub><i>P</i></sub> <i>Y</i></p></div><p class="connector"><span class="lbl">faithfulness</span><span class="arrow" aria-hidden="true">⇓</span><span class="arrow" aria-hidden="true">⇑</span><span class="lbl">contrapositive</span></p><div class="side side-g"><h3>in the graph <i>G</i></h3><p class="rel"><i>X</i> <span class="ci" role="img" aria-label="is separated from">⊥⊥</span><sub><i>G</i></sub> <i>Z</i></p><p class="rel"><i>X</i> <span class="nci" role="img" aria-label="is not separated from">⊥⊥</span><sub><i>G</i></sub> <i>Y</i></p><p class="rel"><i>Z</i> <span class="nci" role="img" aria-label="is not separated from">⊥⊥</span><sub><i>G</i></sub> <i>Y</i></p></div><img class="dag plate" src="assets/fig/collider.svg" alt="Collider: X and Z each point into Y, and there is no edge between X and Z"></div></div></div>
-
-Read forwards, faithfulness applies to the non-adjacent pair <i>X</i>, <i>Z</i>. Read backwards — the contrapositive — it applies to the adjacent pairs <i>X</i>, <i>Y</i> and <i>Z</i>, <i>Y</i>, and *that* is the direction Markov blanket discovery relies on.
+<div class="panel"><p class="cap">Example — <strong>AND gate</strong> between independent fair coins.</p><div class="duo"><table class="truth"><caption>The AND gate: <i>Y</i> = 1 only when <i>X</i> = <i>Z</i> = 1.</caption><thead><tr><th scope="col"><i>X</i></th><th scope="col"><i>Z</i></th><th scope="col"><i>Y</i></th></tr></thead><tbody><tr><td>0</td><td>0</td><td>0</td></tr><tr><td>0</td><td>1</td><td>0</td></tr><tr><td>1</td><td>0</td><td>0</td></tr><tr><td>1</td><td>1</td><td>1</td></tr></tbody></table><img class="dag plate" src="assets/fig/collider.svg" alt="Collider: X and Z each point into Y, and there is no edge between X and Z"></div><div class="reading"><div class="side side-p"><h3>in the distribution <i>P</i></h3><p class="rel"><i>X</i> <span class="ci" role="img" aria-label="is independent of">⊥⊥</span><sub><i>P</i></sub> <i>Z</i></p></div><p class="connector"><span class="lbl">faithfulness</span><span class="arrow" aria-hidden="true">⇓</span><span class="vh">implies</span></p><div class="side side-g"><h3>in the graph <i>G</i></h3><p class="rel"><i>X</i> <span class="ci" role="img" aria-label="is separated from">⊥⊥</span><sub><i>G</i></sub> <i>Z</i></p></div></div><p class="readnote">Read forwards, on the <strong>non-adjacent</strong> pair <i>X</i>, <i>Z</i>.</p><hr class="readsplit"><div class="reading"><div class="side side-g"><h3>in the graph <i>G</i></h3><p class="rel"><i>X</i> <span class="nci" role="img" aria-label="is not separated from">⊥⊥</span><sub><i>G</i></sub> <i>Y</i></p><p class="rel"><i>Z</i> <span class="nci" role="img" aria-label="is not separated from">⊥⊥</span><sub><i>G</i></sub> <i>Y</i></p></div><p class="connector"><span class="lbl">contrapositive</span><span class="arrow" aria-hidden="true">⇓</span><span class="vh">implies</span></p><div class="side side-p"><h3>in the distribution <i>P</i></h3><p class="rel"><i>X</i> <span class="nci" role="img" aria-label="is not independent of">⊥⊥</span><sub><i>P</i></sub> <i>Y</i></p><p class="rel"><i>Z</i> <span class="nci" role="img" aria-label="is not independent of">⊥⊥</span><sub><i>P</i></sub> <i>Y</i></p></div></div><p class="readnote">Read backwards, on the <strong>adjacent</strong> pairs <i>X</i>, <i>Y</i> and <i>Z</i>, <i>Y</i> — the direction Markov blanket discovery relies on, and the one XOR breaks.</p></div>
 
 Generally under the faithfulness assumption:
 
@@ -80,11 +109,6 @@ Increasing order admits edges invisible on lower orders. Generally, parity over 
 - **A bigger search budget cuts both ways**: it wins on Alarm1 and Insurance, but on high-cardinality nets the independence tests lose power, and *k* = 1 wins. The Barley (+0.18) and Mildew (+0.13) gains over the best baseline both exceed 2 SE; on Alarm1 and Insurance the margin is within noise.
 - **The cost.** Runtime grows with the budget: *k* = 1 takes 5–58 s, *k* = 2 takes 14–336 s, *k* = 3 hits a 30-min cap. *k* = *l* ≤ 2 is a robust default, and approximate variants that keep the guarantee while taming the *k* = 2 cost are the open problem.
 
-## Abstract
-{: #abstract }
-
-The problem of learning the graphical Markov blanket (MB) of a variable from data has applications in many areas such as structure learning for Bayesian networks and Markov random fields, causal discovery, and feature selection. However, a common assumption most methods make is that the conditional independencies in the distribution imply the same separation in the graphical structure — also known as the **faithfulness assumption**. Unfortunately, this assumption can be violated by higher-order dependencies such as XOR and parity-type relations, and — on finite samples — by empirical violations that, in extreme cases, even induce spurious dependencies absent from the true distribution. Therefore, in this paper we propose a "*k*-order" relaxation of the faithfulness assumption that captures parity-type relationships between *k*+2 variables. We then propose a proof-of-concept algorithm called ***k*-order Markov blanket (kOMB)** that uses this relaxation for MB discovery. Finally, we empirically show how kOMB can recover the MB of a variable under both true and empirical violations of faithfulness.
-
 ## The poster
 {: #poster }
 
@@ -114,31 +138,5 @@ pip install -r requirements.txt
 Datasets are not committed — `experiments/get_data.py` fetches the benchmark networks and generates the synthetic ones. The [README](https://github.com/lklee9/k-order-Markov-blanket#readme) documents the full pipeline, including how to regenerate every table and figure in the paper from scratch.
 
 </div></details>
-
-## Cite this work
-{: #citing }
-
-Lee, L. K., Krishnamoorthy, R., & Piatkowski, N. (2026). High-Order Markov Blanket Discovery via a *k*-Order Relaxation of the Faithfulness Assumption. *UAI 2026*. arXiv:2607.26357.
-
-<details><summary>BibTeX</summary><div markdown="1">
-
-<div class="scroller" tabindex="0" role="region" aria-label="BibTeX entry" markdown="1">
-
-```bibtex
-@inproceedings{lee2026highorder,
-  title     = {High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption},
-  author    = {Lee, Loong Kuan and Krishnamoorthy, Ragavi and Piatkowski, Nico},
-  booktitle = {Proceedings of the Conference on Uncertainty in Artificial Intelligence (UAI)},
-  year      = {2026},
-  eprint    = {2607.26357},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.LG},
-}
-```
-
-</div>
-</div></details>
-
-A machine-readable [`CITATION.cff`](https://github.com/lklee9/k-order-Markov-blanket/blob/main/CITATION.cff) is included in the repository.
 
 <p class="funding">Funded by the Federal Ministry of Research, Technology and Space of Germany and the state of North Rhine-Westphalia as part of the Lamarr Institute for Machine Learning and Artificial Intelligence.</p>
