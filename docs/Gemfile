@@ -1,0 +1,19 @@
+# Local preview only. GitHub Pages ignores this file and builds with its own
+# pinned gem set; the `github-pages` gem mirrors that set exactly (it reported
+# Jekyll v3.10.0 in the live page's generator meta), so a local build is what
+# actually ships. Jekyll's default `exclude` keeps Gemfile* out of the output.
+#
+#   bundle install --path vendor/bundle
+#   bundle exec jekyll serve --livereload
+source "https://rubygems.org"
+
+gem "github-pages", group: :jekyll_plugins
+
+# Ruby 3.4 moved these out of the default gems, but Jekyll 3.10 and its
+# dependencies still require them, so they have to be requested explicitly.
+gem "webrick"      # `jekyll serve` needs it from Ruby 3.0 on
+gem "csv"
+gem "base64"
+gem "bigdecimal"
+gem "logger"
+gem "ostruct"

@@ -661,14 +661,18 @@
         // Replaces the old benchmark table. All 8 baselines as grey ticks
         // (best whiskered), kOMB k=1 filled / k=2 hollow orange with ±1 SE
         // whiskers, lanes grouped by cardinality. Data from
-        // experiments/output/real_f1.csv; SE = std over the 10 targets /sqrt(10).
+        // experiments/output/real_f1.csv. std there is over 100 runs (10 targets x
+        // 10 samples); SE = std/sqrt(10), i.e. treating the 10 targets as the
+        // independent units. Verified: 0.0593->0.059, 0.0444->0.044, 0.0406->0.041.
         #let bench-data = (
-            // `card` = mean domain size |X| per variable, measured over all ten
-            // s5000 samples in experiments/data/<net>/. Lanes are ordered by it,
-            // so the "higher cardinality favours lower k" trend is spatial.
+            // `card` = mean number of states per variable: distinct values are
+            // POOLED over all ten s5000 samples in experiments/data/<net>/ and
+            // then averaged over variables (averaging per-sample instead gives
+            // 2.8/3.3/8.4/15.1). Lanes are ordered by it, so the "higher
+            // cardinality favours lower k" trend is spatial.
             (name: "Alarm1",    card: "2.8", bl: (0.674, 0.343, 0.764, 0.693, 0.681, 0.769, 0.737, 0.660), best: 5, bestse: 0.059, k1: (0.780, 0.036), k2: (0.821, 0.061)),
             (name: "Insurance", card: "3.3", bl: (0.659, 0.461, 0.675, 0.629, 0.628, 0.698, 0.630, 0.565), best: 5, bestse: 0.044, k1: (0.714, 0.042), k2: (0.734, 0.051)),
-            (name: "Barley",    card: "8.7", bl: (0.339, 0.211, 0.340, 0.337, 0.337, 0.330, 0.228, 0.215), best: 2, bestse: 0.041, k1: (0.516, 0.062), k2: (0.313, 0.050)),
+            (name: "Barley",    card: "8.6", bl: (0.339, 0.211, 0.340, 0.337, 0.337, 0.330, 0.228, 0.215), best: 2, bestse: 0.041, k1: (0.516, 0.062), k2: (0.313, 0.050)),
             (name: "Mildew",    card: "15.4", bl: (0.495, 0.287, 0.492, 0.468, 0.467, 0.486, 0.416, 0.273), best: 0, bestse: 0.034, k1: (0.622, 0.050), k2: (0.436, 0.044)),
         )
         #let grey-dark = rgb("#6E7676")

@@ -62,3 +62,11 @@ wheels/
 # ---- Poster build artifacts (mirrors the paper convention above) ----
 /poster/auto/
 /poster/main.pdf
+
+# ---- Project-page local preview (Jekyll); the site is built by GitHub Pages ----
+/docs/_site/
+/docs/vendor/
+/docs/.jekyll-cache/
+/docs/.bundle/
+/docs/Gemfile.lock
+/.claude/launch.json

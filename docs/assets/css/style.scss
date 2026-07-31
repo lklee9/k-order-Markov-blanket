@@ -1,0 +1,624 @@
+---
+# Empty front matter is REQUIRED — it is what makes Jekyll run this through Sass.
+# A file at this path shadows the theme's own assets/css/style.scss.
+---
+
+// Overrides for jekyll-theme-minimal 0.2.0 (pinned by docs/Gemfile via the
+// github-pages gem). Importing the theme first keeps its typography, its
+// rouge-github code highlighting and its print block; everything below only adds
+// properties to selectors that exist in 0.2.0. `header { display: none }` is the
+// one rule that would break loudly on a gem bump that renames that element.
+@import "{{ site.theme }}";
+
+// ===========================================================================
+//  1. Neutralise the two-column float layout, at EVERY width.
+// ---------------------------------------------------------------------------
+//  Stock 0.2.0 is: header 270px fixed-position float, section 500px float,
+//  footer 270px fixed float. That has three consequences this page cannot live
+//  with: the content column is capped at 500px so figures and 5-column tables
+//  are cramped; the sidebar's site title and description duplicate the paper
+//  title; and on a phone the sidebar block comes FIRST, so the reader scrolls
+//  past ~230px of site chrome before reaching the paper title, and ~610px
+//  before reaching a single link.
+//
+//  So: hide the sidebar, and run one centred column at all widths. There is no
+//  second layout to maintain, and figures tuned for a 360px phone simply scale
+//  up to the ~690px measure on a desktop.
+// ===========================================================================
+header { display: none; }
+
+body {
+  margin: 0;                 // the UA's 8px was adding to .wrapper's padding
+  padding: 1.75rem 0 0;
+  font-size: 1.0625rem;      // = 17px at a 16px root; rem so OS text scaling works
+  line-height: 1.6;
+  color: #3c4142;
+  -webkit-text-size-adjust: 100%;
+}
+
+// `div.wrapper`, not `.wrapper`: the theme's <=960px block sets
+// `div.wrapper { margin: 0 }` at specificity (0,1,1), which beats a bare class
+// selector and pins the column to the left edge on tablet widths.
+div.wrapper {
+  width: auto;
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 0 1.15rem;
+}
+
+section {
+  width: auto;
+  float: none;
+  border: 0;
+  margin: 0;
+  padding: 0 0 2.5rem;
+}
+
+footer {
+  position: static;
+  float: none;
+  width: auto;
+  padding: 1.25rem 0 2.5rem;
+  border-top: 1px solid #e5e5e5;
+  font-size: 0.85rem;
+  color: #6e7676;
+}
+
+// The theme bolds every link on hover, which reflows the line under the cursor
+// and makes the button grid twitch. Keep the weight, change the colour instead.
+a:hover,
+a:focus {
+  font-weight: inherit;
+}
+
+// WCAG 1.4.1: the theme sets `a { text-decoration: none }`, leaving in-prose
+// links identifiable by colour alone. Underline running-text links only — the
+// button grid and the jump chips carry their own shape affordance.
+section p a,
+section li a,
+.figcap a,
+.legend a,
+footer a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.btns a,
+.jump a { text-decoration: none; }
+
+// ===========================================================================
+//  2. Typography
+// ===========================================================================
+h1 {
+  font-size: clamp(1.5rem, 5.4vw, 2.1rem);
+  line-height: 1.18;
+  color: #1b1f20;
+  margin: 0 0 0.75rem;
+}
+
+h2 {
+  font-size: 1.32rem;
+  margin: 2.5rem 0 0.85rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid #179c7d;
+  color: #1b1f20;
+}
+
+h3 { font-size: 1.03rem; margin: 0 0 0.5rem; }
+
+// The two summary-box headings are h2 for document structure, but must not
+// inherit the section-rule styling of the page's real h2s.
+.tldr h2 {
+  font-size: 1.03rem;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  border: 0;
+}
+
+// Long words (URLs, kOMB-1-2, arXiv ids) must never be the thing that widens
+// the page. Everything wide gets an explicit scroller below instead.
+p, li, td, th, dd { overflow-wrap: break-word; }
+
+// ===========================================================================
+//  3. Hero — requirement: paper title, authors and links come FIRST on a phone.
+// ===========================================================================
+.eyebrow {
+  font-size: 0.78rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #6e7676;
+  margin: 0 0 0.5rem;
+}
+
+.authors { margin: 0 0 0.15rem; }
+.authors strong { color: #1b1f20; }
+
+.affil {
+  margin: 0 0 0.9rem;
+  color: #6e7676;
+  font-size: 0.95rem;
+}
+
+.logo { margin: 0 0 1.1rem; }
+.logo img { height: 26px; width: auto; display: block; }
+
+// 2x2 on a phone so all four targets are in the first screenful; a single row
+// once there is room. 48px min-height is the tap-target floor — the plain
+// inline links this replaces measured 19px.
+.btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+  margin: 0 0 0.7rem;
+}
+
+.btns a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  background: #10745d;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.btns a:hover,
+.btns a:focus {
+  background: #0c5a48;
+  color: #fff;
+}
+
+.btns a.ghost {
+  background: #fff;
+  color: #10745d;
+  border: 2px solid #179c7d;
+}
+
+.btns a.ghost:hover,
+.btns a.ghost:focus {
+  background: #e8f5f2;
+  color: #0d5c4a;
+}
+
+// Plain-text repeat of the same targets: insurance against Reader Mode or a
+// stylesheet failure stripping the grid above.
+.plainlinks {
+  font-size: 0.88rem;
+  color: #6e7676;
+  margin: 0 0 1.6rem;
+}
+
+// ===========================================================================
+//  4. Cards
+// ===========================================================================
+// #179C7D, the poster green, is only 3.45:1 against white — and at 1.16rem
+// (18.56px) bold this misses WCAG's 18.66px "large text" threshold by a tenth of
+// a pixel, so it needs the full 4.5:1. #14866C is the same hue at 86% brightness
+// and the closest darker green that clears it (4.51:1). Print keeps #179C7D,
+// where contrast ratios do not apply.
+.claim {
+  background: #14866c;
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.95rem 1.05rem;
+  margin: 0 0 0.5rem;
+  font-size: 1.16rem;
+  font-weight: 700;
+  line-height: 1.32;
+}
+
+// Outside the green card on purpose: white on #179C7D is 3.45:1, which clears
+// AA for large/bold text only, and this is neither.
+.caveat {
+  font-size: 1rem;
+  color: #555;
+  margin: 0 0 1.75rem;
+}
+
+.tldr {
+  background: #e8f5f2;
+  border-radius: 10px;
+  padding: 1rem 1.1rem 0.4rem;
+  margin: 0 0 1.6rem;
+}
+
+.tldr h2 { color: #006e92; }
+.tldr ul { margin: 0 0 1rem; padding-left: 1.1rem; }
+.tldr li { margin-bottom: 0.45rem; }
+@media screen and (max-width: 43.99rem) {
+  .tldr > div + div h2 { margin-top: 0.4rem; }
+}
+
+// Section jump list. Chips, not a bulleted list, so it stays one thumb-height.
+.jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.jump a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.85rem;
+  border: 1px solid #cfd6d6;
+  border-radius: 22px;
+  font-size: 0.92rem;
+  text-decoration: none;
+}
+
+.jump a:hover,
+.jump a:focus { border-color: #179c7d; background: #f2faf8; }
+
+// ===========================================================================
+//  5. Figure panels — the poster's white framed blocks, captions above.
+// ===========================================================================
+.panel {
+  border: 1.5px solid #a8afaf;
+  border-radius: 8px;
+  padding: 0.85rem 0.9rem 0.6rem;
+  margin: 0 0 1.4rem;
+  background: #fff;
+}
+
+.panel .cap,
+.figcap {
+  font-size: 0.92rem;
+  color: #494949;
+  margin: 0 0 0.7rem;
+}
+
+.figcap { margin-top: 0.2rem; }
+
+// The UA default is figure{margin:1em 40px}, which the theme never resets — it
+// was insetting the chart and the collider by 40px on each side and costing a
+// quarter of the available width on a phone.
+figure { margin: 0 0 1.3rem; }
+
+// Direct child only: `.side h3` also lives inside a .panel and is styled below.
+.panel > h3 {
+  font-size: 0.98rem;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  border: 0;
+  color: #1b1f20;
+}
+
+// The DAGs are sized by HEIGHT, never by width. The three ladder rungs carry 2,
+// 3 and 4 nodes at identical intrinsic heights (80x208, 232x208, 384x208), so
+// height-sizing makes their widths grow 1 : 2.9 : 4.8 with equal-diameter
+// circles — which IS the "same graph, more witnesses" argument. Width-sizing
+// would instead scale the k = 0 circles to twice the k = 2 diameter.
+.dag {
+  display: block;
+  height: auto;
+  max-height: 6.4em;         // max-height, not height: with max-width:100% a
+  width: auto;               // fixed height squashes the aspect ratio instead
+  max-width: 100%;           // of scaling (measured: k=2 rung -2.8% at ~710px)
+  margin: 0.2rem auto 0.6rem;
+  object-fit: contain;
+}
+
+.dag-sm { max-height: 5.4em; }
+
+// The figures are transparent SVG. Give them an explicit white plate so an
+// Android auto-dark pass cannot leave black strokes on a black background.
+.plate { background: #fff; border-radius: 6px; }
+
+// The one raster figure. Portrait-ish by design, so it never needs a scroller.
+.chart {
+  display: block;
+  width: 100%;
+  max-width: 24rem;
+  height: auto;
+  margin: 0.3rem auto 0.5rem;
+  background: #fff;
+}
+
+.legend {
+  font-size: 0.95rem;
+  color: #494949;
+  margin: 0 0 1rem;
+}
+
+// ===========================================================================
+//  6. The P => G implication blocks and the CI relations
+// ===========================================================================
+.side {
+  border-radius: 6px;
+  padding: 0.55rem 0.7rem;
+  margin: 0;
+}
+
+.side-p { background: #eaf4f8; }
+.side-g { background: #e8f5f2; }
+
+.side h3 {
+  margin: 0 0 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.side-p h3 { color: #006e92; }
+.side-g h3 { color: #0e6b57; }
+
+.rel { margin: 0.15rem 0; font-size: 1.05rem; }
+.rel i { font-family: Georgia, "Times New Roman", serif; }
+
+// U+2AEB (the real double-tack) is tofu in several iOS/Android system fonts, so
+// the relation is composed from two U+22A5 tacks pulled together. The padding
+// gives back the space the negative tracking steals from the following word.
+.ci,
+.nci {
+  display: inline-block;
+  letter-spacing: -0.26em;
+  padding-right: 0.3em;
+  font-style: normal;
+  // line-height 1 makes the box the height of the glyph, so the cancel bar
+  // below can be positioned against the glyph instead of against an inherited
+  // line box — otherwise the bar's length changes with every line-height.
+  line-height: 1;
+}
+
+// Likewise U+21CD: the negation is a drawn rule, not a glyph.
+//
+// It has to be a STEEP bar that overshoots the glyph top and bottom. A shallow
+// diagonal instead lands on the two tacks' baselines and closes a triangle with
+// them — it read as a single "⊿" glyph rather than as a cancelled relation.
+.nci { position: relative; }
+
+// left is the midpoint between the two tack stems, which sit at roughly 0.36em
+// and 0.82em once the -0.26em tracking is applied.
+.nci::after {
+  content: "";
+  position: absolute;
+  left: 0.55em;
+  top: -0.16em;
+  bottom: -0.16em;
+  width: 0.085em;
+  background: currentColor;
+  transform: rotate(22deg);
+}
+
+// The faithfulness connector: label above a down arrow, up arrow above a label.
+.connector {
+  text-align: center;
+  color: #b04e00;
+  font-weight: 700;
+  margin: 0.6rem 0;
+  line-height: 1.15;
+}
+
+.connector .arrow { font-size: 1.5rem; display: block; line-height: 1.05; }
+.connector .lbl { font-size: 0.86rem; letter-spacing: 0.02em; }
+
+// The P-statement / arrow / G-statement stack reads as one vertical unit, so it
+// is centred as a block — left-aligning the statements while the arrow between
+// them is centred makes the arrow look unrelated to either.
+.implic { text-align: center; }
+.implic .rel { margin: 0.1rem 0; }
+
+// The broken implication inside the two violation cards. Red, and it carries the
+// words "does not imply" for anyone who cannot see the arrow.
+.breaks-arrow {
+  text-align: center;
+  color: #c1272d;
+  margin: 0.45rem 0;
+  line-height: 1.15;
+}
+
+// The poster negates this arrow with a real glyph (U+21CD, main.typ:84). On the
+// page the same U+21D3 also carries a VALID implication in .connector, so the
+// negation is drawn here rather than left to the adjacent red words alone.
+.breaks-arrow .arrow {
+  font-size: 1.45rem;
+  display: block;
+  position: relative;
+  width: 1em;
+  margin: 0 auto;
+}
+
+.breaks-arrow .arrow::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 20%;
+  bottom: 20%;
+  width: 0.055em;
+  background: currentColor;
+  transform: translateX(-0.02em) rotate(48deg);
+}
+.breaks-arrow .lbl { font-size: 0.82rem; font-weight: 700; }
+
+.eqbox {
+  background: #dcf0ec;
+  border-radius: 6px;
+  padding: 0.7rem 0.85rem;
+  margin: 0.6rem 0 1.2rem;
+  font-size: 1.02rem;
+}
+
+.eqbox p { margin: 0.25rem 0; }
+.eqbox .scope { font-size: 0.86rem; color: #4a5152; }
+
+.verdict-ok,
+.verdict-no { font-weight: 700; white-space: nowrap; }
+.verdict-ok { color: #12836a; }
+.verdict-no { color: #c1272d; }
+.dim { color: #6e7676; }
+.wit { color: #b04e00; font-weight: 700; }
+
+// ===========================================================================
+//  7. Tables and code — the two things that made the page scroll sideways.
+//     Measured before: tables laid out at 388px and <pre> at 517/937px inside a
+//     314px column, for 51px of horizontal document overflow.
+// ===========================================================================
+.scroller {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 0 0.9rem;
+}
+
+.scroller:focus-visible { outline: 2px solid #179c7d; outline-offset: 2px; }
+
+table { font-size: 0.95rem; margin: 0; }
+th, td { padding: 0.35rem 0.45rem; }
+caption {
+  caption-side: bottom;
+  font-size: 0.85rem;
+  color: #6e7676;
+  text-align: left;
+  padding-top: 0.4rem;
+}
+
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+// Truth tables take the full column on a phone. Content-sizing them looks
+// tidier but strands the <caption>, which inherits the table's box: at `width:
+// auto` the table is ~165px and the caption wrapped over four lines.
+.truth { width: 100%; font-size: 0.92rem; }
+.truth th, .truth td { text-align: center; padding: 0.22rem 0.6rem; }
+.truth .flip { color: #c1272d; font-weight: 700; }
+
+pre { max-width: 100%; font-size: 0.86rem; }
+code { font-size: 0.92em; }
+
+// Screen-reader-only text, for cues that are otherwise colour-only.
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// ===========================================================================
+//  8. Disclosure widgets. Only ever wrap content that is redundant or optional
+//     — <details> is invisible to find-in-page and is lost when printing.
+// ===========================================================================
+details {
+  border: 1px solid #e0e5e5;
+  border-radius: 8px;
+  padding: 0 0.85rem;
+  margin: 0 0 1.2rem;
+}
+
+details[open] { padding-bottom: 0.6rem; }
+details[open] > summary::before { transform: rotate(90deg); }
+
+summary {
+  display: flex;
+  align-items: center;
+  // display:flex suppresses the UA's ::marker, so the triangle is redrawn here
+  // — without it the four <details> have no visual expand affordance at all.
+  &::before {
+    content: "\25B8";
+    margin-right: 0.5rem;
+    transition: transform 0.15s ease;
+  }
+  min-height: 48px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #10745d;
+}
+
+summary:focus-visible { outline: 2px solid #179c7d; outline-offset: 2px; }
+
+.funding { font-size: 0.88rem; color: #555; margin: 2rem 0 0; }
+
+// ===========================================================================
+//  9. Wider viewports. Same DOM, same single column — only four things change.
+// ===========================================================================
+@media screen and (min-width: 44rem) {
+  body { font-size: 1.125rem; padding-top: 2.5rem; }
+
+  .btns { grid-template-columns: repeat(4, 1fr); }
+
+  // The poster's summary box was two columns; restore that here.
+  .tldr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 1.6rem;
+  }
+
+  // The poster's read-across: truth table beside the graph.
+  .duo {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0 1.4rem;
+    align-items: center;
+  }
+
+  // Beside the graph the table is content-sized again, but keep enough width
+  // that its caption still reads as a sentence rather than a column of words.
+  .duo > .truth { width: auto; min-width: 13rem; }
+
+  // The ladder's three rungs side by side, as on the poster. DOM order is
+  // already k = 0 -> 1 -> 2, so the grid never carries meaning of its own.
+  // Two panel rows share .ladder but hold different counts: the violations
+  // block has 2, the k-order rung block has 3. A single repeat(3, 1fr) left the
+  // violations block with an empty third column; repeat(auto-fit, …) instead
+  // collapsed the rung block to 2 tracks at 860px, breaking the 3-across
+  // comparison that IS the argument. So each row declares its own track count.
+  .ladder--duo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .ladder--duo > .panel { margin: 0; }
+}
+
+// Narrowest phones still in use (iPhone SE 1st gen / small Androids at 320px).
+// At the default 0.95rem the four-column results table measures 290px inside a
+// 267px column and needs 23px of sideways scroll — the exact hazard the layout
+// exists to avoid. Tightening type and cell padding makes it fit outright.
+@media screen and (max-width: 22.5rem) {
+  table { font-size: 0.86rem; }
+  th, td { padding: 0.3rem 0.28rem; }
+  .claim { font-size: 1.1rem; }
+}
+
+// The three rungs go side by side only once .wrapper has reached its 46rem cap,
+// so the tracks are ~222px rather than being squeezed at the 44rem breakpoint.
+@media screen and (min-width: 48rem) {
+  .ladder--trio {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .ladder--trio > .panel { margin: 0; }
+}
+
+// The theme's own print block sets 12pt/0.4in. Add link targets, and stop the
+// cards from being invisible tinted boxes on a mono printer.
+@media print {
+  .btns, .jump { display: none; }
+  .claim { background: #fff; color: #000; border: 2px solid #000; }
+  .tldr, .eqbox, .side-p, .side-g { background: #fff; border: 1px solid #999; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; }
+}
+
+// ===========================================================================
+//  10. Two of the theme's rouge syntax colours fail AA on its own #f8f8f8 code
+//      background: .nb (shell builtins) at 3.91:1 and .na (BibTeX field names)
+//      at 4.49:1. Same hues, darkened to 6.9:1 and 6.4:1.
+// ===========================================================================
+.highlight .nb { color: #005e7a; }
+.highlight .na { color: #00666b; }

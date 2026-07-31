@@ -1,9 +1,29 @@
 # GitHub Pages (Jekyll) config for the project page.
-# Enable in the repo: Settings -> Pages -> Source: <default branch>, folder /docs
+# Live at https://lklee.dev/k-order-Markov-blanket/ (Settings -> Pages ->
+# Source: main, folder /docs). lklee.dev/uai26 is a redirect to it, served from
+# the lklee9.github.io user-site repo — that is the URL printed on the poster.
 title: High-Order Markov Blanket Discovery
 description: >-
   A k-order relaxation of the faithfulness assumption, and kOMB — a Markov
   blanket discovery algorithm that recovers members hidden by XOR/parity-type
   dependence. UAI 2026.
+
+# Without these, jekyll-seo-tag has no absolute base and emits `http://` (not
+# https) canonical and og:url tags, and page-relative image paths never
+# absolutize — so shared links unfurl with no preview image.
+url: https://lklee.dev
+baseurl: /k-order-Markov-blanket
+
+# GitHub injects this as PAGES_REPO_NWO when it builds, but a local `jekyll
+# build` infers it from the `origin` remote — which here points at an internal
+# GitLab, so the theme's github-metadata lookup fails hard without this. It also
+# drives the theme's "View the Project on GitHub" link.
+repository: lklee9/k-order-Markov-blanket
+
+# The poster thumbnail is 1200px wide, so ask for the large card rather than the
+# default 120px square thumbnail.
+twitter:
+  card: summary_large_image
+
 theme: jekyll-theme-minimal
 show_downloads: false
