@@ -17,11 +17,6 @@ image: /poster.png
 <nav class="btns" aria-label="Paper and code"><a href="https://arxiv.org/abs/2607.26357">Paper<br>(arXiv)</a><a href="poster.pdf">Poster<br>(PDF)</a><a href="https://github.com/lklee9/k-order-Markov-blanket">Code</a><a class="ghost" href="#citing">Cite</a></nav>
 <p class="plainlinks">Or as plain text: arXiv:2607.26357 (<a href="https://arxiv.org/pdf/2607.26357">direct PDF</a>) · <a href="https://github.com/lklee9/k-order-Markov-blanket/blob/main/CITATION.cff">CITATION.cff</a></p>
 
-<p class="claim">Higher-order faithfulness finds better Markov blankets, even on standard benchmarks.</p>
-<p class="caveat">The four benchmark networks supply real network structure; the samples are drawn from those networks — hence “standard benchmarks”, not real-world data.</p>
-
-<div class="tldr"><div><h2>Our Motivation</h2><ul><li><strong>Markov blanket discovery</strong> finds the minimal set shielding a target <i>Y</i>. Underpins Bayesian / Markov network structure learning.</li><li>Nearly every method assumes <strong>faithfulness</strong>: an independence in the distribution <i>P</i> implies a separation in the graph <i>G</i>.</li><li>But faithfulness can be <strong>violated</strong>, for example: on XOR/parity relations, and on finite samples</li></ul></div><div><h2>Our Contributions</h2><ul><li><strong><i>k</i>-order faithfulness</strong>: assume an edge must still reveal itself in the distribution, but up to <i>k</i> <strong>witness</strong> variables may be needed to see it.</li><li><strong>kOMB</strong>: A proof of concept Grow-and-Shrink type algorithm. Provably recovers the blanket under <i>k</i>-order faithfulness.</li><li><strong>Result</strong>: kOMB <i>k</i> = 1 beats <strong>all eight</strong> baselines on <strong>all four</strong> benchmarks. On parity every baseline scores 0.03 where kOMB (<i>k</i> = 2) reaches <span class="wit">1.00</span>.</li></ul></div></div>
-
 ## Abstract
 {: #abstract }
 
@@ -30,18 +25,20 @@ The problem of learning the graphical Markov blanket (MB) of a variable from dat
 ## Cite this work
 {: #citing }
 
-Lee, L. K., Krishnamoorthy, R., & Piatkowski, N. (2026). High-Order Markov Blanket Discovery via a *k*-Order Relaxation of the Faithfulness Assumption. arXiv:2607.26357.
+Lee, L. K., Krishnamoorthy, R., & Piatkowski, N. (2026). High-Order Markov Blanket Discovery via a *k*-Order Relaxation of the Faithfulness Assumption. In *Proceedings of the Conference on Uncertainty in Artificial Intelligence (UAI)*. To appear. arXiv:2607.26357.
 
 <details><summary>BibTeX</summary><div markdown="1">
 
 <div class="scroller" tabindex="0" role="region" aria-label="BibTeX entry" markdown="1">
 
 ```bibtex
-@misc{lee2026highorder,
-  title  = {High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption},
-  author = {Lee, Loong Kuan and Krishnamoorthy, Ragavi and Piatkowski, Nico},
-  year   = {2026},
-  eprint = {2607.26357},
+@inproceedings{lee2026highorder,
+  title     = {High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption},
+  author    = {Lee, Loong Kuan and Krishnamoorthy, Ragavi and Piatkowski, Nico},
+  booktitle = {Proceedings of the Conference on Uncertainty in Artificial Intelligence (UAI)},
+  year      = {2026},
+  note      = {To appear},
+  eprint    = {2607.26357},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG},
 }
@@ -50,7 +47,14 @@ Lee, L. K., Krishnamoorthy, R., & Piatkowski, N. (2026). High-Order Markov Blank
 </div>
 </div></details>
 
-Cite the arXiv preprint for now. This will be replaced with the UAI proceedings entry once they are published. A machine-readable [`CITATION.cff`](https://github.com/lklee9/k-order-Markov-blanket/blob/main/CITATION.cff) is included in the repository.
+The proceedings are not published yet, so the entry is marked *to appear* and carries the arXiv id; volume and pages will be added once they exist. A machine-readable [`CITATION.cff`](https://github.com/lklee9/k-order-Markov-blanket/blob/main/CITATION.cff) is included in the repository.
+
+
+
+<p class="claim">Higher-order faithfulness finds better Markov blankets, even on standard benchmarks.</p>
+<p class="caveat">The four benchmark networks supply real network structure; the samples are drawn from those networks — hence “standard benchmarks”, not real-world data.</p>
+
+<div class="tldr"><div><h2>Our Motivation</h2><ul><li><strong>Markov blanket discovery</strong> finds the minimal set shielding a target <i>Y</i>. Underpins Bayesian / Markov network structure learning.</li><li>Nearly every method assumes <strong>faithfulness</strong>: an independence in the distribution <i>P</i> implies a separation in the graph <i>G</i>.</li><li>But faithfulness can be <strong>violated</strong>, for example: on XOR/parity relations, and on finite samples</li></ul></div><div><h2>Our Contributions</h2><ul><li><strong><i>k</i>-order faithfulness</strong>: assume an edge must still reveal itself in the distribution, but up to <i>k</i> <strong>witness</strong> variables may be needed to see it.</li><li><strong>kOMB</strong>: A proof of concept Grow-and-Shrink type algorithm. Provably recovers the blanket under <i>k</i>-order faithfulness.</li><li><strong>Result</strong>: kOMB <i>k</i> = 1 beats <strong>all eight</strong> baselines on <strong>all four</strong> benchmarks. On parity every baseline scores 0.03 where kOMB (<i>k</i> = 2) reaches <span class="wit">1.00</span>.</li></ul></div></div>
 
 
 <ul class="jump"><li><a href="#faithfulness">Faithfulness</a></li><li><a href="#breaks">How it breaks</a></li><li><a href="#korder"><i>k</i>-order</a></li><li><a href="#results">Results</a></li><li><a href="#citing">Cite</a></li></ul>

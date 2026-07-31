@@ -19,14 +19,16 @@ authors:
     affiliation: "Fraunhofer IAIS"
 repository-code: "https://github.com/lklee9/k-order-Markov-blanket"
 url: "https://lklee.dev/k-order-Markov-blanket"
-# The paper is accepted at UAI 2026, but the proceedings are not published yet,
-# so the preferred citation points at the arXiv preprint. Switch this back to
-# type: conference-paper with a collection-title once they appear.
+# The anticipated proceedings entry: people copy a citation once and rarely come
+# back, so the record they copy should be the one they ought to end up with. The
+# `notes` field carries the to-appear status. Add volume/pages/publisher (PMLR)
+# once the UAI 2026 proceedings are published.
 preferred-citation:
-  type: article
+  type: conference-paper
   title: "High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption"
   year: 2026
-  notes: "arXiv preprint; accepted at the Conference on Uncertainty in Artificial Intelligence (UAI) 2026, proceedings not yet published."
+  collection-title: "Proceedings of the Conference on Uncertainty in Artificial Intelligence (UAI)"
+  notes: "To appear. Proceedings not yet published; the arXiv preprint is the readable version for now."
   url: "https://arxiv.org/abs/2607.26357"
   identifiers:
     - type: other

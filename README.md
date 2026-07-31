@@ -94,15 +94,17 @@ mirrors the underlying numbers to `./output/*.csv`. The real-world grid is the o
 
 ## Citing
 
-If you use this software or its results, please cite the arXiv preprint. This entry will
-be replaced with the UAI proceedings entry once they are published.
+If you use this software or its results, please cite our paper. The proceedings are not
+published yet, so the entry is marked `To appear`; volume and pages will follow.
 
 ```bibtex
-@misc{lee2026highorder,
-  title  = {High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption},
-  author = {Lee, Loong Kuan and Krishnamoorthy, Ragavi and Piatkowski, Nico},
-  year   = {2026},
-  eprint = {2607.26357},
+@inproceedings{lee2026highorder,
+  title     = {High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption},
+  author    = {Lee, Loong Kuan and Krishnamoorthy, Ragavi and Piatkowski, Nico},
+  booktitle = {Proceedings of the Conference on Uncertainty in Artificial Intelligence (UAI)},
+  year      = {2026},
+  note      = {To appear},
+  eprint    = {2607.26357},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG},
 }
