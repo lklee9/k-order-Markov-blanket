@@ -1,12 +1,12 @@
 # High-Order Markov Blanket Discovery
 
-**Paper:** [arXiv:2607.26357](https://arxiv.org/abs/2607.26357) · **Project page:** [lklee.dev/k-order-Markov-blanket](https://lklee.dev/k-order-Markov-blanket)
+**Paper:** [PMLR v337, 3338–3354](https://proceedings.mlr.press/v337/lee26b.html) · [arXiv:2607.26357](https://arxiv.org/abs/2607.26357) · **Project page:** [lklee.dev/k-order-Markov-blanket](https://lklee.dev/k-order-Markov-blanket)
 
 Code accompanying the paper:
 
 > **High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption**
 > Loong Kuan Lee, Ragavi Krishnamoorthy, Nico Piatkowski.
-> *Conference on Uncertainty in Artificial Intelligence (UAI), 2026.*
+> *Proceedings of the 42nd Conference on Uncertainty in Artificial Intelligence (UAI), PMLR 337:3338–3354, 2026.*
 
 Constraint-based Markov-blanket (MB) discovery methods assume *faithfulness* and rely on
 low-order conditional-independence (CI) tests, so they miss MB members that participate only in
@@ -94,16 +94,20 @@ mirrors the underlying numbers to `./output/*.csv`. The real-world grid is the o
 
 ## Citing
 
-If you use this software or its results, please cite our paper. The proceedings are not
-published yet, so the entry is marked `To appear`; volume and pages will follow.
+If you use this software or its results, please cite our paper:
 
 ```bibtex
 @inproceedings{lee2026highorder,
   title     = {High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption},
   author    = {Lee, Loong Kuan and Krishnamoorthy, Ragavi and Piatkowski, Nico},
-  booktitle = {Proceedings of the Conference on Uncertainty in Artificial Intelligence (UAI)},
+  booktitle = {Proceedings of the 42nd Conference on Uncertainty in Artificial Intelligence},
+  editor    = {Perkovi{\'c}, Emilija and Malinsky, Daniel},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {337},
+  pages     = {3338--3354},
+  publisher = {PMLR},
   year      = {2026},
-  note      = {To appear},
+  url       = {https://proceedings.mlr.press/v337/lee26b.html},
   eprint    = {2607.26357},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG},

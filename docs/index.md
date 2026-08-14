@@ -14,8 +14,8 @@ image: /poster.png
 <p class="authors"><strong><a href="mailto:loong.kuan.lee@iais.fraunhofer.de">Loong Kuan Lee</a></strong>, Ragavi Krishnamoorthy, Nico Piatkowski</p>
 <p class="affil">Hybrid Intelligence · Fraunhofer IAIS · Germany</p>
 <p class="logo"><img src="iais.png" alt="Fraunhofer IAIS"></p>
-<nav class="btns" aria-label="Paper and code"><a href="https://arxiv.org/abs/2607.26357">Paper<br>(arXiv)</a><a href="poster.pdf">Poster<br>(PDF)</a><a href="https://github.com/lklee9/k-order-Markov-blanket">Code</a><a class="ghost" href="#citing">Cite</a></nav>
-<p class="plainlinks">As plain text: arXiv:2607.26357 (<a href="https://arxiv.org/pdf/2607.26357">PDF</a>) · <a href="https://github.com/lklee9/k-order-Markov-blanket/blob/main/CITATION.cff">CITATION.cff</a></p>
+<nav class="btns" aria-label="Paper and code"><a href="https://proceedings.mlr.press/v337/lee26b.html">Paper<br>(PMLR)</a><a href="poster.pdf">Poster<br>(PDF)</a><a href="https://github.com/lklee9/k-order-Markov-blanket">Code</a><a class="ghost" href="#citing">Cite</a></nav>
+<p class="plainlinks">As plain text: PMLR v337, pp. 3338–3354 · arXiv:2607.26357 (<a href="https://arxiv.org/pdf/2607.26357">PDF</a>) · <a href="https://github.com/lklee9/k-order-Markov-blanket/blob/main/CITATION.cff">CITATION.cff</a></p>
 
 <!-- <p class="claim">Higher-order faithfulness finds better Markov blankets, even on standard benchmarks.</p> -->
 <!-- <p class="caveat">The four benchmark networks supply real network structure; the samples are drawn from those networks — hence “standard benchmarks”, not real-world data.</p> -->
@@ -23,12 +23,12 @@ image: /poster.png
 ## Abstract
 {: #abstract }
 
-The problem of learning the graphical Markov blanket (MB) of a variable from data has applications in many areas such as structure learning for Bayesian networks and Markov random fields, causal discovery, and feature selection. However, a common assumption most methods make is that the conditional independencies in the distribution imply the same separation in the graphical structure — also known as the **faithfulness assumption**. Unfortunately, this assumption can be violated by higher-order dependencies such as XOR and parity-type relations, and — on finite samples — by empirical violations that, in extreme cases, even induce spurious dependencies absent from the true distribution. Therefore, in this paper we propose a "*k*-order" relaxation of the faithfulness assumption that captures parity-type relationships between *k*+2 variables. We then propose a proof-of-concept algorithm called ***k*-order Markov blanket (kOMB)** that uses this relaxation for MB discovery. Finally, we empirically show how kOMB can recover the MB of a variable under both true and empirical violations of faithfulness.
+The problem of learning the graphical Markov blanket (MB) of a variable from data has applications in many areas such as structure learning for Bayesian networks and Markov random fields, causal discovery, and feature selection. However, a common assumption most methods make is that the conditional independencies in the distribution imply the same separation in the graphical structure — also known as the **faithfulness assumption**. Unfortunately, this assumption can be violated by higher-order dependencies such as XOR and parity-type relations, and — on finite samples — by empirical violations that, in extreme cases, even induce spurious dependencies absent from the true distribution. Therefore, in this paper we propose a "*k*-order" relaxation of the faithfulness assumption that captures parity type relationships between *k*+2 variables. We then propose a proof of concept algorithm called ***k*-order Markov blanket (kOMB)** that uses this relaxation for MB discovery. Finally, we empirically show how kOMB can recover the MB of a variable under both true and empirical violations of faithfulness.
 
 ## Cite this work
 {: #citing }
 
-Lee, L. K., Krishnamoorthy, R., & Piatkowski, N. (2026). High-Order Markov Blanket Discovery via a *k*-Order Relaxation of the Faithfulness Assumption. In *Proceedings of the Conference on Uncertainty in Artificial Intelligence (UAI)*. To appear. arXiv:2607.26357.
+Lee, L. K., Krishnamoorthy, R., & Piatkowski, N. (2026). High-Order Markov Blanket Discovery via a *k*-Order Relaxation of the Faithfulness Assumption. In *Proceedings of the 42nd Conference on Uncertainty in Artificial Intelligence*, volume 337 of *Proceedings of Machine Learning Research*, pages 3338–3354. PMLR. arXiv:2607.26357.
 
 <details><summary>BibTeX</summary><div markdown="1">
 
@@ -38,9 +38,14 @@ Lee, L. K., Krishnamoorthy, R., & Piatkowski, N. (2026). High-Order Markov Blank
 @inproceedings{lee2026highorder,
   title     = {High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption},
   author    = {Lee, Loong Kuan and Krishnamoorthy, Ragavi and Piatkowski, Nico},
-  booktitle = {Proceedings of the Conference on Uncertainty in Artificial Intelligence (UAI)},
+  booktitle = {Proceedings of the 42nd Conference on Uncertainty in Artificial Intelligence},
+  editor    = {Perkovi{\'c}, Emilija and Malinsky, Daniel},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {337},
+  pages     = {3338--3354},
+  publisher = {PMLR},
   year      = {2026},
-  note      = {To appear},
+  url       = {https://proceedings.mlr.press/v337/lee26b.html},
   eprint    = {2607.26357},
   archivePrefix = {arXiv},
   primaryClass  = {cs.LG},

@@ -19,17 +19,25 @@ authors:
     affiliation: "Fraunhofer IAIS"
 repository-code: "https://github.com/lklee9/k-order-Markov-blanket"
 url: "https://lklee.dev/k-order-Markov-blanket"
-# The anticipated proceedings entry: people copy a citation once and rarely come
-# back, so the record they copy should be the one they ought to end up with. The
-# `notes` field carries the to-appear status. Add volume/pages/publisher (PMLR)
-# once the UAI 2026 proceedings are published.
+# Published: UAI 2026 proceedings, PMLR volume 337. Fields below are taken from
+# PMLR's own entry at https://proceedings.mlr.press/v337/lee26b.html
 preferred-citation:
   type: conference-paper
   title: "High-Order Markov Blanket Discovery via a k-Order Relaxation of the Faithfulness Assumption"
   year: 2026
-  collection-title: "Proceedings of the Conference on Uncertainty in Artificial Intelligence (UAI)"
-  notes: "To appear. Proceedings not yet published; the arXiv preprint is the readable version for now."
-  url: "https://arxiv.org/abs/2607.26357"
+  collection-title: "Proceedings of the 42nd Conference on Uncertainty in Artificial Intelligence"
+  collection-type: proceedings
+  volume: 337
+  start: 3338
+  end: 3354
+  publisher:
+    name: PMLR
+  editors:
+    - family-names: "Perković"
+      given-names: Emilija
+    - family-names: Malinsky
+      given-names: Daniel
+  url: "https://proceedings.mlr.press/v337/lee26b.html"
   identifiers:
     - type: other
       value: "arXiv:2607.26357"
