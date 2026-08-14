@@ -108,9 +108,6 @@ If you use this software or its results, please cite our paper:
   publisher = {PMLR},
   year      = {2026},
   url       = {https://proceedings.mlr.press/v337/lee26b.html},
-  eprint    = {2607.26357},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.LG},
 }
 ```
 

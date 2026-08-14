@@ -28,7 +28,7 @@ The problem of learning the graphical Markov blanket (MB) of a variable from dat
 ## Cite this work
 {: #citing }
 
-Lee, L. K., Krishnamoorthy, R., & Piatkowski, N. (2026). High-Order Markov Blanket Discovery via a *k*-Order Relaxation of the Faithfulness Assumption. In *Proceedings of the 42nd Conference on Uncertainty in Artificial Intelligence*, volume 337 of *Proceedings of Machine Learning Research*, pages 3338–3354. PMLR. arXiv:2607.26357.
+Lee, L. K., Krishnamoorthy, R., & Piatkowski, N. (2026). High-Order Markov Blanket Discovery via a *k*-Order Relaxation of the Faithfulness Assumption. In *Proceedings of the 42nd Conference on Uncertainty in Artificial Intelligence*, volume 337 of *Proceedings of Machine Learning Research*, pages 3338–3354. PMLR.
 
 <details><summary>BibTeX</summary><div markdown="1">
 
@@ -46,9 +46,6 @@ Lee, L. K., Krishnamoorthy, R., & Piatkowski, N. (2026). High-Order Markov Blank
   publisher = {PMLR},
   year      = {2026},
   url       = {https://proceedings.mlr.press/v337/lee26b.html},
-  eprint    = {2607.26357},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.LG},
 }
 ```
 

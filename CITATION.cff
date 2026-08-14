@@ -38,10 +38,6 @@ preferred-citation:
     - family-names: Malinsky
       given-names: Daniel
   url: "https://proceedings.mlr.press/v337/lee26b.html"
-  identifiers:
-    - type: other
-      value: "arXiv:2607.26357"
-      description: "arXiv preprint"
   authors:
     - family-names: Lee
       given-names: "Loong Kuan"
